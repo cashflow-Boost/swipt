@@ -6,12 +6,14 @@
  * ce qui rend l'assistant vocal interne (Addendum §5) branchable en V2 sans
  * réécriture : il suffira d'exposer ce registre comme liste d'outils.
  */
+import { getAgentSettings, updateAgentSettings } from "./agent-settings";
 import { blockSlot, moveAppointment } from "./appointments";
 import { getCall, correctExtraction } from "./calls";
 import { getCustomer, getHistory } from "./customers";
 import { createQuote, sendQuote } from "./quotes";
 import { markPaid, sendReminder } from "./invoices";
 
+export { getAgentSettings, updateAgentSettings } from "./agent-settings";
 export { blockSlot, moveAppointment } from "./appointments";
 export { getCall, correctExtraction } from "./calls";
 export { getCustomer, getHistory } from "./customers";
@@ -22,6 +24,8 @@ export type { Action, ActionContext } from "./types";
 
 /** Toutes les actions, pour exposition en tool-calling ou introspection. */
 export const ACTIONS = [
+  getAgentSettings,
+  updateAgentSettings,
   blockSlot,
   moveAppointment,
   getCall,
