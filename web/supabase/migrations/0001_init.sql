@@ -4,25 +4,6 @@
 -- tables, sans exception (SPEC §7).
 
 -- ─────────────────────────────────────────────────────────────
--- Résolution de l'organisation courante.
--- SPEC §7 : « org_id = auth.jwt() -> org_id ». On lit d'abord le claim JWT
--- (à alimenter par un Custom Access Token Hook Supabase), avec repli sur la
--- table users. SECURITY DEFINER pour éviter la récursion RLS sur users.
--- ─────────────────────────────────────────────────────────────
-create or replace function public.current_org_id()
-returns uuid
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select coalesce(
-    nullif(current_setting('request.jwt.claims', true)::jsonb ->> 'org_id', '')::uuid,
-    (select u.org_id from public.users u where u.id = auth.uid())
-  );
-$$;
-
--- ─────────────────────────────────────────────────────────────
 -- Tables
 -- ─────────────────────────────────────────────────────────────
 create table public.organizations (
@@ -173,6 +154,27 @@ create index on public.price_items (org_id);
 create index on public.quotes (org_id, status);
 create index on public.invoices (org_id, status);
 create index on public.reminders (org_id);
+
+-- ─────────────────────────────────────────────────────────────
+-- Résolution de l'organisation courante.
+-- SPEC §7 : « org_id = auth.jwt() -> org_id ». On lit d'abord le claim JWT
+-- (à alimenter par un Custom Access Token Hook Supabase), avec repli sur la
+-- table users. SECURITY DEFINER pour éviter la récursion RLS sur users.
+-- Créée après les tables : son corps SQL référence public.users, validé à la
+-- création.
+-- ─────────────────────────────────────────────────────────────
+create or replace function public.current_org_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    nullif(current_setting('request.jwt.claims', true)::jsonb ->> 'org_id', '')::uuid,
+    (select u.org_id from public.users u where u.id = auth.uid())
+  );
+$$;
 
 -- ─────────────────────────────────────────────────────────────
 -- RLS — SPEC §7 : obligatoire sur toutes les tables, aucune exception.
