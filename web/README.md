@@ -1,7 +1,8 @@
 # SWIPT — application (`web/`)
 
 Standard téléphonique intelligent des artisans du dépannage. Application
-Next.js. La spécification de référence est `../SWIPT_SPEC.md`.
+Next.js. Spécifications de référence : `../SWIPT_SPEC.md` (v1.0) et
+`../SWIPT_SPEC_ADDENDUM_v1.1.md` (fait foi en cas de contradiction).
 
 ## État — Phase 0 (fondations)
 
@@ -20,9 +21,16 @@ Conformément à l'ordre de construction (SPEC §12), cette phase pose :
 - **Schéma multi-tenant + RLS** : `supabase/migrations/0001_init.sql`. RLS
   activée sur **toutes** les tables (SPEC §7), montants en **centimes entiers**
   (SPEC §13, helpers dans `lib/money.ts`).
+- **Couche actions** (`lib/actions/`) — Addendum v1.1 §6, appliqué dès la V1 :
+  chaque action métier est une fonction appelable, typée et validée (Zod),
+  journalisée, et porteuse d'une description exploitable en *tool calling*
+  Claude. Aucune logique métier dans les composants ou les routes ; ils
+  **appellent** ces fonctions. `lib/actions/index.ts` en tient le registre
+  (`ACTIONS`, `actionCatalog`), socle de l'assistant vocal interne (Addendum §5).
 
 Prochaines étapes : Phase 1 — Réglages de l'agent, runtime vocal, puis le
-**Journal des appels** (module critique, SPEC §4.1).
+**Journal des appels** (module critique, SPEC §4.1), chaque module s'appuyant
+sur `lib/actions/`.
 
 ## Démarrer
 
