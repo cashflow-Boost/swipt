@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   SWIPT — design tokens (SPEC §3). Valeurs échantillonnées au
+   pixel dans le logo puis vérifiées au contraste WCAG.
+   NE PAS modifier à l'œil.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Base — mode clair (par défaut) */
+  --w:      #FFFFFF;
+  --w2:     #FAFAF8;
+  --w3:     #F4F3F0;
+
+  --ink:    #111113;  /* texte principal, boutons pleins — 18,9:1 */
+  --soft:   #6A6660;  /* texte secondaire — 5,7:1 */
+  --faint:  #98948C;  /* légendes, méta — usage non essentiel */
+
+  --line:   #E9E7E2;
+  --line2:  #DDDAD3;
+
+  /* Marque */
+  --or:      #F35B0F;  /* orange du logo — APLATS SEULEMENT */
+  --or-t:    #B33A06;  /* orange pour TEXTE sur clair — 5,96:1 */
+  --or-2:    #F76A20;  /* orange pour texte sur fond sombre — 5,95:1 */
+  --or-wash: #FFF4EC;
+  --or-line: #FBDDC9;
+
+  /* Sémantiques */
+  --gr:      #1F7A3D;  --gr-wash: #F0F7F2;  /* succès, payé */
+  --rd:      #B3261E;  --rd-wash: #FDF2F1;  /* retard, perte, alerte */
+
+  /* Mode sombre (écrans secondaires, calculateur) */
+  --bg: #0E0E0F;  --bg2: #151517;  --card: #1A1A1D;
+  --d-line: #26262A;  --d-line2: #33333A;
+  --d-txt: #F2F0EB;   --d-dim: #9A968D;  --d-faint: #6E6A63;
+
+  /* Formes et ombres (SPEC §3.4) */
+  --radius-sm: 7px;
+  --radius:    11px;
+  --radius-lg: 14px;
+  --radius-pill: 100px;
+
+  --sh:  0 1px 2px rgba(17,17,19,.05);
+  --sh2: 0 1px 2px rgba(17,17,19,.04), 0 10px 28px -10px rgba(17,17,19,.12);
+  --sh3: 0 2px 4px rgba(17,17,19,.04), 0 24px 56px -16px rgba(17,17,19,.14);
+}
+
+/* Exposition des tokens aux utilitaires Tailwind (bg-w, text-ink, text-or-t…) */
+@theme inline {
+  --color-w:        var(--w);
+  --color-w2:       var(--w2);
+  --color-w3:       var(--w3);
+  --color-ink:      var(--ink);
+  --color-soft:     var(--soft);
+  --color-faint:    var(--faint);
+  --color-line:     var(--line);
+  --color-line2:    var(--line2);
+  --color-or:       var(--or);
+  --color-or-t:     var(--or-t);
+  --color-or-2:     var(--or-2);
+  --color-or-wash:  var(--or-wash);
+  --color-or-line:  var(--or-line);
+  --color-gr:       var(--gr);
+  --color-gr-wash:  var(--gr-wash);
+  --color-rd:       var(--rd);
+  --color-rd-wash:  var(--rd-wash);
+  --color-bg:       var(--bg);
+  --color-bg2:      var(--bg2);
+  --color-card:     var(--card);
+
+  --radius-sm:      var(--radius-sm);
+  --radius-lg:      var(--radius-lg);
+  --radius-pill:    var(--radius-pill);
+
+  --shadow-sh:      var(--sh);
+  --shadow-sh2:     var(--sh2);
+  --shadow-sh3:     var(--sh3);
+
+  /* Polices injectées par next/font (voir app/layout.tsx) */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--w);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  font-weight: 450;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Focus visible partout (SPEC §3.6) */
+:focus-visible {
+  outline: 2px solid var(--or);
+  outline-offset: 3px;
+}
+
+/* Mouvement (SPEC §3.5) — neutralisation complète en mode réduit */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
