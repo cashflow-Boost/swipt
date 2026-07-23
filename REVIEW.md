@@ -19,9 +19,9 @@ relève de **recommandations** (choix de conception ou données fictives) laiss�
 
 | Sévérité | Nombre | Traitement |
 |---|---|---|
-| Correction appliquée (violation spec claire) | 3 | ✅ corrigé dans ce commit |
-| Recommandation contraste/accessibilité | 2 | 📋 documenté, à arbitrer |
-| Observation (données / robustesse / dépendances) | 4 | 📋 documenté |
+| Correction spec non ambiguë | 4 | ✅ corrigé (§2) |
+| Correction contraste/accessibilité | 2 | ✅ corrigé (§3) |
+| Observation (données / robustesse / dépendances) | 4 | 📋 documenté (§4) |
 
 ---
 
@@ -65,12 +65,14 @@ Le bloc existait mais ne neutralisait pas `scroll-behavior:smooth` ni les `anima
 
 ---
 
-## 3. Recommandations contraste (à arbitrer 📋)
+## 3. Corrections contraste appliquées ✅
 
-Non corrigées volontairement : la spec dit « ne pas modifier les couleurs à l'œil ». Le correctif
-consiste à **choisir un token plus foncé pour le texte porteur de sens**, ce qui est une décision de conception.
+Sans toucher aux valeurs de la palette (« ne pas modifier les couleurs à l'œil »), le texte porteur
+de sens a été basculé du token décoratif vers le token accessible **déjà défini et vérifié par la spec** :
+`--faint → --soft` (clair) et `--dim2 → --dim` (sombre). Les usages purement décoratifs (bordures de
+survol, URL factice de la barre de navigation, compteur d'étape) restent inchangés.
 
-### 3.1 Ton « faint / dim2 » utilisé pour du texte porteur de sens
+### 3.1 Ton « faint / dim2 » utilisé pour du texte porteur de sens — **corrigé**
 Contrastes recalculés (WCAG) :
 
 | Token | Sur fond | Ratio | Seuil §3.6 |
@@ -78,19 +80,19 @@ Contrastes recalculés (WCAG) :
 | `--faint #98948C` | blanc | **3,02:1** | < 4,5 |
 | `--dim2 / d-faint #6E6A63` | `--bg #0E0E0F` | **3,59:1** | < 4,5 |
 
-La spec classe ces tons comme « usage non essentiel » (§3.1). Or ils portent parfois du **sens** :
+La spec classe ces tons comme « usage non essentiel » (§3.1). Or ils portaient parfois du **sens**.
+Éléments repassés en token accessible :
 
-- **Maquette** : `--faint` habille les **libellés de KPI** (`.kpi .k` — « Appels traités aujourd'hui »),
-  les **libellés de fiche** (`.f .k` — « Client », « Adresse ») et les **horaires** (`.li .tm`).
-  Ce sont les étiquettes qui donnent leur sens aux chiffres → devraient être en `--soft` (5,70:1).
-- **Calculateur** : `--dim2` habille les **graduations de curseurs** (`.scale` : 1…12, 100 €…600 €),
-  la **cible de chaque offre** (`.pl .who` : « Artisan seul ») et la **note d'hypothèses** (`.hyp`).
-  → passer ce texte en `--dim #9A968D` (6,54:1) sur fond sombre.
+- **Maquette** (`--faint → --soft`, 5,70:1) : libellés de KPI (`.kpi .k`), libellés de fiche
+  (`.f .k`), horaires de la liste (`.li .tm`), date sous l'en-tête de jour (`.dcol .dh span`),
+  heure des créneaux d'agenda (`.slot b`), texte d'aide des réglages (`.sr .h`).
+- **Calculateur** (`--dim2 → --dim`, 6,54:1) : kickers (`.kick`), graduations de curseurs
+  (`.scale` : 1…12, 100 €…600 €), libellé « net » (`.gain .k`), note d'hypothèses (`.hyp`),
+  cible d'offre (`.pl .who`), mention « /mois HT » (`.pl .pr small`), notes de méthode (`.note`),
+  mentions légales du pied de page.
 
-**Recommandation** : réserver `--faint`/`--dim2` aux séparateurs et méta purement décoratifs ;
-utiliser `--soft` (clair) / `--dim` (sombre) dès qu'un texte est nécessaire à la compréhension.
-C'est aussi ce qui évite que le développement, qui prend la maquette comme référence visuelle (§9),
-n'hérite du problème.
+Ainsi le développement, qui prend la maquette comme référence visuelle (§9), n'héritera plus du
+problème de contraste.
 
 ### 3.2 Rappel positif
 Aucune information n'est portée par la **seule** couleur : les statuts sont toujours doublés d'un
