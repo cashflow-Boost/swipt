@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWIPT — Maquette de l'application, écran par écran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;450;500;600;650&display=swap" rel="stylesheet">
+<style>
+:root{
+  --w:#FFFFFF; --w2:#FAFAF8; --w3:#F4F3F0;
+  --ink:#111113; --soft:#6A6660; --faint:#98948C;
+  --line:#E9E7E2; --line2:#DDDAD3;
+  --or:#F35B0F; --or-t:#B33A06; --or-wash:#FFF4EC; --or-line:#FBDDC9;
+  --gr:#1F7A3D; --gr-wash:#F0F7F2; --rd:#B3261E; --rd-wash:#FDF2F1;
+  --sh:0 1px 2px rgba(17,17,19,.05); --sh2:0 1px 2px rgba(17,17,19,.04),0 10px 28px -10px rgba(17,17,19,.12);
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--w2);color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;line-height:1.55;font-weight:450;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.028em;line-height:1.15;}
+p{margin:0 0 12px;}
+a{color:inherit;text-decoration:none;}
+.mono{font-family:"IBM Plex Mono",monospace;}
+:focus-visible{outline:2px solid var(--or);outline-offset:3px;}
+
+/* en-tête du document */
+.doc{max-width:1180px;margin:0 auto;padding:34px 22px 20px;}
+.doc .kick{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--or-t);font-weight:500;}
+.doc h1{font-size:clamp(26px,3.6vw,38px);margin-top:12px;letter-spacing:-.035em;}
+.doc p{color:var(--soft);max-width:62ch;margin-top:12px;}
+
+/* fil des étapes */
+.steps{max-width:1180px;margin:0 auto;padding:8px 22px 0;display:flex;gap:7px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.steps::-webkit-scrollbar{height:0;}
+.stp{flex:0 0 auto;border:1px solid var(--line2);background:var(--w);border-radius:100px;
+  padding:8px 15px;font-size:13.5px;font-weight:500;color:var(--soft);cursor:pointer;
+  display:flex;align-items:center;gap:8px;white-space:nowrap;font-family:Inter,sans-serif;}
+.stp b{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);}
+.stp:hover{border-color:var(--faint);}
+.stp[aria-selected=true]{background:var(--ink);border-color:var(--ink);color:var(--w);}
+.stp[aria-selected=true] b{color:var(--or);}
+
+/* fenêtre app */
+.frame{max-width:1180px;margin:20px auto 0;padding:0 22px 46px;}
+.win{background:var(--w);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--sh2);overflow:hidden;}
+.tbar{display:flex;align-items:center;gap:8px;padding:12px 16px;
+  border-bottom:1px solid var(--line);background:var(--w2);}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--line2);}
+.tbar .url{margin-left:10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);}
+.tbar .hand{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--rd);
+  border:1px solid var(--line2);border-radius:100px;padding:5px 12px;background:var(--w);}
+
+.body{display:grid;grid-template-columns:1fr;}
+@media(min-width:900px){.body{grid-template-columns:212px 1fr;}}
+.side{border-bottom:1px solid var(--line);background:var(--w2);padding:12px;
+  display:flex;gap:6px;overflow-x:auto;}
+@media(min-width:900px){.side{border-bottom:0;border-right:1px solid var(--line);
+  display:block;overflow:visible;min-height:560px;}}
+.side .lg{display:flex;align-items:center;gap:7px;font-weight:650;font-size:16px;
+  letter-spacing:-.03em;padding:4px 8px 14px;display:none;}
+@media(min-width:900px){.side .lg{display:flex;}}
+.chev{display:flex;gap:2px;}
+.chev i{width:6px;height:12px;background:var(--or);
+  clip-path:polygon(0 0,52% 0,100% 50%,52% 100%,0 100%,48% 50%);}
+.nav{display:flex;gap:6px;}
+@media(min-width:900px){.nav{display:block;}}
+.nv{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 11px;border-radius:8px;font-size:14px;color:var(--soft);font-weight:500;
+  white-space:nowrap;margin-bottom:2px;}
+.nv.on{background:var(--w);color:var(--ink);font-weight:600;box-shadow:var(--sh);}
+@media(min-width:900px){.nv.on{background:var(--or-wash);box-shadow:none;color:var(--or-t);}}
+.nv em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  background:var(--or);color:var(--ink);border-radius:100px;padding:1px 7px;font-weight:600;}
+
+.main{padding:22px;min-height:560px;}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+.mh h2{font-size:20px;}
+.mh p{color:var(--soft);font-size:14px;margin:4px 0 0;max-width:56ch;}
+.btn{font-size:13.5px;font-weight:600;padding:8px 15px;border-radius:100px;
+  background:var(--ink);color:var(--w);border:1px solid var(--ink);white-space:nowrap;}
+.btn.g{background:var(--w);color:var(--ink);border-color:var(--line2);}
+.btn.or{background:var(--or);border-color:var(--or);color:var(--ink);}
+
+/* briques */
+.kpis{display:grid;gap:12px;}
+@media(min-width:680px){.kpis{grid-template-columns:repeat(4,1fr);}}
+.kpi{border:1px solid var(--line);border-radius:11px;padding:16px;background:var(--w);}
+.kpi .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--soft);}
+.kpi .v{font-size:30px;font-weight:650;letter-spacing:-.035em;margin-top:6px;}
+.kpi .v.or{color:var(--or-t);}
+.kpi .d{font-size:12.5px;color:var(--soft);margin-top:2px;}
+
+.lst{border:1px solid var(--line);border-radius:11px;overflow:hidden;}
+.li{display:grid;gap:4px;padding:13px 15px;border-bottom:1px solid var(--line);}
+.li:last-child{border-bottom:0;}
+.li:hover{background:var(--w2);}
+@media(min-width:760px){.li{grid-template-columns:74px 1fr 148px 106px;align-items:center;gap:14px;}}
+.li .tm{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--soft);}
+.li .ti{font-weight:550;font-size:14.5px;}
+.li .sb{font-size:13px;color:var(--soft);}
+.li .rt{font-size:13px;color:var(--soft);}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:100px;
+  border:1px solid var(--line2);color:var(--soft);background:var(--w2);white-space:nowrap;}
+.tag.or{background:var(--or-wash);border-color:var(--or-line);color:var(--or-t);}
+.tag.gr{background:var(--gr-wash);border-color:#CFE6D8;color:var(--gr);}
+.tag.rd{background:var(--rd-wash);border-color:#F2D5D2;color:var(--rd);}
+
+.two{display:grid;gap:16px;}
+@media(min-width:900px){.two{grid-template-columns:1.1fr .9fr;}}
+.panel{border:1px solid var(--line);border-radius:11px;padding:16px;background:var(--w);}
+.panel h3{font-size:14.5px;margin-bottom:10px;}
+.thread{display:flex;flex-direction:column;gap:8px;}
+.bub{max-width:88%;padding:8px 12px;border-radius:12px;font-size:13.8px;line-height:1.45;}
+.bub.them{background:var(--w3);border-bottom-left-radius:4px;align-self:flex-start;}
+.bub.us{background:var(--ink);color:var(--w);border-bottom-right-radius:4px;align-self:flex-end;}
+.f{padding:9px 0;border-bottom:1px solid var(--line);}
+.f:last-of-type{border-bottom:0;}
+.f .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--soft);}
+.f .v{margin-top:2px;font-size:14px;font-weight:500;}
+.f .v.hot{color:var(--or-t);}
+
+/* agenda */
+.week{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(min-width:760px){.week{grid-template-columns:repeat(6,1fr);}}
+.dcol{border:1px solid var(--line);border-radius:10px;overflow:hidden;min-height:210px;}
+.dcol .dh{background:var(--w2);border-bottom:1px solid var(--line);padding:8px;
+  text-align:center;font-size:12px;font-weight:600;}
+.dcol .dh span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  color:var(--soft);font-weight:400;}
+.slot{margin:7px;padding:7px 8px;border-radius:7px;font-size:11.5px;line-height:1.35;}
+.slot.ia{background:var(--or-wash);border:1px solid var(--or-line);}
+.slot.me{background:var(--w3);border:1px solid var(--line2);}
+.slot b{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  color:var(--soft);font-weight:500;}
+.lgd{display:flex;gap:18px;margin-top:14px;font-size:12.5px;color:var(--soft);flex-wrap:wrap;}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:6px;}
+
+/* réglages */
+.set{border:1px solid var(--line);border-radius:11px;overflow:hidden;}
+.sr{display:grid;gap:4px;padding:14px 16px;border-bottom:1px solid var(--line);}
+.sr:last-child{border-bottom:0;}
+@media(min-width:700px){.sr{grid-template-columns:200px 1fr;gap:18px;align-items:baseline;}}
+.sr .k{font-size:13.5px;color:var(--soft);}
+.sr .v{font-size:14.5px;font-weight:500;}
+.sr .h{font-size:12.5px;color:var(--soft);font-weight:400;margin-top:2px;}
+
+/* note pédagogique */
+.why{max-width:1180px;margin:0 auto;padding:0 22px 40px;}
+.whybox{background:var(--w);border:1px solid var(--line);border-left:3px solid var(--or);
+  border-radius:11px;padding:18px 20px;box-shadow:var(--sh);}
+.whybox .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--or-t);font-weight:500;margin-bottom:7px;}
+.whybox p{margin:0;color:var(--soft);max-width:80ch;font-size:14.5px;}
+.whybox p+p{margin-top:9px;}
+.nav-btns{display:flex;justify-content:space-between;gap:12px;margin-top:18px;}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{transition:none !important;animation:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="doc">
+  <div class="kick">Maquette — application SWIPT</div>
+  <h1>Les huit écrans, un par un</h1>
+  <p>Cliquez sur une étape pour voir l'écran correspondant. Les données sont fictives mais réalistes : c'est une journée type d'un plombier-dépanneur seul, un mardi de novembre.</p>
+</div>
+
+<div class="steps" id="steps"></div>
+
+<div class="frame">
+  <div class="win">
+    <div class="tbar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="url" id="url">app.swipt.fr/tableau-de-bord</span>
+      <span class="hand">⏸ Je reprends la main</span>
+    </div>
+    <div class="body">
+      <aside class="side">
+        <div class="lg"><span>SWIPT</span><span class="chev"><i></i><i></i></span></div>
+        <div class="nav" id="nav"></div>
+      </aside>
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+</div>
+
+<div class="why">
+  <div class="whybox">
+    <div class="k" id="wk">Pourquoi cet écran</div>
+    <div id="why"></div>
+    <div class="nav-btns">
+      <button class="btn g" id="prev" type="button">← Écran précédent</button>
+      <button class="btn or" id="next" type="button">Écran suivant →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var S=[
+{id:"tableau-de-bord",nav:"Tableau de bord",t:"Tableau de bord",
+ sub:"Ce qui s'est passé pendant que vous travailliez, et ce qui attend une décision de votre part.",
+ act:"Voir la journée",
+ why:["<p>Quatre chiffres, pas quinze. L'artisan ouvre l'application entre deux interventions : il doit savoir en cinq secondes si quelque chose l'attend.</p><p>Le seul chiffre en orange est celui qui demande une action de sa part. Les trois autres sont du constat.</p>"],
+ html:function(){return ''
+ +'<div class="kpis">'
+ +kpi("Appels traités aujourd\'hui","7","dont 2 hors zone, refusés poliment")
+ +kpi("Rendez-vous posés","3","mercredi et jeudi")
+ +kpi("Devis qui vous attendent","2",'à valider — 1 340 € au total',true)
+ +kpi("Argent qui dort","2 180 €","1 devis sans réponse, 1 facture en retard")
+ +'</div>'
+ +'<h3 style="margin:24px 0 12px;font-size:15px;">Derniers événements</h3>'
+ +'<div class="lst">'
+ +row("20:38","Mme Réaux — fuite sous évier","Rendez-vous mercredi 8 h – 10 h",tag("Devis à valider","or"))
+ +row("18:12","M. Bourdin — chaudière en sécurité","Rendez-vous jeudi 14 h",tag("Traité","gr"))
+ +row("17:04","Relance automatique","Devis n° 2411-08 — 5 jours sans réponse",tag("Envoyée","gr"))
+ +row("15:47","Mme Trinh — porte claquée","Urgence — appel transféré vers vous",tag("Transféré",""))
+ +row("11:20","Numéro masqué","Hors zone d\'intervention (Mantes)",tag("Refusé",""))
+ +'</div>';}},
+
+{id:"appels",nav:"Appels",badge:"7",t:"Journal des appels",
+ sub:"Chaque appel pris par SWIPT, avec sa transcription intégrale. Vous pouvez tout relire et corriger.",
+ act:"Exporter",
+ why:["<p><strong>C'est l'écran le plus important de l'application</strong>, et c'est aussi celui qu'on oublie de construire.</p><p>Les deux premières semaines, l'artisan va tout relire — c'est normal, il vient de confier sa relation client à une machine. S'il peut lire, corriger et constater que ça s'améliore, il reste. S'il ne peut que subir, il coupe le renvoi au quinzième jour.</p>"],
+ html:function(){return ''
+ +'<div class="two">'
+ +'<div class="panel"><h3>Mardi 12 novembre, 20 h 38 — 1 min 42</h3>'
+ +'<div class="thread">'
+ +bub("them","Allô ? J'ai une fuite sous mon évier, ça coule partout.")
+ +bub("us","Bonsoir, Plomberie Vasseur. Ça coule en continu ou au goutte-à-goutte ?")
+ +bub("them","En continu, la bassine déborde.")
+ +bub("us","Coupez le robinet d'arrêt sous le meuble si vous y avez accès. Votre adresse ?")
+ +bub("them","14 rue des Écoles à Poissy, 2ᵉ étage, code 3390.")
+ +bub("us","Noté. M. Vasseur peut passer demain entre 8 h et 10 h — ça vous convient ?")
+ +bub("them","Oui, très bien. Ça coûtera combien ?")
+ +bub("us","Déplacement 45 €, siphon environ 120 €. Le devis arrive par SMS.")
+ +'</div>'
+ +'<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">'
+ +'<span class="btn g">Écouter l\'enregistrement</span><span class="btn g">Corriger la fiche</span></div></div>'
+ +'<div class="panel"><h3>Ce que SWIPT en a retenu</h3>'
+ +fld("Client","Mme Réaux — 06 12 •• •• 47")
+ +fld("Adresse","14 rue des Écoles, Poissy — 2ᵉ ét., code 3390")
+ +fld("Demande","Fuite continue sous évier")
+ +fld("Urgence","Élevée — eau coupée par la cliente",true)
+ +fld("Rendez-vous","Mercredi 8 h – 10 h — confirmé par SMS")
+ +fld("Devis préparé","165 € TTC — en attente de votre validation",true)
+ +'</div></div>'
+ +'<h3 style="margin:24px 0 12px;font-size:15px;">Les six autres appels du jour</h3>'
+ +'<div class="lst">'
+ +row("18:12","M. Bourdin — Villennes","Chaudière en sécurité, code E04",tag("Traité","gr"))
+ +row("15:47","Mme Trinh — Poissy","Porte claquée, enfant à l'intérieur",tag("Transféré","rd"))
+ +row("14:03","M. Ferreira — Chambourcy","Demande de devis salle de bain",tag("Traité","gr"))
+ +row("11:20","Numéro masqué","Hors zone — Mantes-la-Jolie",tag("Refusé",""))
+ +row("09:55","Mme Kadri — Orgeval","Rappel d'un devis en cours",tag("Traité","gr"))
+ +row("08:41","Démarchage commercial","Isolation à 1 €",tag("Écarté",""))
+ +'</div>';}},
+
+{id:"agenda",nav:"Agenda",t:"Agenda",
+ sub:"Vos rendez-vous et ceux posés par SWIPT. Un créneau bloqué par vous est intouchable.",
+ act:"Bloquer un créneau",
+ why:["<p>La distinction visuelle entre ce que SWIPT a posé et ce que l'artisan a posé lui-même est <strong>non négociable</strong>. Sans elle, il perd le contrôle de sa journée et se méfie.</p><p>Le bouton « bloquer un créneau » est sa soupape : déjeuner, rendez-vous médical, fin de journée. SWIPT n'y touche jamais.</p>"],
+ html:function(){
+  var d=[["Mar","12 nov",[["me","08:00","Chantier Ferreira"],["ia","14:00","Mme Kadri — WC"]]],
+         ["Mer","13 nov",[["ia","08:00","Mme Réaux — fuite évier"],["me","12:00","Déjeuner — bloqué"],["ia","15:30","M. Lopes — robinet"]]],
+         ["Jeu","14 nov",[["ia","14:00","M. Bourdin — chaudière"]]],
+         ["Ven","15 nov",[["me","08:00","Chantier Ferreira (suite)"]]],
+         ["Sam","16 nov",[["ia","09:00","Mme Trinh — serrure"]]],
+         ["Lun","18 nov",[]]];
+  var h='<div class="week">';
+  d.forEach(function(c){
+    h+='<div class="dcol"><div class="dh">'+c[0]+'<span>'+c[1]+'</span></div>';
+    c[2].forEach(function(s){ h+='<div class="slot '+s[0]+'"><b>'+s[1]+'</b>'+s[2]+'</div>'; });
+    h+='</div>';
+  });
+  h+='</div><div class="lgd">'
+   +'<span><span class="sw" style="background:var(--or-wash);border:1px solid var(--or-line);"></span>Posé par SWIPT</span>'
+   +'<span><span class="sw" style="background:var(--w3);border:1px solid var(--line2);"></span>Posé par vous — SWIPT n\'y touche pas</span></div>';
+  return h;}},
+
+{id:"devis",nav:"Devis",badge:"2",t:"Devis",
+ sub:"Trois files. La première est la seule qui demande votre attention.",
+ act:"Nouveau devis",
+ why:["<p>C'est ici que se joue la promesse commerciale : <strong>trente secondes au lieu d'une heure</strong>. Le devis est déjà chiffré depuis la bibliothèque de prix, avec la TVA appliquée ligne par ligne.</p><p>L'artisan ajuste éventuellement une ligne au doigt, puis envoie. La file « à valider » doit toujours être la première chose visible.</p>"],
+ html:function(){return ''
+ +'<div class="panel" style="border-color:var(--or-line);background:var(--or-wash);margin-bottom:16px;">'
+ +'<h3 style="color:var(--or-t);">À valider — 2 devis, 1 340 € au total</h3>'
+ +'<div class="lst" style="background:var(--w);">'
+ +row("2411-12","Mme Réaux — fuite sous évier","Déplacement 45 € + siphon 120 € — TVA 10 %","<span class=\'btn or\'>Valider et envoyer</span>")
+ +row("2411-11","M. Ferreira — salle de bain","Rénovation complète — TVA 10 %, 1 175 € HT","<span class=\'btn or\'>Valider et envoyer</span>")
+ +'</div></div>'
+ +'<h3 style="margin:20px 0 10px;font-size:15px;">Envoyés — en attente de signature</h3>'
+ +'<div class="lst">'
+ +row("2411-08","M. Lopes — robinet thermostatique","Envoyé il y a 5 jours — relancé automatiquement",tag("Relancé","or"))
+ +row("2411-07","Mme Kadri — WC suspendu","Envoyé il y a 2 jours",tag("En attente",""))
+ +'</div>'
+ +'<h3 style="margin:20px 0 10px;font-size:15px;">Signés — prêts à facturer</h3>'
+ +'<div class="lst">'
+ +row("2411-05","M. Bourdin — entretien chaudière","Signé le 8 novembre — 189 € TTC",tag("Facturé","gr"))
+ +row("2411-04","Mme Trinh — cylindre de serrure","Signé le 6 novembre — 240 € TTC",tag("Facturé","gr"))
+ +'</div>';}},
+
+{id:"factures",nav:"Factures",t:"Factures",
+ sub:"Elles découlent du devis signé. Format Factur-X, conforme à l'échéance de septembre 2026.",
+ act:"Exporter pour le comptable",
+ why:["<p>Aucune ressaisie : la facture est le devis signé, converti. C'est le maillon que les standards téléphoniques n'ont pas et que les logiciels de devis ne relient pas à l'appel.</p><p>L'export comptable est une fonction discrète mais décisive — c'est ce qui évite à l'artisan de tout réimprimer à la fin du trimestre.</p>"],
+ html:function(){return ''
+ +'<div class="kpis" style="margin-bottom:20px;">'
+ +kpi("Encaissé ce mois","3 420 €","6 factures réglées")
+ +kpi("En attente","890 €","2 factures dans les délais")
+ +kpi("En retard","640 €","1 facture — relancée 2 fois",true)
+ +kpi("Format","Factur-X","via plateforme agréée")
+ +'</div>'
+ +'<div class="lst">'
+ +row("F-2411-06","M. Bourdin — entretien chaudière","Émise le 9 nov — 189 € TTC",tag("Payée","gr"))
+ +row("F-2411-05","Mme Trinh — cylindre","Émise le 7 nov — 240 € TTC",tag("Payée","gr"))
+ +row("F-2411-04","M. Ferreira — acompte chantier","Échéance le 20 nov — 890 € TTC",tag("En attente",""))
+ +row("F-2410-19","Mme Sauvage — débouchage","Échéance dépassée de 12 jours — 640 € TTC",tag("En retard","rd"))
+ +'</div>';}},
+
+{id:"relances",nav:"Relances",t:"Relances automatiques",
+ sub:"Ce qui est parti tout seul, et ce que ça a rapporté. Vous fixez les règles une fois.",
+ act:"Modifier les règles",
+ why:["<p>C'est la fonction que l'artisan n'ose pas faire lui-même. Relancer un client qui n'a pas répondu, réclamer une facture en retard : beaucoup laissent filer par gêne.</p><p>Afficher <strong>ce que les relances ont rapporté</strong> transforme une fonction anodine en argument de renouvellement d'abonnement.</p>"],
+ html:function(){return ''
+ +'<div class="kpis" style="margin-bottom:20px;">'
+ +kpi("Relances envoyées","14","ce mois-ci, sans intervention")
+ +kpi("Ont abouti","6","devis signés ou factures réglées")
+ +kpi("Récupéré","1 890 €","qui seraient restés dormants",true)
+ +kpi("Temps économisé","≈ 2 h","au tarif d'un appel par relance")
+ +'</div>'
+ +'<h3 style="margin:0 0 10px;font-size:15px;">Règles actives</h3>'
+ +'<div class="set" style="margin-bottom:20px;">'
+ +srow("Devis sans réponse","Relance courtoise à J+5, puis J+12","Deux relances maximum, puis le devis est classé sans suite")
+ +srow("Facture à échéance","Rappel le jour de l'échéance, puis à J+7 et J+15","Le ton se durcit progressivement ; vous validez le troisième envoi")
+ +srow("Client sans nouvelle depuis 6 mois","Aucune relance","Désactivé — vous ne voulez pas de démarchage")
+ +'</div>'
+ +'<h3 style="margin:0 0 10px;font-size:15px;">Historique récent</h3>'
+ +'<div class="lst">'
+ +row("Hier","Devis 2411-08 — M. Lopes","1ʳᵉ relance, J+5",tag("Envoyée","gr"))
+ +row("11 nov","Facture F-2410-19 — Mme Sauvage","2ᵉ relance, J+7",tag("Sans réponse","rd"))
+ +row("9 nov","Devis 2411-02 — M. Aubry","1ʳᵉ relance → signé le lendemain",tag("A abouti","gr"))
+ +'</div>';}},
+
+{id:"clients",nav:"Clients",t:"Clients",
+ sub:"L'historique de chaque client. SWIPT s'en sert pendant l'appel : « on est déjà intervenus chez vous en mars ».",
+ act:"Ajouter un client",
+ why:["<p>Un dépanneur revoit ses clients. Sans historique, SWIPT traite un habitué comme un inconnu — et l'effet est désastreux au téléphone.</p><p>C'est aussi ce qui permet de repérer le client qui appelle trois fois pour la même panne : le problème n'a pas été réglé.</p>"],
+ html:function(){return ''
+ +'<div class="two">'
+ +'<div class="panel"><h3>Mme Réaux — Poissy</h3>'
+ +fld("Téléphone","06 12 •• •• 47")
+ +fld("Adresse","14 rue des Écoles — 2ᵉ ét., code 3390")
+ +fld("Première intervention","mars 2025")
+ +fld("Interventions","3 — dont 2 sur la même colonne d\'eau",true)
+ +fld("Chiffre d\'affaires","512 € TTC")
+ +fld("Paiement","Toujours réglé dans les délais")
+ +'</div>'
+ +'<div class="panel"><h3>Historique</h3><div class="lst" style="border:0;">'
+ +row("12 nov","Fuite sous évier","Rendez-vous mercredi",tag("En cours","or"))
+ +row("22 mai","Chasse d\'eau bloquée","192 € TTC",tag("Payée","gr"))
+ +row("14 mars","Fuite colonne cuisine","165 € TTC",tag("Payée","gr"))
+ +'</div>'
+ +'<p style="margin:14px 0 0;font-size:13.5px;color:var(--soft);">Troisième fuite au même endroit. À signaler lors de l\'intervention : le problème vient probablement de la colonne, pas du siphon.</p>'
+ +'</div></div>';}},
+
+{id:"reglages",nav:"Réglages de l'agent",t:"Réglages de l'agent",
+ sub:"Ce qui transforme un service générique en votre standard à vous.",
+ act:"Tester un appel",
+ why:["<p>C'est le module qui fait la différence entre un répondeur et un standard. Tout est renseigné à la mise en service, en quarante-cinq minutes de téléphone.</p><p>Le champ le plus important est le dernier : <strong>ce que SWIPT refuse</strong>. Un artisan qui voit qu'il contrôle les refus accepte beaucoup plus facilement de lui confier ses appels.</p>"],
+ html:function(){return ''
+ +'<div class="set">'
+ +srow("Nom annoncé","« Plomberie Vasseur, bonsoir »","Suivi de la mention d\'accueil automatique")
+ +srow("Métier","Plomberie et chauffage","Détermine le questionnement et le vocabulaire")
+ +srow("Zone d\'intervention","Poissy et 15 km alentour","Au-delà, SWIPT refuse poliment et l\'indique à l\'appelant")
+ +srow("Horaires de rendez-vous","Lundi au vendredi 8 h – 18 h, samedi 9 h – 12 h","SWIPT ne propose rien en dehors")
+ +srow("Déclenchement","Après 4 sonneries sans réponse","Votre téléphone sonne toujours en premier")
+ +srow("Forfait de déplacement","45 € TTC","Annoncé systématiquement pendant l\'appel")
+ +srow("Bibliothèque de prix","218 ouvrages renseignés","Base du chiffrage automatique des devis")
+ +srow("Urgences à transférer","Fuite active · coupure totale · personne bloquée · odeur de gaz","Alerte immédiate au lieu du résumé du soir")
+ +srow("Ce que SWIPT refuse","Démarchage · hors zone · hors métier · négociation de prix","Vous ajoutez vos propres règles quand vous voulez")
+ +'</div>';}}
+];
+
+function kpi(k,v,d,hot){return '<div class="kpi"><div class="k">'+k+'</div><div class="v'+(hot?' or':'')+'">'+v+'</div><div class="d">'+d+'</div></div>';}
+function row(a,b,c,d){return '<div class="li"><div class="tm">'+a+'</div><div><div class="ti">'+b+'</div><div class="sb">'+c+'</div></div><div class="rt"></div><div style="text-align:right;">'+(d||"")+'</div></div>';}
+function tag(t,c){return '<span class="tag'+(c?' '+c:'')+'">'+t+'</span>';}
+function bub(w,t){return '<div class="bub '+w+'">'+t+'</div>';}
+function fld(k,v,hot){return '<div class="f"><div class="k">'+k+'</div><div class="v'+(hot?' hot':'')+'">'+v+'</div></div>';}
+function srow(k,v,h){return '<div class="sr"><div class="k">'+k+'</div><div><div class="v">'+v+'</div><div class="h">'+h+'</div></div></div>';}
+
+var steps=document.getElementById("steps"), nav=document.getElementById("nav"),
+    main=document.getElementById("main"), why=document.getElementById("why"),
+    url=document.getElementById("url"), cur=0;
+
+S.forEach(function(s,i){
+  var b=document.createElement("button");
+  b.className="stp"; b.type="button"; b.setAttribute("aria-selected",i===0?"true":"false");
+  b.innerHTML='<b>'+("0"+(i+1)).slice(-2)+'</b>'+s.nav;
+  b.addEventListener("click",function(){go(i);});
+  steps.appendChild(b);
+
+  var n=document.createElement("div");
+  n.className="nv"+(i===0?" on":"");
+  n.innerHTML='<span>'+s.nav+'</span>'+(s.badge?'<em>'+s.badge+'</em>':'');
+  n.addEventListener("click",function(){go(i);});
+  nav.appendChild(n);
+});
+
+function go(i){
+  cur=i; var s=S[i];
+  var bs=steps.querySelectorAll(".stp"), ns=nav.querySelectorAll(".nv");
+  for(var k=0;k<bs.length;k++){
+    bs[k].setAttribute("aria-selected",k===i?"true":"false");
+    ns[k].classList.toggle("on",k===i);
+  }
+  url.textContent="app.swipt.fr/"+s.id;
+  main.innerHTML='<div class="mh"><div><h2>'+s.t+'</h2><p>'+s.sub+'</p></div>'
+    +'<span class="btn g">'+s.act+'</span></div>'+s.html();
+  why.innerHTML=s.why[0];
+  bs[i].scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
+}
+document.getElementById("prev").addEventListener("click",function(){go((cur-1+S.length)%S.length);});
+document.getElementById("next").addEventListener("click",function(){go((cur+1)%S.length);});
+go(0);
+})();
+</script>
+</body>
+</html>

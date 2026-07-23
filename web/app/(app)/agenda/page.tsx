@@ -1,0 +1,74 @@
+import { getAppointments } from "@/lib/data";
+
+export default async function AgendaPage() {
+  const appts = await getAppointments();
+
+  // Groupe par jour.
+  const byDay = new Map<string, typeof appts>();
+  for (const a of appts) {
+    const key = a.startsAt.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" });
+    if (!byDay.has(key)) byDay.set(key, []);
+    byDay.get(key)!.push(a);
+  }
+
+  return (
+    <div>
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-4 border-b border-line pb-4">
+        <div>
+          <h1 className="text-xl font-[650]">Agenda</h1>
+          <p className="mt-1 max-w-[56ch] text-sm text-soft">
+            Vos rendez-vous et ceux posés par SWIPT. Un créneau bloqué par vous
+            est intouchable par l&apos;agent.
+          </p>
+        </div>
+        <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
+          Bloquer un créneau
+        </button>
+      </div>
+
+      {appts.length === 0 ? (
+        <p className="rounded-[11px] border border-dashed border-line2 bg-w px-4 py-10 text-center text-sm text-soft">
+          Aucun rendez-vous à venir.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {[...byDay.entries()].map(([day, list]) => (
+            <div key={day}>
+              <h2 className="mb-2 text-[13px] font-semibold capitalize text-soft">{day}</h2>
+              <div className="space-y-2">
+                {list.map((a) => (
+                  <div
+                    key={a.id}
+                    className={[
+                      "flex items-center gap-3 rounded-[10px] border p-3",
+                      a.source === "agent" ? "border-or-line bg-or-wash" : "border-line2 bg-w3",
+                    ].join(" ")}
+                  >
+                    <span className="font-mono text-[12.5px] text-soft">
+                      {a.startsAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <span className="flex-1 text-[14px] font-medium">{a.label}</span>
+                    {a.locked && (
+                      <span className="rounded-pill border border-line2 bg-w px-2 py-0.5 text-[11px] font-medium text-soft">
+                        verrouillé
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-4 text-[12.5px] text-soft">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded-[3px] border border-or-line bg-or-wash" /> Posé par SWIPT
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded-[3px] border border-line2 bg-w3" /> Posé par vous — intouchable
+        </span>
+      </div>
+    </div>
+  );
+}

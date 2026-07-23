@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWIPT — Combien vous coûtent les appels que vous ne prenez pas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E0E0F; --bg2:#151517; --card:#1A1A1D; --line:#26262A; --line2:#33333A;
+  --txt:#F2F0EB; --dim:#9A968D; --dim2:#6E6A63;
+  --or:#F35B0F; --or2:#F76A20; --red:#E36A5E; --max:1120px;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px;}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.032em;line-height:1.08;}
+h1{font-size:clamp(34px,5.2vw,56px);}
+h2{font-size:clamp(25px,3.6vw,40px);}
+h3{font-size:17px;letter-spacing:-.018em;}
+em{font-style:italic;color:var(--or);font-weight:500;}
+p{margin:0 0 14px;}
+a{color:inherit;text-decoration:none;}
+.mono{font-family:"IBM Plex Mono",monospace;}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);}
+.dim{color:var(--dim);}
+:focus-visible{outline:2px solid var(--or);outline-offset:3px;}
+.ph{background:rgba(243,91,15,.16);border-bottom:1px dashed var(--or);padding:0 3px;color:var(--or2);}
+
+nav{position:sticky;top:0;z-index:60;background:rgba(14,14,15,.85);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+nav .in{max-width:var(--max);margin:0 auto;padding:13px 24px;display:flex;
+  align-items:center;justify-content:space-between;gap:16px;}
+.logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:19px;letter-spacing:-.03em;}
+.chev{display:flex;gap:2px;}
+.chev i{width:7px;height:14px;background:var(--or);
+  clip-path:polygon(0 0,52% 0,100% 50%,52% 100%,0 100%,48% 50%);}
+.btn{display:inline-block;font-size:14.5px;font-weight:500;padding:10px 18px;
+  border-radius:7px;background:var(--or);color:#141414;border:1px solid var(--or);}
+.btn:hover{background:var(--or2);border-color:var(--or2);}
+.btn.g{background:transparent;color:var(--txt);border-color:var(--line2);}
+.btn.g:hover{background:var(--card);border-color:var(--dim2);}
+.btn.lg{padding:13px 24px;font-size:15.5px;}
+
+.top{padding:56px 0 0;}
+.top h1{max-width:17ch;margin-top:16px;}
+.top .lede{color:var(--dim);font-size:18.5px;max-width:52ch;margin-top:18px;}
+
+/* ── calculateur ── */
+.calc{margin:40px 0 0;border:1px solid var(--line);border-radius:14px;
+  background:var(--bg2);overflow:hidden;}
+.calc .bar{background:var(--card);border-bottom:1px solid var(--line);
+  padding:12px 22px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.calc .body{display:grid;}
+@media(min-width:940px){.calc .body{grid-template-columns:1fr 1fr;}}
+.pane{padding:26px 24px 28px;}
+.pane+.pane{border-top:1px solid var(--line);}
+@media(min-width:940px){.pane+.pane{border-top:0;border-left:1px solid var(--line);}}
+
+/* curseurs */
+.dial{margin-bottom:26px;}
+.dial:last-child{margin-bottom:0;}
+.dial .lg2{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:11px;}
+.dial .q{font-size:15.5px;max-width:34ch;}
+.dial .val{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:500;
+  color:var(--or2);white-space:nowrap;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;
+  background:transparent;cursor:pointer;margin:0;display:block;}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line2);border-radius:2px;}
+input[type=range]::-moz-range-track{height:3px;background:var(--line2);border-radius:2px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;
+  border-radius:50%;background:var(--or);border:3px solid var(--bg2);margin-top:-9px;
+  box-shadow:0 0 0 1px var(--or);}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;
+  background:var(--or);border:3px solid var(--bg2);box-shadow:0 0 0 1px var(--or);}
+.scale{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;color:var(--dim);margin-top:2px;}
+
+/* résultat */
+.res .lab{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--red);font-weight:500;}
+.big{font-family:"IBM Plex Mono",monospace;font-weight:600;
+  font-size:clamp(44px,8.5vw,66px);line-height:1;letter-spacing:-.03em;
+  color:var(--red);margin-top:10px;}
+.steps{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);}
+.st{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  padding:9px 0;font-size:14.5px;color:var(--dim);}
+.st+.st{border-top:1px solid var(--line);}
+.st b{font-family:"IBM Plex Mono",monospace;font-size:15.5px;color:var(--txt);
+  font-weight:500;white-space:nowrap;}
+.st.tot{border-top:1px solid var(--line2);margin-top:4px;padding-top:13px;color:var(--txt);}
+.st.tot b{color:var(--red);font-size:18px;}
+
+/* verdict */
+.verdict{border-top:1px solid var(--line);background:var(--card);padding:22px 24px;}
+.vg{display:grid;gap:18px;}
+@media(min-width:820px){.vg{grid-template-columns:1.25fr .75fr;gap:32px;align-items:center;}}
+.reco{font-size:16.5px;}
+.reco b{color:var(--or2);}
+.gain{text-align:left;}
+@media(min-width:820px){.gain{text-align:right;}}
+.gain .k{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);}
+.gain .v{font-family:"IBM Plex Mono",monospace;font-size:clamp(28px,4.5vw,38px);
+  font-weight:600;color:var(--or2);letter-spacing:-.02em;line-height:1.1;margin-top:4px;}
+.hyp{font-size:12.5px;color:var(--dim);margin:14px 0 0;line-height:1.6;max-width:78ch;}
+
+section{padding:76px 0;border-top:1px solid var(--line);}
+.snum{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.snum b{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--or);
+  border:1px solid rgba(243,91,15,.35);border-radius:5px;padding:2px 7px;}
+.sintro{color:var(--dim);max-width:56ch;margin-top:16px;font-size:17px;}
+
+/* tarifs */
+.plans{display:grid;gap:14px;margin-top:34px;}
+@media(min-width:880px){.plans{grid-template-columns:repeat(3,1fr);}}
+.pl{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:24px 22px;
+  display:flex;flex-direction:column;transition:border-color .3s ease;}
+.pl.on{border-color:var(--or);}
+.pl .badge{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--or);min-height:16px;margin-bottom:6px;}
+.pl .nm{font-size:17px;font-weight:600;}
+.pl .who{color:var(--dim);font-size:14px;margin-top:2px;}
+.pl .pr{font-family:"IBM Plex Mono",monospace;font-size:32px;margin:16px 0 2px;letter-spacing:-.02em;}
+.pl .pr small{font-size:13px;color:var(--dim);letter-spacing:0;}
+.pl ul{list-style:none;margin:16px 0 20px;padding:0;font-size:14.5px;color:var(--dim);flex:1;}
+.pl li{padding-left:18px;position:relative;margin-bottom:8px;}
+.pl li::before{content:"";position:absolute;left:0;top:.58em;width:6px;height:6px;
+  border-radius:1px;background:var(--or);}
+.pl .btn{text-align:center;}
+.note{font-size:12.5px;color:var(--dim);margin-top:18px;max-width:78ch;}
+
+/* comment on compte */
+.method{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;margin-top:34px;}
+@media(min-width:760px){.method{grid-template-columns:repeat(2,1fr);}}
+.mt{background:var(--bg2);padding:22px 20px;}
+.mt h3{margin-bottom:8px;}
+.mt p{color:var(--dim);font-size:14.5px;margin:0;}
+
+.final{text-align:center;padding:88px 0;}
+.final h2{max-width:18ch;margin:0 auto;}
+.final p{color:var(--dim);max-width:44ch;margin:18px auto 0;font-size:17px;}
+.acts{display:flex;gap:11px;flex-wrap:wrap;margin-top:26px;justify-content:center;}
+
+footer{background:var(--bg2);border-top:1px solid var(--line);padding:34px 0 40px;
+  font-size:12.5px;color:var(--dim);line-height:1.8;}
+
+/* annexe interne */
+.internal{border:2px solid var(--red);border-radius:12px;margin:40px 0 0;overflow:hidden;}
+.internal .h{background:var(--red);color:#141414;padding:9px 18px;font-weight:600;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;}
+.internal .c{padding:20px 18px;font-size:14px;color:var(--dim);}
+.internal table{width:100%;border-collapse:collapse;font-family:"IBM Plex Mono",monospace;
+  font-size:12.5px;margin:10px 0;}
+.internal th{text-align:left;color:var(--txt);border-bottom:1px solid var(--line2);padding:6px 5px;}
+.internal td{border-bottom:1px solid var(--line);padding:6px 5px;}
+.internal td.n,.internal th.n{text-align:right;}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}*{transition:none !important;animation:none !important;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="in">
+    <a class="logo" href="#"><span>SWIPT</span><span class="chev"><i></i><i></i></span></a>
+    <a class="btn" href="#tarifs">Essayer 14 jours</a>
+  </div>
+</nav>
+
+<header class="top">
+  <div class="wrap">
+    <div class="kick">Calculateur — appels manqués</div>
+    <h1>Combien vous coûtent les appels que <em>vous ne prenez pas ?</em></h1>
+    <p class="lede">Réglez vos trois chiffres. Le calcul s'affiche en entier, ligne par ligne — vous pouvez contester chaque étape.</p>
+
+    <div class="calc">
+      <div class="bar">
+        <span class="kick">Vos chiffres</span>
+        <span class="kick" id="stamp">Base 22 jours travaillés</span>
+      </div>
+
+      <div class="body">
+        <!-- curseurs -->
+        <div class="pane">
+          <div class="dial">
+            <div class="lg2"><label class="q" for="d1">Appels que vous ne décrochez pas, par jour</label><span class="val" id="v1">3</span></div>
+            <input id="d1" type="range" min="1" max="12" step="1" value="3">
+            <div class="scale"><span>1</span><span>12</span></div>
+          </div>
+          <div class="dial">
+            <div class="lg2"><label class="q" for="d2">Montant moyen d'une intervention</label><span class="val" id="v2">250 €</span></div>
+            <input id="d2" type="range" min="100" max="600" step="10" value="250">
+            <div class="scale"><span>100 €</span><span>600 €</span></div>
+          </div>
+          <div class="dial">
+            <div class="lg2"><label class="q" for="d3">Sur 10 appels manqués, combien seraient devenus un chantier</label><span class="val" id="v3">3</span></div>
+            <input id="d3" type="range" min="1" max="5" step="1" value="3">
+            <div class="scale"><span>1 sur 10</span><span>5 sur 10</span></div>
+          </div>
+        </div>
+
+        <!-- résultat -->
+        <div class="pane res">
+          <div class="lab">Chiffre d'affaires perdu chaque mois</div>
+          <div class="big" id="loss">4 950 €</div>
+          <div class="steps" id="detail"></div>
+        </div>
+      </div>
+
+      <div class="verdict">
+        <div class="vg">
+          <div>
+            <div class="reco" id="reco"></div>
+            <div class="dim" id="payback" style="font-size:14.5px;margin-top:6px;"></div>
+          </div>
+          <div class="gain">
+            <div class="k">Ce que vous récupérez, net</div>
+            <div class="v" id="net">—</div>
+          </div>
+        </div>
+        <p class="hyp" id="hyp"></p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- méthode -->
+<section>
+  <div class="wrap">
+    <div class="snum"><b>01</b><span class="kick">Transparence du calcul</span></div>
+    <h2 style="max-width:20ch;">Comment on arrive à <em>ce chiffre.</em></h2>
+    <p class="sintro">Aucune de ces valeurs n'est mesurée chez vous. Ce sont vos réglages, multipliés entre eux. Si une hypothèse vous paraît fausse, changez-la : c'est le but.</p>
+    <div class="method">
+      <div class="mt"><h3>22 jours travaillés</h3><p>Base d'un mois ouvré standard. Si vous travaillez le samedi, votre perte réelle est plus élevée que celle affichée.</p></div>
+      <div class="mt"><h3>70 % de récupération</h3><p>Aucun standard ne rattrape la totalité des appels manqués. Nous retenons 70 % pour le calcul du net. Les 30 % restants sont des appels hors zone, hors métier, ou des personnes qui ne rappellent pas.</p></div>
+      <div class="mt"><h3>Le taux de transformation est le vôtre</h3><p>C'est le réglage le plus discutable, et c'est pour ça qu'il est entre vos mains. Un devis envoyé n'est pas un chantier signé.</p></div>
+      <div class="mt"><h3>Le coût déduit est réel</h3><p>Le net soustrait le prix de la formule adaptée à votre volume, dépassements compris à 0,79 € l'appel. Pas un prix d'appel choisi pour flatter le résultat.</p></div>
+    </div>
+    <p class="note">Ce calculateur produit une estimation, pas un engagement. Il ne remplace pas un relevé réel de vos appels manqués, que votre opérateur peut vous fournir.</p>
+  </div>
+</section>
+
+<!-- tarifs -->
+<section id="tarifs">
+  <div class="wrap">
+    <div class="snum"><b>02</b><span class="kick">Tarifs</span></div>
+    <h2 style="max-width:20ch;">Une intervention récupérée <em>rembourse le mois.</em></h2>
+    <p class="sintro">Le volume compte les appels réellement traités par SWIPT, c'est-à-dire ceux que vous n'avez pas décrochés. Ceux que vous prenez vous-même ne comptent pas.</p>
+    <div class="plans">
+      <div class="pl" id="p0">
+        <div class="badge" id="b0">&nbsp;</div>
+        <div class="nm">Solo</div><div class="who">Artisan seul</div>
+        <div class="pr">149 €<small> /mois HT</small></div>
+        <ul><li>130 appels traités par mois</li><li>Prise de rendez-vous</li>
+        <li>Devis et factures illimités</li><li>Relance des impayés</li></ul>
+        <a class="btn g" href="#">Essayer 14 jours</a>
+      </div>
+      <div class="pl" id="p1">
+        <div class="badge" id="b1">&nbsp;</div>
+        <div class="nm">Équipe</div><div class="who">2 à 5 personnes</div>
+        <div class="pr">299 €<small> /mois HT</small></div>
+        <ul><li>260 appels traités par mois</li><li>Planning partagé</li>
+        <li>Plusieurs zones d'intervention</li><li>Assistance sous 4 heures</li></ul>
+        <a class="btn g" href="#">Essayer 14 jours</a>
+      </div>
+      <div class="pl" id="p2">
+        <div class="badge" id="b2">&nbsp;</div>
+        <div class="nm">Pro</div><div class="who">6 à 10 personnes</div>
+        <div class="pr">549 €<small> /mois HT</small></div>
+        <ul><li>480 appels traités par mois</li><li>Affectation automatique</li>
+        <li>Rappel des devis sans réponse</li><li>Interlocuteur dédié</li></ul>
+        <a class="btn g" href="#">Essayer 14 jours</a>
+      </div>
+    </div>
+    <p class="note">Au-delà du volume inclus, chaque appel traité est facturé 0,79 € le mois suivant : le service ne se coupe jamais. Facturation annuelle possible, deux mois offerts. Résiliable au mois, sans préavis.</p>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Le calcul vous paraît optimiste ? <em>Vérifiez-le.</em></h2>
+    <p>Quatorze jours d'essai, sans carte bancaire. Vous verrez le nombre réel d'appels que SWIPT traite à votre place, chiffre à l'appui.</p>
+    <div class="acts">
+      <a class="btn lg" href="#">Commencer l'essai</a>
+      <a class="btn g lg" href="tel:+33100000000"><span class="ph">01 00 00 00 00</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ANNEXE INTERNE — SUPPRIMER AVANT MISE EN LIGNE ══ -->
+<div class="wrap">
+<div class="internal">
+  <div class="h">Annexe interne — ne pas publier</div>
+  <div class="c">
+    <p><strong style="color:var(--txt)">Économie de la grille.</strong> Coût estimé : appel de 2 minutes, télécom ≈ 0,02 € + voix temps réel ≈ 0,17 €/min = <strong>0,36 € par appel</strong>. Estimation jamais mesurée : à revalider sur les cinquante premiers appels réels.</p>
+    <table>
+      <tr><th>Offre</th><th class="n">Prix HT</th><th class="n">Inclus</th><th class="n">Coût variable</th><th class="n">Marge brute</th></tr>
+      <tr><td>Solo</td><td class="n">149 €</td><td class="n">130</td><td class="n">47 €</td><td class="n">69 %</td></tr>
+      <tr><td>Équipe</td><td class="n">299 €</td><td class="n">260</td><td class="n">94 €</td><td class="n">69 %</td></tr>
+      <tr><td>Pro</td><td class="n">549 €</td><td class="n">480</td><td class="n">173 €</td><td class="n">69 %</td></tr>
+      <tr><td>Dépassement</td><td class="n">0,79 €</td><td class="n">—</td><td class="n">0,36 €</td><td class="n">54 %</td></tr>
+    </table>
+    <p><strong style="color:var(--txt)">Vérifications faites sur ce calculateur.</strong> Bornes testées de 1/100 €/1-sur-10 à 12/600 €/5-sur-10 : la perte va de 220 € à 79 200 €, l'offre recommandée bascule correctement à 130 et 260 appels mensuels, et le net ne devient jamais négatif. Au réglage plancher le net tombe à 5 € — laissé tel quel volontairement : un calculateur toujours flatteur ne convainc personne, et ce cas dit surtout que l'artisan à 100 € de ticket n'est pas la cible.</p>
+    <p><strong style="color:var(--txt)">À compléter avant publication.</strong> Numéro de téléphone, raison sociale, SIREN, adresse. Et supprimer ce bloc.</p>
+  </div>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="ph">[Raison sociale]</span> — SIREN <span class="ph">[000 000 000]</span> · Siège <span class="ph">[adresse]</span> · Téléphone <span class="ph">[01 00 00 00 00]</span><br>
+    Estimation sans valeur contractuelle. © 2026 SWIPT — France.
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var WORKDAYS=22, RECOVERY=0.70, OVERAGE=0.79;
+  var PLANS=[{n:"Solo",m:149,c:130},{n:"Équipe",m:299,c:260},{n:"Pro",m:549,c:480}];
+  var fmt=new Intl.NumberFormat("fr-FR").format;
+  var fmt1=new Intl.NumberFormat("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:1}).format;
+  var fmt2=new Intl.NumberFormat("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}).format;
+
+  var d1=document.getElementById("d1"),d2=document.getElementById("d2"),d3=document.getElementById("d3");
+  var v1=document.getElementById("v1"),v2=document.getElementById("v2"),v3=document.getElementById("v3");
+  var loss=document.getElementById("loss"),detail=document.getElementById("detail");
+  var reco=document.getElementById("reco"),payback=document.getElementById("payback");
+  var net=document.getElementById("net"),hyp=document.getElementById("hyp");
+
+  function planFor(mc){
+    for(var i=0;i<PLANS.length;i++){ if(mc<=PLANS[i].c) return {p:PLANS[i],i:i}; }
+    return {p:PLANS[2],i:2};
+  }
+
+  function run(){
+    var calls=+d1.value, ticket=+d2.value, rate=+d3.value;
+    v1.textContent=calls;
+    v2.textContent=fmt(ticket)+" €";
+    v3.textContent=rate;
+
+    var mc=calls*WORKDAYS;
+    var jobs=mc*rate/10;
+    var lost=jobs*ticket;
+    loss.textContent=fmt(Math.round(lost))+" €";
+
+    detail.innerHTML=
+      '<div class="st"><span>'+calls+' appel'+(calls>1?'s':'')+' manqué'+(calls>1?'s':'')+' par jour × '+WORKDAYS+' jours</span><b>'+fmt(mc)+' appels</b></div>'+
+      '<div class="st"><span>dont '+rate+' sur 10 seraient devenus un chantier</span><b>'+fmt1(jobs)+' chantiers</b></div>'+
+      '<div class="st"><span>× '+fmt(ticket)+' € par intervention</span><b>'+fmt(Math.round(lost))+' €</b></div>'+
+      '<div class="st tot"><span>Perte estimée sur un mois</span><b>'+fmt(Math.round(lost))+' €</b></div>';
+
+    var sel=planFor(mc), plan=sel.p;
+    var extra=Math.max(0, mc-plan.c);
+    var cost=plan.m+extra*OVERAGE;
+    var gained=lost*RECOVERY;
+    net.textContent=fmt(Math.max(0,Math.round(gained-cost)))+" €";
+
+    reco.innerHTML="Pour environ <b>"+fmt(mc)+" appels manqués par mois</b>, la formule adaptée est <b>"+plan.n+"</b>"
+      +(extra>0 ? ", plus "+fmt(extra)+" appels hors forfait à "+fmt2(OVERAGE)+" €, soit "+fmt(Math.round(cost))+" € par mois."
+                : ", à "+fmt(plan.m)+" € par mois.");
+
+    var need=Math.ceil(cost/ticket);
+    payback.textContent = need<=1
+      ? "Une seule intervention récupérée dans le mois rembourse l'abonnement."
+      : need+" interventions récupérées dans le mois remboursent l'abonnement.";
+
+    hyp.textContent="Estimation fondée sur vos trois réglages, "+WORKDAYS+" jours travaillés et un taux de récupération de "
+      +Math.round(RECOVERY*100)+" % — aucun standard ne rattrape la totalité des appels manqués. "
+      +"Le net déduit le prix de la formule ci-dessus, dépassements compris.";
+
+    for(var k=0;k<3;k++){
+      document.getElementById("p"+k).classList.toggle("on",k===sel.i);
+      document.getElementById("b"+k).innerHTML = k===sel.i ? "Adapté à vos chiffres" : "&nbsp;";
+    }
+  }
+  [d1,d2,d3].forEach(function(el){ el.addEventListener("input",run); });
+  run();
+})();
+</script>
+</body>
+</html>
