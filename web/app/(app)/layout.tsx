@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { LogoutButton } from "@/components/LogoutButton";
-import { getSessionOrg } from "@/lib/auth";
+import { getUserAndOrg } from "@/lib/auth";
 
 /**
  * Coquille de l'application authentifiée (SPEC §4). Redirige vers /login sans
@@ -13,8 +13,9 @@ import { getSessionOrg } from "@/lib/auth";
 export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getSessionOrg();
+  const session = await getUserAndOrg();
   if (!session) redirect("/login");
+  if (!session.orgId) redirect("/onboarding");
 
   return (
     <div className="min-h-screen bg-w2">
