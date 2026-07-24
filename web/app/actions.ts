@@ -6,6 +6,7 @@ import { updateAgentSettings } from "@/lib/actions/agent-settings";
 import { validateQuote } from "@/lib/actions/quotes";
 import { markPaid } from "@/lib/actions/invoices";
 import { blockSlot } from "@/lib/actions/appointments";
+import { correctExtraction } from "@/lib/actions/calls";
 
 // Server Actions : l'interface APPELLE les fonctions de lib/actions/, elle ne
 // contient pas la logique métier (Addendum v1.1 §6).
@@ -47,6 +48,25 @@ export async function saveAgentSettingsAction(formData: FormData) {
     calloutFeeCents: euros !== undefined ? Math.round(euros * 100) : undefined,
   });
   revalidatePath("/reglages");
+}
+
+export async function correctExtractionAction(formData: FormData) {
+  let current: Record<string, unknown> = {};
+  try {
+    current = JSON.parse(String(formData.get("current") || "{}"));
+  } catch {}
+  const request = str(formData, "request");
+  const urgency = str(formData, "urgency");
+  const extraction = {
+    ...current,
+    ...(request ? { request } : {}),
+    ...(urgency ? { urgency } : {}),
+  };
+  await correctExtraction.withContext(await ctx())({
+    callId: String(formData.get("callId")),
+    extraction,
+  });
+  revalidatePath("/appels");
 }
 
 export async function blockSlotAction(formData: FormData) {

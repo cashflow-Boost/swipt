@@ -101,6 +101,26 @@ export async function getReminders() {
   }));
 }
 
+export async function getLatestCallDetail() {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("calls")
+    .select("id, started_at, duration_seconds, status, urgency, transcript, extraction, customers(full_name)")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    id: data.id as string,
+    startedAt: new Date(data.started_at as string),
+    duration: data.duration_seconds as number | null,
+    customer: custName(data.customers),
+    status: data.status as string | null,
+    transcript: (data.transcript as { role: string; text: string }[] | null) ?? [],
+    extraction: (data.extraction as Record<string, unknown> | null) ?? {},
+  };
+}
+
 export async function getCustomers() {
   const supabase = await createClient();
   const { data } = await supabase
