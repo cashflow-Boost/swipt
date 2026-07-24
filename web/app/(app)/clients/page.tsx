@@ -1,4 +1,5 @@
 import { getCustomers } from "@/lib/data";
+import { createCustomerAction } from "@/app/actions";
 
 export default async function ClientsPage() {
   const customers = await getCustomers();
@@ -12,9 +13,17 @@ export default async function ClientsPage() {
             L&apos;historique de chaque client. SWIPT s&apos;en sert pendant l&apos;appel pour reconnaître un habitué.
           </p>
         </div>
-        <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
-          Ajouter un client
-        </button>
+        <details>
+          <summary className="cursor-pointer list-none rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
+            Ajouter un client
+          </summary>
+          <form action={createCustomerAction} className="mt-3 flex flex-wrap items-end gap-2 rounded-[11px] border border-line bg-w p-3">
+            <label className="text-[12px] text-soft">Nom<input name="fullName" required placeholder="Mme Dupont" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
+            <label className="text-[12px] text-soft">Téléphone<input name="phone" placeholder="06 …" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
+            <label className="text-[12px] text-soft">Adresse<input name="address" placeholder="Ville" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
+            <button type="submit" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Ajouter</button>
+          </form>
+        </details>
       </div>
 
       {customers.length === 0 ? (

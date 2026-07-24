@@ -2,6 +2,42 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { defineAction } from "./types";
 
+/** Émet une facture à partir d'un devis signé — aucune ressaisie (SPEC §4.4). */
+export const issueInvoiceFromQuote = defineAction({
+  name: "issueInvoiceFromQuote",
+  description:
+    "Émet une facture à partir d'un devis signé (reprend le montant TTC, échéance à 30 jours).",
+  input: z.object({ quoteId: z.string().uuid() }),
+  handler: async (input, ctx) => {
+    const supabase = await createClient();
+    const { data: q, error } = await supabase
+      .from("quotes")
+      .select("id, number, total_ttc_cents, status")
+      .eq("id", input.quoteId)
+      .eq("org_id", ctx.orgId)
+      .single();
+    if (error) throw new Error(error.message);
+    if (q.status !== "signed") throw new Error("Le devis doit être signé.");
+
+    const due = new Date();
+    due.setDate(due.getDate() + 30);
+    const { data, error: e2 } = await supabase
+      .from("invoices")
+      .insert({
+        org_id: ctx.orgId,
+        quote_id: q.id as string,
+        number: q.number ? `F-${q.number}` : null,
+        status: "issued",
+        due_date: due.toISOString().slice(0, 10),
+        total_ttc_cents: q.total_ttc_cents as number,
+      })
+      .select("id")
+      .single();
+    if (e2) throw new Error(e2.message);
+    return { id: data.id as string };
+  },
+});
+
 /** Marque une facture comme payée (SPEC §4.4). */
 export const markPaid = defineAction({
   name: "markPaid",

@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 import { getSessionOrg } from "@/lib/auth";
 import { updateAgentSettings } from "@/lib/actions/agent-settings";
 import { createQuote, validateQuote } from "@/lib/actions/quotes";
-import { markPaid } from "@/lib/actions/invoices";
+import { markPaid, issueInvoiceFromQuote } from "@/lib/actions/invoices";
 import { blockSlot } from "@/lib/actions/appointments";
 import { correctExtraction } from "@/lib/actions/calls";
+import { createCustomer } from "@/lib/actions/customers";
 
 // Server Actions : l'interface APPELLE les fonctions de lib/actions/, elle ne
 // contient pas la logique métier (Addendum v1.1 §6).
@@ -51,6 +52,12 @@ export async function validateQuoteAction(formData: FormData) {
   revalidatePath("/tableau-de-bord");
 }
 
+export async function issueInvoiceAction(formData: FormData) {
+  await issueInvoiceFromQuote.withContext(await ctx())({ quoteId: String(formData.get("id")) });
+  revalidatePath("/devis");
+  revalidatePath("/factures");
+}
+
 export async function markInvoicePaidAction(formData: FormData) {
   await markPaid.withContext(await ctx())({ invoiceId: String(formData.get("id")) });
   revalidatePath("/factures");
@@ -67,6 +74,17 @@ export async function saveAgentSettingsAction(formData: FormData) {
     calloutFeeCents: euros !== undefined ? Math.round(euros * 100) : undefined,
   });
   revalidatePath("/reglages");
+}
+
+export async function createCustomerAction(formData: FormData) {
+  const fullName = str(formData, "fullName");
+  if (!fullName) throw new Error("Le nom est requis.");
+  await createCustomer.withContext(await ctx())({
+    fullName,
+    phone: str(formData, "phone"),
+    address: str(formData, "address"),
+  });
+  revalidatePath("/clients");
 }
 
 export async function correctExtractionAction(formData: FormData) {
