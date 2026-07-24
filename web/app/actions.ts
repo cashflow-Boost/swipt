@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getSessionOrg } from "@/lib/auth";
 import { updateAgentSettings } from "@/lib/actions/agent-settings";
-import { validateQuote } from "@/lib/actions/quotes";
+import { createQuote, validateQuote } from "@/lib/actions/quotes";
 import { markPaid } from "@/lib/actions/invoices";
 import { blockSlot } from "@/lib/actions/appointments";
 import { correctExtraction } from "@/lib/actions/calls";
@@ -25,6 +26,24 @@ const num = (fd: FormData, k: string) => {
   const v = fd.get(k);
   return v !== null && v !== "" ? Number(v) : undefined;
 };
+
+type LineInput = { label: string; quantity: number; unitPriceCents: number; vatRate: number };
+
+export async function createQuoteAction(formData: FormData) {
+  const c = await ctx();
+  let lines: LineInput[] = [];
+  try {
+    lines = JSON.parse(String(formData.get("lines") || "[]"));
+  } catch {}
+  lines = lines.filter((l) => l.label && l.quantity > 0);
+  if (lines.length === 0) throw new Error("Ajoutez au moins une ligne.");
+  await createQuote.withContext(c)({
+    customerId: str(formData, "customerId"),
+    lines: lines as never,
+  });
+  revalidatePath("/devis");
+  redirect("/devis");
+}
 
 export async function validateQuoteAction(formData: FormData) {
   await validateQuote.withContext(await ctx())({ quoteId: String(formData.get("id")) });
