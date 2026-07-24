@@ -1,4 +1,5 @@
 import { getAppointments } from "@/lib/data";
+import { blockSlotAction } from "@/app/actions";
 
 export default async function AgendaPage() {
   const appts = await getAppointments();
@@ -21,9 +22,18 @@ export default async function AgendaPage() {
             est intouchable par l&apos;agent.
           </p>
         </div>
-        <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
-          Bloquer un créneau
-        </button>
+        <details>
+          <summary className="cursor-pointer list-none rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
+            Bloquer un créneau
+          </summary>
+          <form action={blockSlotAction} className="mt-3 flex flex-wrap items-end gap-2 rounded-[11px] border border-line bg-w p-3">
+            <label className="text-[12px] text-soft">Date<input name="date" type="date" required className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
+            <label className="text-[12px] text-soft">Début<input name="start" type="time" required className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
+            <label className="text-[12px] text-soft">Fin<input name="end" type="time" required className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
+            <label className="text-[12px] text-soft">Motif<input name="notes" placeholder="Déjeuner…" className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
+            <button type="submit" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Bloquer</button>
+          </form>
+        </details>
       </div>
 
       {appts.length === 0 ? (
