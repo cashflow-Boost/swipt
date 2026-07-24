@@ -1,6 +1,7 @@
 import { StatusTag } from "@/components/StatusTag";
 import { getQuotes } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
+import Link from "next/link";
 import { validateQuoteAction } from "@/app/actions";
 
 export default async function DevisPage() {
@@ -17,9 +18,9 @@ export default async function DevisPage() {
           <h1 className="text-xl font-[650]">Devis</h1>
           <p className="mt-1 text-sm text-soft">Trois files. La première est la seule qui demande votre attention.</p>
         </div>
-        <button type="button" className="rounded-pill border border-ink bg-ink px-3.5 py-2 text-[13.5px] font-semibold text-w">
+        <Link href="/devis/nouveau" className="rounded-pill border border-ink bg-ink px-3.5 py-2 text-[13.5px] font-semibold text-w">
           Nouveau devis
-        </button>
+        </Link>
       </div>
 
       <div className="mb-4 rounded-[11px] border border-or-line bg-or-wash p-4">
