@@ -1,65 +1,69 @@
-const MODULES = [
-  { path: "/tableau-de-bord", label: "Tableau de bord" },
-  { path: "/appels", label: "Journal des appels", star: true },
-  { path: "/agenda", label: "Agenda" },
-  { path: "/devis", label: "Devis" },
-  { path: "/factures", label: "Factures" },
-  { path: "/relances", label: "Relances" },
-  { path: "/clients", label: "Clients" },
-  { path: "/reglages", label: "Réglages de l'agent" },
-];
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <div className="mb-3 flex items-center gap-2 text-[19px] font-bold tracking-tight">
-        <span>SWIPT</span>
-        <span className="flex gap-0.5">
-          <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-          <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-        </span>
-      </div>
+    <main className="min-h-screen bg-w2">
+      <header className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-2 text-[20px] font-bold tracking-tight">
+          <span>SWIPT</span>
+          <span className="flex gap-0.5">
+            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
+            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
+          </span>
+        </div>
+        <Link href="/login" className="text-[14px] font-semibold text-soft hover:text-ink">
+          Se connecter
+        </Link>
+      </header>
 
-      <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">
-        Phase 0 — fondations
-      </p>
-      <h1 className="mt-3 max-w-[20ch] text-4xl font-[650] leading-[1.06] tracking-[-0.035em]">
-        Le socle est en place.
-      </h1>
-      <p className="mt-4 max-w-[54ch] text-soft">
-        Next.js, tokens de conception, abstractions téléphonie/voix et schéma
-        multi-tenant avec RLS. Les huit écrans se construisent ensuite, dans
-        l&apos;ordre de la spécification.
-      </p>
+      <section className="mx-auto max-w-3xl px-6 pt-16 text-center sm:pt-24">
+        <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">
+          Le standard téléphonique des artisans du dépannage
+        </p>
+        <h1 className="mx-auto mt-4 max-w-[22ch] text-4xl font-[650] leading-[1.05] tracking-[-0.04em] sm:text-5xl">
+          Vous êtes sur le chantier. Vos clients ne restent jamais sans réponse.
+        </h1>
+        <p className="mx-auto mt-5 max-w-[52ch] text-[17px] text-soft">
+          SWIPT, c&apos;est le poste que vous n&apos;avez jamais pu embaucher :
+          il décroche quand vous ne pouvez pas, fixe le rendez-vous, prépare le
+          devis et relance les impayés.
+        </p>
 
-      <ul className="mt-10 divide-y divide-line rounded-[11px] border border-line">
-        {MODULES.map((m) => (
-          <li
-            key={m.path}
-            className="flex items-center justify-between gap-4 px-4 py-3"
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/signup"
+            className="rounded-pill bg-or px-6 py-3 text-[15.5px] font-semibold text-ink"
           >
-            <span className="flex items-center gap-2 font-medium">
-              {m.label}
-              {m.star && (
-                <span className="rounded-pill bg-or-wash px-2 py-0.5 text-[11px] font-semibold text-or-t">
-                  critique
-                </span>
-              )}
-            </span>
-            <code className="font-mono text-[12.5px] text-faint">{m.path}</code>
-          </li>
-        ))}
-      </ul>
+            Commencer l&apos;essai
+          </Link>
+          <Link
+            href="/login"
+            className="rounded-pill border border-line2 bg-w px-6 py-3 text-[15.5px] font-semibold"
+          >
+            Se connecter
+          </Link>
+        </div>
+        <p className="mt-4 text-[13.5px] text-faint">
+          14 jours d&apos;essai · sans carte bancaire · résiliable à tout moment
+        </p>
+      </section>
 
-      <p className="mt-8 text-[13px] text-soft">
-        Configurer <code className="font-mono text-faint">.env.local</code>{" "}
-        (voir <code className="font-mono text-faint">.env.example</code>) puis
-        appliquer la migration{" "}
-        <code className="font-mono text-faint">
-          supabase/migrations/0001_init.sql
-        </code>
-        .
-      </p>
+      <section className="mx-auto mt-20 grid max-w-4xl gap-4 px-6 pb-24 sm:grid-cols-3">
+        {[
+          { t: "Il répond", d: "En moins de deux secondes, la nuit et le week-end. Nom de votre entreprise annoncé, urgence identifiée." },
+          { t: "Il organise", d: "Rendez-vous posé dans votre agenda selon votre zone et vos horaires. Client confirmé par SMS." },
+          { t: "Il facture", d: "Devis chiffré depuis vos prix, facture au format Factur-X, relance des impayés." },
+        ].map((c) => (
+          <div key={c.t} className="rounded-[12px] border border-line bg-w p-5 text-left">
+            <h2 className="text-[16px] font-[650]">{c.t}</h2>
+            <p className="mt-1.5 text-[14px] text-soft">{c.d}</p>
+          </div>
+        ))}
+      </section>
+
+      <footer className="border-t border-line px-6 py-8 text-center text-[12.5px] text-faint">
+        © 2026 SWIPT — France
+      </footer>
     </main>
   );
 }
