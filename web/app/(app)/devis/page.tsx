@@ -1,6 +1,7 @@
 import { StatusTag } from "@/components/StatusTag";
 import { getQuotes } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
+import { validateQuoteAction } from "@/app/actions";
 
 export default async function DevisPage() {
   const quotes = await getQuotes();
@@ -36,11 +37,12 @@ export default async function DevisPage() {
                   <div className="text-[14.5px] font-[550]">{q.customer}</div>
                   <div className="text-[13px] text-soft">{formatEuros(q.totalTtcCents)} TTC</div>
                 </div>
-                <div className="sm:justify-self-end">
-                  <button type="button" className="rounded-pill border border-or bg-or px-3.5 py-2 text-[13px] font-semibold text-ink">
+                <form action={validateQuoteAction} className="sm:justify-self-end">
+                  <input type="hidden" name="id" value={q.id} />
+                  <button type="submit" className="rounded-pill border border-or bg-or px-3.5 py-2 text-[13px] font-semibold text-ink">
                     Valider et envoyer
                   </button>
-                </div>
+                </form>
               </div>
             ))}
           </div>

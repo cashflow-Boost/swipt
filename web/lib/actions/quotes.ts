@@ -89,3 +89,25 @@ export const sendQuote = defineAction({
     return { ok: true as const };
   },
 });
+
+/** Valide un devis « à valider » et le passe en « envoyé » (SPEC §4.3). */
+export const validateQuote = defineAction({
+  name: "validateQuote",
+  description:
+    "Valide un devis en attente et le bascule en « envoyé » (prêt pour signature).",
+  input: z.object({ quoteId: z.string().uuid() }),
+  handler: async (input, ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("quotes")
+      .update({ status: "sent", sent_at: new Date().toISOString() })
+      .eq("id", input.quoteId)
+      .eq("org_id", ctx.orgId)
+      .eq("status", "to_validate")
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error("Devis introuvable ou déjà traité.");
+    return { id: data.id as string };
+  },
+});

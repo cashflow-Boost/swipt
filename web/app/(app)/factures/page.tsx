@@ -1,6 +1,7 @@
 import { StatusTag, type TagVariant } from "@/components/StatusTag";
 import { getInvoices } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
+import { markInvoicePaidAction } from "@/app/actions";
 
 const LABEL: Record<string, string> = { issued: "Émise", paid: "Payée", overdue: "En retard" };
 const VARIANT: Record<string, TagVariant> = { issued: "neutral", paid: "gr", overdue: "rd" };
@@ -55,7 +56,17 @@ export default async function FacturesPage() {
                   {i.status === "paid" ? "Réglée" : i.dueDate ? `Échéance ${new Date(i.dueDate).toLocaleDateString("fr-FR")}` : "—"}
                 </div>
               </div>
-              <div className="sm:justify-self-end"><StatusTag variant={VARIANT[i.status]}>{LABEL[i.status] ?? i.status}</StatusTag></div>
+              <div className="flex items-center gap-2 sm:justify-self-end">
+                <StatusTag variant={VARIANT[i.status]}>{LABEL[i.status] ?? i.status}</StatusTag>
+                {i.status !== "paid" && (
+                  <form action={markInvoicePaidAction}>
+                    <input type="hidden" name="id" value={i.id} />
+                    <button type="submit" className="rounded-pill border border-line2 bg-w px-3 py-1.5 text-[12.5px] font-semibold hover:border-faint">
+                      Marquer payée
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           ))}
         </div>

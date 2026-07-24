@@ -10,14 +10,14 @@ import { getAgentSettings, updateAgentSettings } from "./agent-settings";
 import { blockSlot, moveAppointment } from "./appointments";
 import { getCall, correctExtraction } from "./calls";
 import { getCustomer, getHistory } from "./customers";
-import { createQuote, sendQuote } from "./quotes";
+import { createQuote, sendQuote, validateQuote } from "./quotes";
 import { markPaid, sendReminder } from "./invoices";
 
 export { getAgentSettings, updateAgentSettings } from "./agent-settings";
 export { blockSlot, moveAppointment } from "./appointments";
 export { getCall, correctExtraction } from "./calls";
 export { getCustomer, getHistory } from "./customers";
-export { createQuote, sendQuote } from "./quotes";
+export { createQuote, sendQuote, validateQuote } from "./quotes";
 export { markPaid, sendReminder } from "./invoices";
 export { defineAction } from "./types";
 export type { Action, ActionContext } from "./types";
@@ -34,6 +34,7 @@ export const ACTIONS = [
   getHistory,
   createQuote,
   sendQuote,
+  validateQuote,
   markPaid,
   sendReminder,
 ] as const;
