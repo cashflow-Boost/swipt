@@ -9,16 +9,16 @@
 import { getAgentSettings, updateAgentSettings } from "./agent-settings";
 import { blockSlot, moveAppointment } from "./appointments";
 import { getCall, correctExtraction } from "./calls";
-import { getCustomer, getHistory } from "./customers";
+import { getCustomer, getHistory, createCustomer } from "./customers";
 import { createQuote, sendQuote, validateQuote } from "./quotes";
-import { markPaid, sendReminder } from "./invoices";
+import { markPaid, sendReminder, issueInvoiceFromQuote } from "./invoices";
 
 export { getAgentSettings, updateAgentSettings } from "./agent-settings";
 export { blockSlot, moveAppointment } from "./appointments";
 export { getCall, correctExtraction } from "./calls";
-export { getCustomer, getHistory } from "./customers";
+export { getCustomer, getHistory, createCustomer } from "./customers";
 export { createQuote, sendQuote, validateQuote } from "./quotes";
-export { markPaid, sendReminder } from "./invoices";
+export { markPaid, sendReminder, issueInvoiceFromQuote } from "./invoices";
 export { defineAction } from "./types";
 export type { Action, ActionContext } from "./types";
 
@@ -32,11 +32,13 @@ export const ACTIONS = [
   correctExtraction,
   getCustomer,
   getHistory,
+  createCustomer,
   createQuote,
   sendQuote,
   validateQuote,
   markPaid,
   sendReminder,
+  issueInvoiceFromQuote,
 ] as const;
 
 /** Métadonnées des actions (nom + description) — base d'une liste d'outils Claude. */

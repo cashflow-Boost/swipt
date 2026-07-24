@@ -27,9 +27,9 @@ export default async function AppelsPage() {
             Vous pouvez tout relire et corriger.
           </p>
         </div>
-        <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
+        <a href="/appels/export" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
           Exporter CSV
-        </button>
+        </a>
       </div>
 
       {detail ? (

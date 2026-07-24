@@ -2,7 +2,7 @@ import { StatusTag } from "@/components/StatusTag";
 import { getQuotes } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
 import Link from "next/link";
-import { validateQuoteAction } from "@/app/actions";
+import { validateQuoteAction, issueInvoiceAction } from "@/app/actions";
 
 export default async function DevisPage() {
   const quotes = await getQuotes();
@@ -51,7 +51,7 @@ export default async function DevisPage() {
       </div>
 
       <QuoteList title="Envoyés — en attente de signature" items={sent} tag="En attente" variant="neutral" />
-      <QuoteList title="Signés — prêts à facturer" items={signed} tag="Signé" variant="gr" />
+      <QuoteList title="Signés — prêts à facturer" items={signed} tag="Signé" variant="gr" invoiceButton />
 
       <p className="mt-6 text-[13px] text-soft">
         Données lues en direct depuis Supabase (RLS). Chiffrage via{" "}
@@ -66,11 +66,13 @@ function QuoteList({
   items,
   tag,
   variant,
+  invoiceButton,
 }: {
   title: string;
   items: { id: string; number: string | null; customer: string; totalTtcCents: number }[];
   tag: string;
   variant: "neutral" | "gr";
+  invoiceButton?: boolean;
 }) {
   return (
     <>
@@ -86,7 +88,17 @@ function QuoteList({
                 <div className="text-[14.5px] font-[550]">{q.customer}</div>
                 <div className="text-[13px] text-soft">{formatEuros(q.totalTtcCents)} TTC</div>
               </div>
-              <div className="sm:justify-self-end"><StatusTag variant={variant}>{tag}</StatusTag></div>
+              <div className="flex items-center gap-2 sm:justify-self-end">
+                <StatusTag variant={variant}>{tag}</StatusTag>
+                {invoiceButton && (
+                  <form action={issueInvoiceAction}>
+                    <input type="hidden" name="id" value={q.id} />
+                    <button type="submit" className="rounded-pill border border-line2 bg-w px-3 py-1.5 text-[12.5px] font-semibold hover:border-faint">
+                      Créer la facture
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
           ))}
         </div>
