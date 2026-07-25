@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createQuoteAction } from "@/app/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type Line = { label: string; quantity: number; unitPriceEuros: number; vatRate: number };
 const VAT = [20, 10, 5.5] as const;
@@ -96,9 +97,9 @@ export function QuoteForm({ customers }: { customers: { id: string; name: string
         </div>
       </div>
 
-      <button type="submit" className="rounded-pill bg-or px-5 py-2.5 text-[14.5px] font-semibold text-ink">
+      <SubmitButton pendingText="Création…" className="rounded-pill bg-or px-5 py-2.5 text-[14.5px] font-semibold text-ink">
         Créer le devis
-      </button>
+      </SubmitButton>
     </form>
   );
 }

@@ -50,7 +50,7 @@ export default function SignupPage() {
 
         <form onSubmit={onSubmit} className="rounded-[14px] border border-line bg-w p-6 shadow-sh2">
           <h1 className="text-lg font-[650]">Créer un compte</h1>
-          <p className="mb-5 mt-1 text-[13.5px] text-soft">14 jours d&apos;essai, sans carte bancaire.</p>
+          <p className="mb-5 mt-1 text-[13.5px] text-soft">7 jours d&apos;essai, sans carte bancaire.</p>
 
           <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="email">Adresse e-mail</label>
           <input id="email" type="email" autoComplete="email" required value={email}

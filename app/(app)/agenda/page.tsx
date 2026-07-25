@@ -1,16 +1,10 @@
 import { getAppointments } from "@/lib/data";
 import { blockSlotAction } from "@/app/actions";
+import { WeekCalendar } from "@/components/WeekCalendar";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function AgendaPage() {
   const appts = await getAppointments();
-
-  // Groupe par jour.
-  const byDay = new Map<string, typeof appts>();
-  for (const a of appts) {
-    const key = a.startsAt.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" });
-    if (!byDay.has(key)) byDay.set(key, []);
-    byDay.get(key)!.push(a);
-  }
 
   return (
     <div>
@@ -31,44 +25,17 @@ export default async function AgendaPage() {
             <label className="text-[12px] text-soft">Début<input name="start" type="time" required className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
             <label className="text-[12px] text-soft">Fin<input name="end" type="time" required className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
             <label className="text-[12px] text-soft">Motif<input name="notes" placeholder="Déjeuner…" className="mt-1 block rounded-sm border border-line2 px-2 py-1.5 text-[13px]" /></label>
-            <button type="submit" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Bloquer</button>
+            <SubmitButton pendingText="…" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Bloquer</SubmitButton>
           </form>
         </details>
       </div>
 
       {appts.length === 0 ? (
         <p className="rounded-[11px] border border-dashed border-line2 bg-w px-4 py-10 text-center text-sm text-soft">
-          Aucun rendez-vous à venir.
+          Aucun rendez-vous cette semaine. Utilisez « Bloquer un créneau » pour réserver du temps.
         </p>
       ) : (
-        <div className="space-y-4">
-          {[...byDay.entries()].map(([day, list]) => (
-            <div key={day}>
-              <h2 className="mb-2 text-[13px] font-semibold capitalize text-soft">{day}</h2>
-              <div className="space-y-2">
-                {list.map((a) => (
-                  <div
-                    key={a.id}
-                    className={[
-                      "flex items-center gap-3 rounded-[10px] border p-3",
-                      a.source === "agent" ? "border-or-line bg-or-wash" : "border-line2 bg-w3",
-                    ].join(" ")}
-                  >
-                    <span className="font-mono text-[12.5px] text-soft">
-                      {a.startsAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    <span className="flex-1 text-[14px] font-medium">{a.label}</span>
-                    {a.locked && (
-                      <span className="rounded-pill border border-line2 bg-w px-2 py-0.5 text-[11px] font-medium text-soft">
-                        verrouillé
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <WeekCalendar appointments={appts} />
       )}
 
       <div className="mt-4 flex flex-wrap gap-4 text-[12.5px] text-soft">
@@ -76,7 +43,10 @@ export default async function AgendaPage() {
           <span className="inline-block h-3 w-3 rounded-[3px] border border-or-line bg-or-wash" /> Posé par SWIPT
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-[3px] border border-line2 bg-w3" /> Posé par vous — intouchable
+          <span className="inline-block h-3 w-3 rounded-[3px] border border-line2 bg-w3" /> Posé par vous
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded-[3px] bg-ink" /> Créneau bloqué (occupé)
         </span>
       </div>
     </div>

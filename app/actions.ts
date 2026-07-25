@@ -63,15 +63,24 @@ export async function markInvoicePaidAction(formData: FormData) {
   revalidatePath("/factures");
 }
 
+function parseList(fd: FormData, k: string): string[] | undefined {
+  const v = str(fd, k);
+  if (!v) return undefined;
+  return v.split(/[·,;]/).map((x) => x.trim()).filter(Boolean);
+}
+
 export async function saveAgentSettingsAction(formData: FormData) {
   const euros = num(formData, "calloutFeeEuros");
+  const ring = num(formData, "ringCount");
   await updateAgentSettings.withContext(await ctx())({
     announcedName: str(formData, "announcedName"),
     trade: str(formData, "trade"),
     zoneCenter: str(formData, "zoneCenter"),
     zoneRadiusKm: num(formData, "zoneRadiusKm"),
-    ringCount: num(formData, "ringCount"),
+    ringCount: ring !== undefined ? Math.min(9, Math.max(1, Math.round(ring))) : undefined,
     calloutFeeCents: euros !== undefined ? Math.round(euros * 100) : undefined,
+    urgentTriggers: parseList(formData, "urgentTriggers"),
+    refusalRules: parseList(formData, "refusalRules"),
   });
   revalidatePath("/reglages");
 }

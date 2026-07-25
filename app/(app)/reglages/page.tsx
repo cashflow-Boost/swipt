@@ -2,6 +2,7 @@ import { getSessionOrg } from "@/lib/auth";
 import { getAgentSettings } from "@/lib/actions/agent-settings";
 import { createClient } from "@/lib/supabase/server";
 import { saveAgentSettingsAction } from "@/app/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type Settings = {
   announced_name: string | null;
@@ -45,25 +46,34 @@ export default async function ReglagesPage() {
         <Field label="Métier" name="trade" defaultValue={s?.trade ?? ""} placeholder="Plomberie et chauffage" />
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Zone (ville)" name="zoneCenter" defaultValue={s?.zone_center ?? ""} placeholder="Poissy" />
-          <Field label="Rayon (km)" name="zoneRadiusKm" type="number" defaultValue={s?.zone_radius_km ?? ""} />
+          <Field label="Rayon (km)" name="zoneRadiusKm" type="number" min={0} max={200} defaultValue={s?.zone_radius_km ?? ""} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Déclenchement (sonneries)" name="ringCount" type="number" defaultValue={s?.ring_count ?? 4} />
-          <Field label="Forfait déplacement (€ TTC)" name="calloutFeeEuros" type="number" step="0.01" defaultValue={s?.callout_fee_cents != null ? (s.callout_fee_cents / 100).toString() : ""} />
+          <Field label="Déclenchement (sonneries)" name="ringCount" type="number" min={1} max={9} defaultValue={s?.ring_count ?? 4} hint="Entre 1 et 9 sonneries." />
+          <Field label="Forfait déplacement (€ TTC)" name="calloutFeeEuros" type="number" step="0.01" min={0} defaultValue={s?.callout_fee_cents != null ? (s.callout_fee_cents / 100).toString() : ""} />
         </div>
+        <Field
+          label="Urgences à transférer"
+          name="urgentTriggers"
+          defaultValue={s?.urgent_triggers?.join(" · ") ?? ""}
+          placeholder="Fuite active · coupure totale · personne bloquée · odeur de gaz"
+          hint="Séparez les cas par « · » ou une virgule."
+        />
+        <Field
+          label="Ce que SWIPT refuse"
+          name="refusalRules"
+          defaultValue={s?.refusal_rules?.join(" · ") ?? ""}
+          placeholder="Démarchage · hors zone · hors métier · négociation de prix"
+          hint="Séparez les règles par « · » ou une virgule."
+        />
 
         <div className="flex items-center gap-3 pt-1">
-          <button type="submit" className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-ink">
+          <SubmitButton pendingText="Enregistrement…" className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-ink">
             Enregistrer
-          </button>
+          </SubmitButton>
           <span className="text-[12.5px] text-soft">Bibliothèque de prix : {priceItemsCount} ouvrage{priceItemsCount > 1 ? "s" : ""}</span>
         </div>
       </form>
-
-      <div className="mt-6 max-w-2xl rounded-[11px] border border-line bg-w p-4 text-[13px] text-soft">
-        <p><b className="text-ink">Urgences à transférer :</b> {s?.urgent_triggers?.join(" · ") || "—"}</p>
-        <p className="mt-1"><b className="text-ink">Ce que SWIPT refuse :</b> {s?.refusal_rules?.join(" · ") || "—"}</p>
-      </div>
     </div>
   );
 }
@@ -74,14 +84,20 @@ function Field({
   defaultValue,
   type = "text",
   step,
+  min,
+  max,
   placeholder,
+  hint,
 }: {
   label: string;
   name: string;
   defaultValue: string | number;
   type?: string;
   step?: string;
+  min?: number;
+  max?: number;
   placeholder?: string;
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -90,10 +106,13 @@ function Field({
         name={name}
         type={type}
         step={step}
+        min={min}
+        max={max}
         defaultValue={defaultValue}
         placeholder={placeholder}
         className="w-full rounded-sm border border-line2 bg-w px-3 py-2 text-[14.5px] outline-none focus-visible:border-or"
       />
+      {hint && <span className="mt-1 block text-[12px] text-faint">{hint}</span>}
     </label>
   );
 }

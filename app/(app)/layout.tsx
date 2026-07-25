@@ -33,9 +33,15 @@ export default async function AppLayout({
               {session.orgName}
             </span>
           )}
+          <Link
+            href="/abonnement"
+            className="rounded-pill bg-or px-3.5 py-1.5 text-[12.5px] font-semibold text-ink"
+          >
+            S&apos;abonner
+          </Link>
           <button
             type="button"
-            className="rounded-pill border border-line2 bg-w px-3.5 py-1.5 text-[12.5px] font-semibold text-rd"
+            className="hidden rounded-pill border border-line2 bg-w px-3.5 py-1.5 text-[12.5px] font-semibold text-rd sm:inline"
           >
             ⏸ Je reprends la main
           </button>
@@ -43,7 +49,7 @@ export default async function AppLayout({
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-6xl gap-6 px-5 py-6">
+      <div className="mx-auto flex max-w-[1400px] gap-6 px-5 py-6">
         <aside className="hidden w-56 shrink-0 md:block">
           <Sidebar />
         </aside>
