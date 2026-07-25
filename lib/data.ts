@@ -48,6 +48,7 @@ export async function getAppointments() {
   return (data ?? []).map((a) => ({
     id: a.id as string,
     startsAt: new Date(a.starts_at as string),
+    endsAt: new Date(a.ends_at as string),
     source: a.source as "agent" | "manual",
     locked: a.locked as boolean,
     label: (a.notes as string | null) || custName(a.customers),

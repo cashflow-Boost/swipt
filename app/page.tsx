@@ -63,7 +63,7 @@ export default function Home() {
             <Link href="/signup" className="rounded-pill bg-or px-6 py-3 text-[15.5px] font-semibold text-ink">Commencer l&apos;essai</Link>
             <Link href="#calcul" className="rounded-pill border border-line2 bg-w px-6 py-3 text-[15.5px] font-semibold">Calculer ce que je perds</Link>
           </div>
-          <p className="mt-4 text-[13.5px] text-faint">14 jours d&apos;essai · sans carte bancaire · résiliable à tout moment</p>
+          <p className="mt-4 text-[13.5px] text-faint">7 jours d&apos;essai · sans carte bancaire · résiliable à tout moment</p>
         </div>
       </header>
 
@@ -173,7 +173,7 @@ export default function Home() {
       <section className="bg-ink py-24 text-center text-w">
         <div className="mx-auto max-w-2xl px-6">
           <h2 className="mx-auto max-w-[18ch] text-[clamp(28px,4.5vw,42px)] font-[650] tracking-[-0.035em]">Le prochain appel arrive. Décidez qui décroche.</h2>
-          <p className="mx-auto mt-4 max-w-[44ch] text-[17px] text-[#A9A59D]">Quatorze jours d&apos;essai, sans carte bancaire. Si ça ne vous convient pas, vous coupez le renvoi — il ne reste rien.</p>
+          <p className="mx-auto mt-4 max-w-[44ch] text-[17px] text-[#A9A59D]">Sept jours d&apos;essai, sans carte bancaire. Si ça ne vous convient pas, vous coupez le renvoi — il ne reste rien.</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/signup" className="rounded-pill bg-or px-6 py-3 text-[15.5px] font-semibold text-ink">Commencer l&apos;essai</Link>
             <Link href="/login" className="rounded-pill border border-[#3A3A40] px-6 py-3 text-[15.5px] font-semibold text-w">Se connecter</Link>

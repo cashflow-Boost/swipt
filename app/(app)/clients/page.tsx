@@ -1,5 +1,6 @@
 import { getCustomers } from "@/lib/data";
 import { createCustomerAction } from "@/app/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function ClientsPage() {
   const customers = await getCustomers();
@@ -21,7 +22,7 @@ export default async function ClientsPage() {
             <label className="text-[12px] text-soft">Nom<input name="fullName" required placeholder="Mme Dupont" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
             <label className="text-[12px] text-soft">Téléphone<input name="phone" placeholder="06 …" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
             <label className="text-[12px] text-soft">Adresse<input name="address" placeholder="Ville" className="mt-1 block rounded-sm border border-line2 px-2.5 py-1.5 text-[13.5px]" /></label>
-            <button type="submit" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Ajouter</button>
+            <SubmitButton pendingText="…" className="rounded-pill bg-ink px-3.5 py-2 text-[13px] font-semibold text-w">Ajouter</SubmitButton>
           </form>
         </details>
       </div>
