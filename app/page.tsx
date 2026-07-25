@@ -181,8 +181,15 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="px-6 py-8 text-center text-[12.5px] text-faint">
-        © 2026 SWIPT — France · Standard téléphonique intelligent des artisans du dépannage
+      <footer className="border-t border-line px-6 py-8 text-center text-[12.5px] text-faint">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <Link href="/mentions-legales" className="hover:text-ink">Mentions légales</Link>
+          <span>·</span>
+          <Link href="/cgv" className="hover:text-ink">CGV</Link>
+          <span>·</span>
+          <Link href="/confidentialite" className="hover:text-ink">Confidentialité</Link>
+        </div>
+        <p className="mt-3">© 2026 SWIPT — France · Standard téléphonique intelligent des artisans du dépannage</p>
       </footer>
     </main>
   );
