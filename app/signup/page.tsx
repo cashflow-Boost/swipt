@@ -23,15 +23,18 @@ export default function SignupPage() {
       return;
     }
     if (data.session) {
-      // Confirmation e-mail désactivée : session immédiate → onboarding.
       window.location.assign("/onboarding");
-    } else {
-      // Confirmation e-mail requise.
-      setInfo(
-        "Compte créé. Vérifiez votre boîte mail pour confirmer, puis connectez-vous.",
-      );
-      setLoading(false);
+      return;
     }
+    // Les comptes sont auto-confirmés en base (déclencheur) : on se connecte
+    // directement, sans étape e-mail.
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      setInfo("Compte créé. Connectez-vous avec vos identifiants.");
+      setLoading(false);
+      return;
+    }
+    window.location.assign("/onboarding");
   }
 
   return (

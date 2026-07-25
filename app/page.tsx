@@ -85,10 +85,12 @@ export default function Home() {
             <h2 className="mx-auto mt-3 max-w-[24ch] text-[clamp(26px,4vw,40px)] font-[650] tracking-[-0.03em]">Un seul outil, de la sonnerie à la facture payée</h2>
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-3">
-            {PILLARS.map((p) => (
+            {PILLARS.map((p, i) => (
               <div key={p.t} className="rounded-[12px] border border-line bg-w p-6 shadow-sh">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-[11px] border border-or-line bg-or-wash">
-                  <i className="block h-[18px] w-[9px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center gap-0.5 rounded-[11px] border border-or-line bg-or-wash">
+                  {Array.from({ length: i + 1 }).map((_, k) => (
+                    <i key={k} className="block h-[17px] w-[8px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
+                  ))}
                 </div>
                 <h3 className="text-[17px] font-[650]">{p.t}</h3>
                 <p className="mt-1.5 text-[14.5px] text-soft">{p.d}</p>
@@ -111,7 +113,8 @@ export default function Home() {
             {DAY.map((e) => (
               <div key={e.t} className="grid grid-cols-[64px_1fr] gap-5">
                 <div className="pt-0.5 text-right font-mono text-[13px] text-faint">{e.t}</div>
-                <div className="border-l border-line2 pl-5">
+                <div className="relative border-l border-line2 pl-6">
+                  <span className="absolute -left-[6px] top-[5px] h-[11px] w-[11px] rounded-full border-2 border-w bg-or" />
                   <h3 className="text-[16px] font-[600]">{e.h}</h3>
                   <p className="mt-1 max-w-[52ch] text-[14.5px] text-soft">{e.p}</p>
                 </div>
