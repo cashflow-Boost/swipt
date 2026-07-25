@@ -99,6 +99,28 @@ body {
   outline-offset: 3px;
 }
 
+/* Curseurs du calculateur */
+.swipt-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+}
+.swipt-range::-webkit-slider-runnable-track { height: 3px; background: var(--line2); border-radius: 2px; }
+.swipt-range::-moz-range-track { height: 3px; background: var(--line2); border-radius: 2px; }
+.swipt-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--or); border: 3px solid var(--w); margin-top: -9px;
+  box-shadow: 0 0 0 1px var(--or);
+}
+.swipt-range::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%; background: var(--or);
+  border: 3px solid var(--w); box-shadow: 0 0 0 1px var(--or);
+}
+
 /* Mouvement (SPEC §3.5) — neutralisation complète en mode réduit */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
