@@ -176,6 +176,152 @@ async function verifierZone(
     : `${args.ville} est probablement hors de la zone habituelle (centrée sur ${data?.zone_center}). Proposez un rappel de l'artisan plutôt qu'un rendez-vous ferme.`;
 }
 
+// ── Registre interne : l'assistant est fabriqué par SWIPT à chaque appel ─────
+//
+// Vapi ne stocke AUCUNE configuration métier : quand un appel arrive, il envoie
+// « assistant-request » et SWIPT répond avec l'assistant complet, construit à
+// partir des Réglages de l'artisan (nom annoncé, métier, zone, urgences,
+// refus). La personnalisation vit dans le SaaS, pas chez le prestataire.
+
+type OrgProfile = {
+  name: string;
+  agent_paused: boolean;
+  announced_name: string | null;
+  trade: string | null;
+  zone_center: string | null;
+  zone_radius_km: number | null;
+  urgent_triggers: string[] | null;
+  refusal_rules: string[] | null;
+  callout_fee_cents: number | null;
+};
+
+async function loadProfile(
+  admin: ReturnType<typeof createAdminClient>,
+  orgId: string,
+): Promise<OrgProfile | null> {
+  const [{ data: org }, { data: s }] = await Promise.all([
+    admin.from("organizations").select("name, agent_paused").eq("id", orgId).maybeSingle(),
+    admin
+      .from("agent_settings")
+      .select("announced_name, trade, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents")
+      .eq("org_id", orgId)
+      .maybeSingle(),
+  ]);
+  if (!org) return null;
+  return {
+    name: org.name as string,
+    agent_paused: Boolean(org.agent_paused),
+    announced_name: (s?.announced_name as string) ?? null,
+    trade: (s?.trade as string) ?? null,
+    zone_center: (s?.zone_center as string) ?? null,
+    zone_radius_km: (s?.zone_radius_km as number) ?? null,
+    urgent_triggers: (s?.urgent_triggers as string[]) ?? null,
+    refusal_rules: (s?.refusal_rules as string[]) ?? null,
+    callout_fee_cents: (s?.callout_fee_cents as number) ?? null,
+  };
+}
+
+/** Construit le script (system prompt) français depuis les réglages de l'org. */
+function buildPrompt(p: OrgProfile): string {
+  const nom = p.announced_name || p.name;
+  const metier = p.trade ? ` Métier : ${p.trade}.` : "";
+  const zone = p.zone_center
+    ? `Zone d'intervention : ${p.zone_center}${p.zone_radius_km ? ` et environ ${p.zone_radius_km} km autour` : ""}. En cas de doute sur une ville, utilise l'outil « verifier_zone ».`
+    : "En cas de doute sur la couverture d'une ville, utilise l'outil « verifier_zone ».";
+  const urgences =
+    p.urgent_triggers && p.urgent_triggers.length > 0
+      ? p.urgent_triggers.join(", ")
+      : "fuite d'eau active, odeur de gaz, coupure totale de courant, personne bloquée, danger immédiat";
+  const refus =
+    p.refusal_rules && p.refusal_rules.length > 0
+      ? `\n- Tu déclines poliment : ${p.refusal_rules.join(", ")}.`
+      : "";
+  const deplacement =
+    p.callout_fee_cents && p.callout_fee_cents > 0
+      ? `\n- Si on te demande le prix du déplacement : ${(p.callout_fee_cents / 100).toLocaleString("fr-FR")} € TTC, le reste sur devis confirmé par l'artisan.`
+      : "";
+
+  return `Tu es l'assistant téléphonique de ${nom}, entreprise artisanale de dépannage.${metier} Tu réponds à la place de l'artisan quand il est en intervention.
+
+RÈGLES
+- Français naturel, chaleureux, efficace. Phrases courtes, une question à la fois.
+- Tu es un assistant automatique : simple et humain, jamais robotique.
+- Ne promets jamais un prix ferme ni un délai non garanti ; l'artisan confirme le devis.${refus}${deplacement}
+
+DÉROULÉ
+1. Comprends le problème : quoi, où, depuis quand.
+2. Urgences (${urgences}) : dis que tu alertes immédiatement l'artisan et qu'on rappelle très vite — pas de rendez-vous lointain.
+3. ${zone} Hors zone : décline poliment.
+4. Recueille : nom, numéro de rappel, adresse, description du besoin.
+5. Propose un créneau, confirme-le à voix haute (jour et heure), puis enregistre-le avec l'outil « poser_rendez_vous » (date ISO 8601, fuseau Europe/Paris, calculée depuis la date actuelle fournie).
+6. Récapitule, remercie, termine poliment.
+
+Tu représentes un artisan de confiance : rassurant et professionnel.`;
+}
+
+/** Réponse à « assistant-request » : l'assistant complet, personnalisé, à la volée. */
+function buildAssistant(p: OrgProfile, orgId: string, selfUrl: string) {
+  const nom = p.announced_name || p.name;
+  const secret = process.env.VAPI_SERVER_SECRET;
+
+  const systemPrompt = p.agent_paused
+    ? `Tu es l'assistant téléphonique de ${nom}. L'artisan a repris la main et gère ses appels lui-même en ce moment. Explique-le poliment, propose de rappeler plus tard ou prends le nom et le numéro de l'appelant pour qu'on le rappelle. Ne pose AUCUN rendez-vous.`
+    : buildPrompt(p);
+
+  const tools = [
+    {
+      type: "function",
+      function: {
+        name: "poser_rendez_vous",
+        description:
+          "Enregistre un rendez-vous dans l'agenda de l'artisan une fois le créneau confirmé avec le client.",
+        parameters: {
+          type: "object",
+          properties: {
+            nom_client: { type: "string", description: "Nom de l'appelant" },
+            telephone: { type: "string", description: "Numéro de rappel" },
+            adresse: { type: "string", description: "Adresse de l'intervention" },
+            description_besoin: { type: "string", description: "Ce qu'il faut réparer" },
+            debut: { type: "string", description: "Début en ISO 8601, fuseau Europe/Paris" },
+            duree_minutes: { type: "number", description: "Durée estimée en minutes (défaut 60)" },
+          },
+          required: ["nom_client", "debut"],
+        },
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "verifier_zone",
+        description: "Vérifie si une ville est dans la zone d'intervention de l'artisan.",
+        parameters: {
+          type: "object",
+          properties: { ville: { type: "string", description: "Ville ou commune du client" } },
+          required: ["ville"],
+        },
+      },
+    },
+  ];
+
+  return {
+    name: `SWIPT — ${p.name}`,
+    firstMessage: p.agent_paused
+      ? `Bonjour, vous êtes bien chez ${nom}. Un instant, je vous explique comment nous joindre.`
+      : `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`,
+    model: {
+      provider: "openai",
+      model: "gpt-4o-mini",
+      temperature: 0.4,
+      messages: [{ role: "system", content: systemPrompt }],
+      tools,
+    },
+    voice: { provider: "azure", voiceId: "fr-FR-DeniseNeural" },
+    transcriber: { provider: "deepgram", model: "nova-2", language: "fr" },
+    server: { url: selfUrl, ...(secret ? { secret } : {}) },
+    metadata: { orgId },
+  };
+}
+
 /** Journalise l'appel terminé (transcription, résumé, enregistrement, durée). */
 async function logEndOfCall(
   admin: ReturnType<typeof createAdminClient>,
@@ -233,6 +379,24 @@ export async function POST(req: Request) {
   }
 
   const orgId = await resolveOrgId(admin, message);
+
+  // Un appel entre : Vapi demande QUI doit répondre. SWIPT fabrique l'assistant
+  // à la volée depuis les Réglages de l'artisan — le registre interne du SaaS.
+  if (type === "assistant-request") {
+    if (!orgId) {
+      return NextResponse.json({
+        error: "Numéro non rattaché à un compte SWIPT.",
+      });
+    }
+    const profile = await loadProfile(admin, orgId);
+    if (!profile) {
+      return NextResponse.json({ error: "Compte artisan introuvable." });
+    }
+    const proto = req.headers.get("x-forwarded-proto") ?? "https";
+    const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
+    const selfUrl = `${proto}://${host}/api/voice`;
+    return NextResponse.json({ assistant: buildAssistant(profile, orgId, selfUrl) });
+  }
 
   // Appel terminé : on journalise, sans réponse d'outil.
   if (type === "end-of-call-report") {
