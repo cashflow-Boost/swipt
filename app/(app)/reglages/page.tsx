@@ -3,10 +3,12 @@ import { getAgentSettings } from "@/lib/actions/agent-settings";
 import { createClient } from "@/lib/supabase/server";
 import { saveAgentSettingsAction } from "@/app/actions";
 import { SubmitButton } from "@/components/SubmitButton";
+import { Telephony } from "@/components/Telephony";
 
 type Settings = {
   announced_name: string | null;
   trade: string | null;
+  business_phone: string | null;
   zone_center: string | null;
   zone_radius_km: number | null;
   ring_count: number | null;
@@ -22,13 +24,22 @@ export default async function ReglagesPage() {
     : null) as Settings;
 
   let priceItemsCount = 0;
+  let swiptNumber: string | null = null;
   if (session) {
     const supabase = await createClient();
-    const { count } = await supabase
-      .from("price_items")
-      .select("*", { count: "exact", head: true })
-      .eq("org_id", session.orgId);
+    const [{ count }, { data: org }] = await Promise.all([
+      supabase
+        .from("price_items")
+        .select("*", { count: "exact", head: true })
+        .eq("org_id", session.orgId),
+      supabase
+        .from("organizations")
+        .select("phone_number")
+        .eq("id", session.orgId)
+        .maybeSingle(),
+    ]);
     priceItemsCount = count ?? 0;
+    swiptNumber = (org?.phone_number as string) ?? null;
   }
 
   // Ce qui manque avant que l'agent puisse décrocher correctement.
@@ -88,6 +99,32 @@ export default async function ReglagesPage() {
       <form action={saveAgentSettingsAction} className="max-w-2xl space-y-4">
         <Field label="Nom annoncé" name="announcedName" defaultValue={s?.announced_name ?? ""} placeholder="« Plomberie Vasseur, bonsoir »" />
         <Field label="Métier" name="trade" defaultValue={s?.trade ?? ""} placeholder="Plomberie et chauffage" />
+        <div className="rounded-[12px] border border-line bg-w p-4">
+          <h2 className="text-[14.5px] font-[650]">Téléphonie</h2>
+          <p className="mt-1 text-[13px] text-soft">
+            Vous gardez votre numéro. Vos clients continuent de vous appeler normalement —
+            SWIPT ne prend l&apos;appel que si vous ne décrochez pas.
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Votre numéro professionnel"
+              name="businessPhone"
+              type="tel"
+              defaultValue={s?.business_phone ?? ""}
+              placeholder="06 12 34 56 78"
+              hint="Celui que vos clients composent."
+            />
+            <label className="block">
+              <span className="mb-1 block text-[13px] font-medium text-soft">Votre numéro SWIPT</span>
+              <div className="w-full rounded-sm border border-dashed border-line2 bg-w2 px-3 py-2 font-mono text-[14px] text-soft">
+                {swiptNumber ?? "en cours d'attribution"}
+              </div>
+              <span className="mt-1 block text-[12px] text-faint">La cible du renvoi. Attribué par SWIPT.</span>
+            </label>
+          </div>
+          <Telephony swiptNumber={swiptNumber} ringCount={s?.ring_count ?? 4} />
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Zone (ville)" name="zoneCenter" defaultValue={s?.zone_center ?? ""} placeholder="Poissy" />
           <Field label="Rayon (km)" name="zoneRadiusKm" type="number" min={0} max={200} defaultValue={s?.zone_radius_km ?? ""} />

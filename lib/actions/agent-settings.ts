@@ -36,6 +36,7 @@ export const updateAgentSettings = defineAction({
   input: z.object({
     announcedName: z.string().max(120).optional(),
     trade: z.string().max(120).optional(),
+    businessPhone: z.string().max(40).optional(),
     zoneCenter: z.string().max(200).optional(),
     zoneRadiusKm: z.number().int().min(0).max(200).optional(),
     businessHours: businessHoursSchema.optional(),
@@ -50,6 +51,7 @@ export const updateAgentSettings = defineAction({
       org_id: ctx.orgId,
       announced_name: input.announcedName,
       trade: input.trade,
+      business_phone: input.businessPhone,
       zone_center: input.zoneCenter,
       zone_radius_km: input.zoneRadiusKm,
       business_hours: input.businessHours,
