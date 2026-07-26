@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { getSessionOrg } from "@/lib/auth";
 import { updateAgentSettings } from "@/lib/actions/agent-settings";
 import { createQuote, validateQuote } from "@/lib/actions/quotes";
@@ -27,6 +28,18 @@ const num = (fd: FormData, k: string) => {
   const v = fd.get(k);
   return v !== null && v !== "" ? Number(v) : undefined;
 };
+
+/**
+ * « Je reprends la main » (SPEC §4.9) : bascule la pause de l'agent vocal pour
+ * l'organisation courante. La RLS restreint la mise à jour à sa propre org.
+ */
+export async function setAgentPausedAction(formData: FormData) {
+  const c = await ctx();
+  const paused = String(formData.get("paused")) === "true";
+  const supabase = await createClient();
+  await supabase.from("organizations").update({ agent_paused: paused }).eq("id", c.orgId);
+  revalidatePath("/", "layout");
+}
 
 type LineInput = { label: string; quantity: number; unitPriceCents: number; vatRate: number };
 

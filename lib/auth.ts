@@ -5,6 +5,7 @@ export interface UserAndOrg {
   email: string | null;
   orgId: string | null;
   orgName: string | null;
+  agentPaused: boolean;
 }
 
 /**
@@ -23,17 +24,21 @@ export async function getUserAndOrg(): Promise<UserAndOrg | null> {
 
   const { data } = await supabase
     .from("users")
-    .select("org_id, organizations(name)")
+    .select("org_id, organizations(name, agent_paused)")
     .eq("id", user.id)
     .maybeSingle();
 
-  const org = data?.organizations as { name: string } | { name: string }[] | null;
-  const orgName = Array.isArray(org) ? (org[0]?.name ?? null) : (org?.name ?? null);
+  const org = data?.organizations as
+    | { name: string; agent_paused: boolean }
+    | { name: string; agent_paused: boolean }[]
+    | null;
+  const orgRow = Array.isArray(org) ? (org[0] ?? null) : org;
   return {
     userId: user.id,
     email: user.email ?? null,
     orgId: (data?.org_id as string) ?? null,
-    orgName,
+    orgName: orgRow?.name ?? null,
+    agentPaused: orgRow?.agent_paused ?? false,
   };
 }
 

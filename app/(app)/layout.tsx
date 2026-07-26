@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { LogoutButton } from "@/components/LogoutButton";
+import { TakeControlButton } from "@/components/TakeControlButton";
 import { getUserAndOrg } from "@/lib/auth";
 
 /**
@@ -39,15 +40,16 @@ export default async function AppLayout({
           >
             S&apos;abonner
           </Link>
-          <button
-            type="button"
-            className="hidden rounded-pill border border-line2 bg-w px-3.5 py-1.5 text-[12.5px] font-semibold text-rd sm:inline"
-          >
-            ⏸ Je reprends la main
-          </button>
+          <TakeControlButton paused={session.agentPaused} />
           <LogoutButton />
         </div>
       </header>
+
+      {session.agentPaused && (
+        <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
+          Vous répondez vous-même — SWIPT est en pause. Cliquez « Rendre la main à SWIPT » pour réactiver la prise d&apos;appels.
+        </div>
+      )}
 
       <div className="mx-auto flex max-w-[1400px] gap-6 px-5 py-6">
         <aside className="hidden w-56 shrink-0 md:block">
