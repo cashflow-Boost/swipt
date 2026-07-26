@@ -88,6 +88,7 @@ export async function saveAgentSettingsAction(formData: FormData) {
   await updateAgentSettings.withContext(await ctx())({
     announcedName: str(formData, "announcedName"),
     trade: str(formData, "trade"),
+    businessPhone: str(formData, "businessPhone"),
     zoneCenter: str(formData, "zoneCenter"),
     zoneRadiusKm: num(formData, "zoneRadiusKm"),
     ringCount: ring !== undefined ? Math.min(9, Math.max(1, Math.round(ring))) : undefined,
