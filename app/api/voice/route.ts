@@ -251,11 +251,25 @@ export async function POST(req: Request) {
     const calls = extractToolCalls(message);
     if (calls.length === 0) return NextResponse.json({ ok: true });
 
+    // « Je reprends la main » (SPEC §4.9) : si l'artisan a mis l'agent en pause,
+    // on ne pose rien — il gère ses appels lui-même.
+    let paused = false;
+    if (orgId) {
+      const { data: org } = await admin
+        .from("organizations")
+        .select("agent_paused")
+        .eq("id", orgId)
+        .maybeSingle();
+      paused = Boolean(org?.agent_paused);
+    }
+
     const results: ToolResult[] = [];
     for (const c of calls) {
       let result = "Outil inconnu.";
       if (!orgId) {
         result = "Compte artisan introuvable pour ce numéro. Un conseiller rappellera.";
+      } else if (paused) {
+        result = "L'artisan gère ses appels en direct en ce moment. Invitez l'appelant à rappeler ou à laisser ses coordonnées ; ne posez pas de rendez-vous.";
       } else if (c.name === "poser_rendez_vous") {
         result = await poserRendezVous(admin, orgId, c.args);
       } else if (c.name === "verifier_zone") {
