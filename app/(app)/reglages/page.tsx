@@ -31,6 +31,27 @@ export default async function ReglagesPage() {
     priceItemsCount = count ?? 0;
   }
 
+  // Ce qui manque avant que l'agent puisse décrocher correctement.
+  const announced = (s?.announced_name ?? "").trim();
+  const checks = [
+    {
+      ok: announced.length > 2 && announced.toLowerCase() !== (session?.orgName ?? "").toLowerCase(),
+      label: "Nom annoncé au décroché",
+      fix: "Mettez le nom commercial complet — c'est la première phrase que vos clients entendent.",
+    },
+    {
+      ok: Boolean((s?.zone_center ?? "").trim()),
+      label: "Zone d'intervention",
+      fix: "Sans ville de référence, l'agent ne peut pas refuser le hors-zone.",
+    },
+    {
+      ok: Boolean((s?.trade ?? "").trim()),
+      label: "Métier",
+      fix: "Permet à l'agent de qualifier la panne dans votre vocabulaire.",
+    },
+  ];
+  const missing = checks.filter((c) => !c.ok);
+
   return (
     <div>
       <div className="mb-5 border-b border-line pb-4">
@@ -39,6 +60,29 @@ export default async function ReglagesPage() {
           Ce qui transforme un service générique en votre standard à vous.
           Modifiez et enregistrez — c&apos;est écrit en direct dans Supabase.
         </p>
+      </div>
+
+      <div
+        className={`mb-5 max-w-2xl rounded-[12px] border p-4 ${
+          missing.length === 0 ? "border-line bg-w" : "border-or-line bg-or-wash"
+        }`}
+      >
+        <h2 className={`text-[14.5px] font-[650] ${missing.length === 0 ? "" : "text-or-t"}`}>
+          {missing.length === 0
+            ? "✓ Votre agent est prêt à décrocher"
+            : `L'agent n'est pas encore prêt — ${missing.length} réglage${missing.length > 1 ? "s" : ""} à compléter`}
+        </h2>
+        <ul className="mt-2.5 space-y-1.5 text-[13.5px]">
+          {checks.map((c) => (
+            <li key={c.label} className="flex gap-2">
+              <span className={c.ok ? "text-gr" : "text-or-t"}>{c.ok ? "✓" : "○"}</span>
+              <span className={c.ok ? "text-soft" : ""}>
+                <b className="font-[600]">{c.label}</b>
+                {!c.ok && <span className="text-soft"> — {c.fix}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <form action={saveAgentSettingsAction} className="max-w-2xl space-y-4">
