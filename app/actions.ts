@@ -156,12 +156,12 @@ export async function createPriceItemAction(formData: FormData) {
     vatRate: (vat === 10 || vat === 5.5 ? vat : 20) as 20 | 10 | 5.5,
     tradeCategory: str(formData, "tradeCategory"),
   });
-  revalidatePath("/tarifs");
+  revalidatePath("/mes-tarifs");
 }
 
 export async function deletePriceItemAction(formData: FormData) {
   await deletePriceItem.withContext(await ctx())({ id: String(formData.get("id")) });
-  revalidatePath("/tarifs");
+  revalidatePath("/mes-tarifs");
 }
 
 /** Horaires d'ouverture : une plage par jour, jours fermés absents. */

@@ -4,6 +4,8 @@ import { Logo } from "@/components/Logo";
 import { DemoCallForm } from "@/components/DemoCallForm";
 import { Testimonials } from "@/components/Testimonials";
 import { Reveal } from "@/components/Reveal";
+import { LandingNav } from "@/components/LandingNav";
+import { PlanCards } from "@/components/PlanCards";
 
 /** Coordonnées — à régler dans Vercel avant d'envoyer du trafic. */
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE;
@@ -13,16 +15,19 @@ const TRADES = ["Plombiers", "Couvreurs", "Électriciens", "Menuisiers", "Peintr
 
 const GAINS = [
   {
-    t: "Vous ne quittez plus le chantier",
-    d: "Plus besoin d'interrompre votre travail pour décrocher. Plus besoin de rappeler tout le monde le soir.",
+    n: "6 h",
+    t: "gagnées par semaine",
+    d: "Plus d'interruption sur le chantier, plus de rappels à passer le soir.",
   },
   {
-    t: "Une réponse en 2 secondes, même à 20 h",
-    d: "Lia répond au nom de votre entreprise pendant que vous travaillez. Vos clients ne tombent plus sur le répondeur.",
+    n: "3×",
+    t: "plus de rendez-vous fixés",
+    d: "Lia répond en 2 secondes, même à 20 h. Vos clients ne raccrochent plus.",
   },
   {
-    t: "Aucun devis oublié",
-    d: "Chiffré automatiquement depuis vos prix. Prêt à partir avant même que vous quittiez le chantier.",
+    n: "0",
+    t: "devis oublié",
+    d: "Chiffré automatiquement depuis vos prix, prêt avant que vous quittiez le chantier.",
   },
 ];
 
@@ -45,45 +50,6 @@ const STEPS = [
   { t: "Configurez", d: "Une heure. Vos horaires, votre zone, votre grille de prix." },
   { t: "Lia décroche", d: "Votre ligne sonne quatre fois, puis elle répond au nom de votre entreprise." },
   { t: "Vous recevez tout", d: "Résumé, rendez-vous, devis. Sur votre téléphone. Vous ne touchez à rien." },
-];
-
-const PLANS = [
-  {
-    n: "Solo",
-    who: "Artisan seul",
-    price: 99,
-    cta: "Essai gratuit",
-    feats: ["80 appels inclus", "Devis illimités", "1 utilisateur", "Prise de rendez-vous", "Relance des impayés"],
-  },
-  {
-    n: "Pro",
-    who: "Jusqu'à 3 personnes",
-    price: 199,
-    top: true,
-    cta: "Essai gratuit",
-    feats: [
-      "Appels illimités",
-      "Devis illimités",
-      "Jusqu'à 3 utilisateurs",
-      "Planning partagé",
-      "Relance des impayés",
-      "Plusieurs zones d'intervention",
-    ],
-  },
-  {
-    n: "Agence",
-    who: "Équipe complète",
-    price: 399,
-    cta: "Nous contacter",
-    href: `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Offre Agence — AlloChantier")}`,
-    feats: [
-      "Appels illimités",
-      "Utilisateurs illimités",
-      "Affectation automatique",
-      "Rappel des devis sans réponse",
-      "Interlocuteur dédié",
-    ],
-  },
 ];
 
 const FAQ = [
@@ -112,35 +78,18 @@ const LEDE = "text-[19px] font-light leading-relaxed tracking-wide text-soft";
 export default function Home() {
   return (
     <main className="bg-w">
-      {/* 1 — Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-line bg-w/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4 md:px-8">
-          <Logo />
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#fonctionnalites" className="text-[14px] font-medium tracking-wide text-soft transition-colors hover:text-nv-2">Fonctionnalités</a>
-            <a href="#tarifs" className="text-[14px] font-medium tracking-wide text-soft transition-colors hover:text-nv-2">Tarifs</a>
-            <a href="#questions" className="text-[14px] font-medium tracking-wide text-soft transition-colors hover:text-nv-2">FAQ</a>
-            <Link href="/login" className="text-[14px] font-medium tracking-wide text-soft transition-colors hover:text-nv-2">Se connecter</Link>
-          </div>
-          <Link
-            href="/signup"
-            className="rounded-full bg-or px-5 py-2 text-[14px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
-          >
-            Essai gratuit
-          </Link>
-        </div>
-      </nav>
+      <LandingNav />
 
-      {/* 2 — Hero */}
+      {/* Hero */}
       <header className="flex min-h-[90vh] items-center bg-gradient-to-b from-w to-w3">
         <div className={`${WRAP} py-24 text-center`}>
           <span className="ac-rise ac-d0 mb-7 inline-block rounded-full bg-or-wash px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-or-t">
             L&apos;assistante des artisans
           </span>
-          <h1 className="ac-rise ac-d1 mx-auto max-w-[16ch] text-[clamp(44px,7.5vw,76px)] font-bold leading-[1.04] tracking-tighter text-nv">
+          <h1 className="ac-rise ac-d1 mx-auto max-w-[16ch] text-[clamp(46px,8vw,80px)] font-bold leading-[1.02] tracking-tighter text-nv">
             Vous ne perdez plus un seul appel.
           </h1>
-          <p className={`ac-rise ac-d2 mx-auto mt-7 max-w-2xl text-[20px] font-light leading-relaxed tracking-wide text-soft`}>
+          <p className="ac-rise ac-d2 mx-auto mt-7 max-w-2xl text-[20px] font-light leading-relaxed tracking-wide text-soft">
             AlloChantier répond à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
             recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
           </p>
@@ -183,10 +132,10 @@ export default function Home() {
             {GAINS.map((g, i) => (
               <Reveal key={g.t} delay={i * 110}>
                 <div>
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-nv-wash text-[17px] font-bold text-nv-2">
-                    {i + 1}
-                  </span>
-                  <h3 className="mt-5 text-[18px] font-semibold leading-snug">{g.t}</h3>
+                  <div className="text-[clamp(56px,7vw,76px)] font-bold leading-none tracking-tighter text-nv-2">
+                    {g.n}
+                  </div>
+                  <h3 className="mt-3 text-[18px] font-semibold leading-snug">{g.t}</h3>
                   <p className="mt-2 text-[15px] font-light leading-relaxed tracking-wide text-soft">{g.d}</p>
                 </div>
               </Reveal>
@@ -264,48 +213,9 @@ export default function Home() {
       <section id="tarifs" className="bg-gradient-to-b from-w to-w3 py-24">
         <div className={WRAP}>
           <h2 className={`${H2} text-center`}>Un tarif. Pas de surprise.</h2>
-          <div className="mx-auto mt-16 grid max-w-5xl items-start gap-6 md:grid-cols-3">
-            {PLANS.map((p) => (
-              <div
-                key={p.n}
-                className={`rounded-lg bg-w p-8 transition-all duration-300 hover:-translate-y-1 ${
-                  p.top
-                    ? "border-2 border-or-line shadow-sh3 md:scale-[1.04]"
-                    : "border border-line hover:shadow-sh2"
-                }`}
-              >
-                {p.top && (
-                  <span className="mb-4 inline-block rounded-full bg-or-wash px-4 py-1 text-[11px] font-bold uppercase tracking-[0.1em] text-or-t">
-                    Recommandé
-                  </span>
-                )}
-                <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-faint">{p.n}</h3>
-                <p className="mt-1 text-[14px] font-light text-soft">{p.who}</p>
-                <div className="mt-6 text-[48px] font-bold leading-none tracking-tighter text-nv">
-                  {p.price} €<span className="text-[14px] font-light tracking-normal text-faint"> /mois HT</span>
-                </div>
-                <ul className="mt-8 space-y-3">
-                  {p.feats.map((f) => (
-                    <li key={f} className="text-[15px] font-light tracking-wide text-soft">{f}</li>
-                  ))}
-                </ul>
-                <Link
-                  href={p.href ?? "/signup"}
-                  className={`mt-10 block rounded-full py-3 text-center text-[15px] font-medium transition-colors duration-300 ${
-                    p.top
-                      ? "bg-or text-w shadow-sh2 hover:bg-or-h"
-                      : "border border-or text-or hover:bg-nv-wash"
-                  }`}
-                >
-                  {p.cta}
-                </Link>
-              </div>
-            ))}
+          <div className="mt-16">
+            <PlanCards />
           </div>
-          <p className="mx-auto mt-8 max-w-[68ch] text-center text-[14px] font-light tracking-wide text-faint">
-            Au-delà du forfait Solo : 0,79 € par appel. Sept jours d&apos;essai sans carte bancaire,
-            sans engagement.
-          </p>
         </div>
       </section>
 
