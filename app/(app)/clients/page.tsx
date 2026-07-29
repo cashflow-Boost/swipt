@@ -31,8 +31,12 @@ export default async function ClientsPage() {
         <p className="rounded-[11px] border border-dashed border-line2 bg-w px-4 py-10 text-center text-sm text-soft">Aucun client enregistré.</p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {customers.map((c) => (
-            <div key={c.id as string} className="rounded-[11px] border border-line bg-w p-4">
+          {customers.map((c, i) => (
+            <div
+              key={c.id as string}
+              className="ac-card ac-enter rounded-[11px] border border-line bg-w p-4"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
               <h2 className="text-[15px] font-[650]">{(c.full_name as string) || "Client sans nom"}</h2>
               <dl className="mt-2 space-y-1.5 text-[13.5px]">
                 {c.phone ? <Row k="Téléphone" v={c.phone as string} /> : null}

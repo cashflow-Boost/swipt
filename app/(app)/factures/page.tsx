@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PdfButton } from "@/components/ui";
 import { StatusTag, type TagVariant } from "@/components/StatusTag";
 import { getInvoices } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
@@ -59,12 +60,7 @@ export default async function FacturesPage() {
               </div>
               <div className="flex items-center gap-2 sm:justify-self-end">
                 <StatusTag variant={VARIANT[i.status]}>{LABEL[i.status] ?? i.status}</StatusTag>
-                <Link
-                  href={`/document/facture/${i.id}`}
-                  className="rounded-pill border border-line2 bg-w px-3 py-1.5 text-[12.5px] font-semibold hover:border-faint"
-                >
-                  PDF
-                </Link>
+                <PdfButton href={`/document/facture/${i.id}`} />
                 {i.status !== "paid" && (
                   <form action={markInvoicePaidAction}>
                     <input type="hidden" name="id" value={i.id} />

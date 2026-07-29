@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { LogoutButton } from "@/components/LogoutButton";
 import { TakeControlButton } from "@/components/TakeControlButton";
 import { Logo } from "@/components/Logo";
+import { Splash } from "@/components/ui";
 import { getUserAndOrg } from "@/lib/auth";
 
 /**
@@ -21,6 +22,7 @@ export default async function AppLayout({
 
   return (
     <div className="min-h-screen bg-w2">
+      <Splash />
       <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-line bg-w px-5 py-3">
         <Logo href="/tableau-de-bord" />
         <div className="flex items-center gap-3">

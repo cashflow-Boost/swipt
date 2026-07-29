@@ -16,12 +16,21 @@ export function Sidebar() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={[
-              "block rounded-lg px-3 py-2 text-sm font-medium",
+              "relative block overflow-hidden rounded-lg py-2 pl-4 pr-3 text-sm transition-colors duration-200",
               active
-                ? "bg-or-wash text-or-t"
+                ? "bg-or-wash font-medium text-or-t"
                 : "text-soft hover:bg-w3 hover:text-ink",
             ].join(" ")}
           >
+            {/* Repère de la page courante : il se déplie plutôt que d'apparaître sec. */}
+            <span
+              aria-hidden="true"
+              className="absolute left-0 top-0 h-full w-[3px] origin-center bg-gr transition-transform duration-200"
+              style={{
+                transitionTimingFunction: "cubic-bezier(.16,1,.3,1)",
+                transform: active ? "scaleY(1)" : "scaleY(0)",
+              }}
+            />
             {item.label}
           </Link>
         );
