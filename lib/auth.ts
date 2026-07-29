@@ -6,6 +6,10 @@ export interface UserAndOrg {
   orgId: string | null;
   orgName: string | null;
   agentPaused: boolean;
+  /** Jours restants d'essai (négatif si terminé), null si abonnement actif. */
+  trialDaysLeft: number | null;
+  /** Accès ouvert : abonnement actif, ou essai encore en cours. */
+  accessOpen: boolean;
 }
 
 /**
@@ -24,21 +28,35 @@ export async function getUserAndOrg(): Promise<UserAndOrg | null> {
 
   const { data } = await supabase
     .from("users")
-    .select("org_id, organizations(name, agent_paused)")
+    .select("org_id, organizations(name, agent_paused, trial_ends_at, subscription_status)")
     .eq("id", user.id)
     .maybeSingle();
 
-  const org = data?.organizations as
-    | { name: string; agent_paused: boolean }
-    | { name: string; agent_paused: boolean }[]
-    | null;
+  type OrgRow = {
+    name: string;
+    agent_paused: boolean;
+    trial_ends_at: string | null;
+    subscription_status: string | null;
+  };
+  const org = data?.organizations as OrgRow | OrgRow[] | null;
   const orgRow = Array.isArray(org) ? (org[0] ?? null) : org;
+
+  const subscribed = orgRow?.subscription_status === "active";
+  let trialDaysLeft: number | null = null;
+  if (!subscribed && orgRow?.trial_ends_at) {
+    const ms = new Date(orgRow.trial_ends_at).getTime() - Date.now();
+    trialDaysLeft = Math.ceil(ms / 86_400_000);
+  }
+
   return {
     userId: user.id,
     email: user.email ?? null,
     orgId: (data?.org_id as string) ?? null,
     orgName: orgRow?.name ?? null,
     agentPaused: orgRow?.agent_paused ?? false,
+    trialDaysLeft,
+    // Sans org (avant onboarding) l'accès n'est pas encore la question.
+    accessOpen: subscribed || trialDaysLeft === null || trialDaysLeft > 0,
   };
 }
 

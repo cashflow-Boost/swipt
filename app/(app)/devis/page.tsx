@@ -90,6 +90,12 @@ function QuoteList({
               </div>
               <div className="flex items-center gap-2 sm:justify-self-end">
                 <StatusTag variant={variant}>{tag}</StatusTag>
+                <Link
+                  href={`/document/devis/${q.id}`}
+                  className="rounded-pill border border-line2 bg-w px-3 py-1.5 text-[12.5px] font-semibold hover:border-faint"
+                >
+                  PDF
+                </Link>
                 {invoiceButton && (
                   <form action={issueInvoiceAction}>
                     <input type="hidden" name="id" value={q.id} />

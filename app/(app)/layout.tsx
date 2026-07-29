@@ -51,6 +51,20 @@ export default async function AppLayout({
         </div>
       )}
 
+      {!session.accessOpen ? (
+        <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
+          Votre essai est terminé. Choisissez une offre pour que SWIPT reprenne vos appels.
+        </div>
+      ) : session.trialDaysLeft !== null && session.trialDaysLeft <= 3 ? (
+        <div className="border-b border-or-line bg-or-wash px-5 py-2 text-center text-[13px] font-medium text-or-t">
+          Essai : {session.trialDaysLeft} jour{session.trialDaysLeft > 1 ? "s" : ""} restant
+          {session.trialDaysLeft > 1 ? "s" : ""}.{" "}
+          <Link href="/abonnement" className="underline">
+            Choisir une offre
+          </Link>
+        </div>
+      ) : null}
+
       <div className="mx-auto flex max-w-[1400px] gap-6 px-5 py-6">
         <aside className="hidden w-56 shrink-0 md:block">
           <Sidebar />
