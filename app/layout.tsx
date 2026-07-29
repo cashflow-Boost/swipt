@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { THEME_BOOT } from "@/components/Theme";
 
 // Polices auto-hébergées au build (aucune requête runtime vers Google — SPEC §8, RGPD).
 const inter = Inter({
@@ -38,7 +39,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${plexMono.variable}`}>
+    <html lang="fr" className={`${inter.variable} ${plexMono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Avant la première peinture : pas d'éclair blanc en thème sombre. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

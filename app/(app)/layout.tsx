@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Sidebar } from "@/components/Sidebar";
+import { AppShell } from "@/components/AppShell";
 import { LogoutButton } from "@/components/LogoutButton";
 import { TakeControlButton } from "@/components/TakeControlButton";
 import { Logo } from "@/components/Logo";
@@ -62,12 +62,7 @@ export default async function AppLayout({
         </div>
       ) : null}
 
-      <div className="mx-auto flex max-w-[1400px] gap-6 px-5 py-6">
-        <aside className="hidden w-56 shrink-0 md:block">
-          <Sidebar />
-        </aside>
-        <main className="min-w-0 flex-1">{children}</main>
-      </div>
+      <AppShell>{children}</AppShell>
     </div>
   );
 }

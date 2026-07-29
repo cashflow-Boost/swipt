@@ -5,6 +5,7 @@ import { saveAgentSettingsAction } from "@/app/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Telephony } from "@/components/Telephony";
 import { BusinessHours } from "@/components/BusinessHours";
+import { ThemeToggle } from "@/components/Theme";
 import Link from "next/link";
 
 type Settings = {
@@ -74,6 +75,10 @@ export default async function ReglagesPage() {
           Ce qui transforme un service générique en votre standard à vous.
           Modifiez et enregistrez — c&apos;est écrit en direct dans Supabase.
         </p>
+      </div>
+
+      <div className="mb-5 max-w-2xl">
+        <ThemeToggle />
       </div>
 
       <div
@@ -157,7 +162,7 @@ export default async function ReglagesPage() {
           </SubmitButton>
           <span className="text-[12.5px] text-soft">
             Grille de prix : {priceItemsCount} ouvrage{priceItemsCount > 1 ? "s" : ""} —{" "}
-            <Link href="/tarifs" className="font-medium text-or-t underline">gérer mes tarifs</Link>
+            <Link href="/mes-tarifs" className="font-medium text-or-t underline">gérer mes tarifs</Link>
           </span>
         </div>
       </form>

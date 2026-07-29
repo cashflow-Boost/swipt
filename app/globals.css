@@ -98,7 +98,57 @@
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
+/* ── Thème sombre ────────────────────────────────────────────────────────────
+   Seuls les jetons changent : aucun composant ne connaît le thème, et rien ne
+   peut donc « oublier » de le suivre. */
+:root[data-theme="dark"] {
+  --w:      #0F172A;  /* slate-900 — fond général */
+  --w2:     #1E293B;  /* slate-800 — cartes */
+  --w3:     #1E293B;
+
+  --ink:    #F8FAFC;  /* slate-50 */
+  --soft:   #94A3B8;  /* slate-400 */
+  --faint:  #64748B;  /* slate-500 */
+
+  --line:   #334155;  /* slate-700 */
+  --line2:  #475569;  /* slate-600 */
+
+  --nv:      #F8FAFC;
+  --nv-2:    #60A5FA;
+  --nv-wash: #1E3A5F;
+  --nv-line: #334155;
+
+  --or:      #1D4ED8;  /* le bleu reste bleu */
+  --or-h:    #059669;
+  --or-t:    #34D399;  /* accent texte lisible sur fond sombre */
+  --or-2:    #34D399;
+  --or-wash: #064E3B;
+  --or-line: #065F46;
+
+  --gr:      #34D399;  --gr-wash: #064E3B;
+  --rd:      #FCA5A5;  --rd-wash: #450A0A;
+
+  --card:   #1E293B;
+
+  --sh2: 0 10px 30px -12px rgba(0, 0, 0, .6);
+  --sh3: 0 18px 50px -16px rgba(0, 0, 0, .7);
+}
+
+/* Le shimmer doit s'assombrir avec le reste, sinon il éblouit. */
+:root[data-theme="dark"] .ac-skeleton {
+  background: linear-gradient(90deg, #1E293B 25%, #263449 50%, #1E293B 75%);
+  background-size: 200% 100%;
+}
+:root[data-theme="dark"] .ac-spinner { border-color: #334155; border-top-color: #60A5FA; }
+
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+/* Les surfaces suivent le thème en douceur ; le texte, lui, bascule net. */
+body, aside, header, footer, section,
+[class*="bg-w"], [class*="border-line"] {
+  transition: background-color .3s var(--ease, cubic-bezier(.16,1,.3,1)),
+              border-color .3s var(--ease, cubic-bezier(.16,1,.3,1));
+}
 
 body {
   background: var(--w);
