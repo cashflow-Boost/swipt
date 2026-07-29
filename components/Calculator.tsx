@@ -66,7 +66,7 @@ export function Calculator() {
         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
           Chiffre d&apos;affaires perdu chaque mois
         </p>
-        <div className="mt-3 text-[clamp(44px,7vw,60px)] font-bold leading-none tracking-[-0.035em]">
+        <div className="mt-3 text-[clamp(44px,7vw,60px)] font-bold leading-none tracking-tighter text-nv">
           {fmt.format(Math.round(lost))} €
         </div>
 
@@ -81,11 +81,11 @@ export function Calculator() {
             Pour environ <span className="font-medium text-ink">{fmt.format(monthly)} appels par mois</span>,
             la formule adaptée est <span className="font-medium text-ink">{offer.n}</span>, à{" "}
             {fmt.format(Math.round(offer.cost))} € par mois. Récupéré net :{" "}
-            <span className="font-medium text-or-t">{fmt.format(net)} € par mois</span>.
+            <span className="font-bold text-or-t">{fmt.format(net)} € par mois</span>.
           </p>
           <Link
             href="/signup"
-            className="mt-7 inline-block rounded-full bg-ink px-7 py-3.5 text-[15px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
+            className="mt-7 inline-block rounded-full bg-or px-8 py-4 text-[15px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
           >
             Démarrer mon essai
           </Link>
@@ -105,8 +105,8 @@ function Dial({ label, value, children }: { label: string; value: string; childr
   return (
     <div>
       <div className="mb-4 flex items-baseline justify-between gap-4">
-        <span className="max-w-[36ch] text-[15px] font-light text-soft">{label}</span>
-        <span className="whitespace-nowrap text-[22px] font-semibold tracking-[-0.02em]">{value}</span>
+        <span className="max-w-[36ch] text-[11px] uppercase tracking-[0.16em] text-faint">{label}</span>
+        <span className="whitespace-nowrap text-[26px] font-light tracking-tight text-nv">{value}</span>
       </div>
       {children}
     </div>
@@ -125,8 +125,8 @@ function Scale({ left, right }: { left: string; right: string }) {
 function Line({ l, r }: { l: string; r: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3.5">
-      <dt className="text-[15px] font-light text-soft">{l}</dt>
-      <dd className="whitespace-nowrap font-mono text-[15px]">{r}</dd>
+      <dt className="text-[15px] font-light tracking-wide text-soft">{l}</dt>
+      <dd className="whitespace-nowrap font-mono text-[15px] text-nv">{r}</dd>
     </div>
   );
 }

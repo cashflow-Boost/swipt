@@ -3,62 +3,60 @@
 /* ─────────────────────────────────────────────────────────────
    AlloChantier — design tokens.
 
-   Parti pris : blanc, typographie, espace. Pas de fond coloré, pas
-   d'ombre portée, pas d'icône. L'accent émeraude est rare — trois
-   apparitions au plus sur une page — pour qu'il veuille encore dire
-   quelque chose quand il apparaît.
+   Bleu vif et clair pour la marque, émeraude en accent rare.
+   Blanc dominant, beaucoup d'air, typographie aérée.
 
    Les noms de tokens sont conservés (--or, --nv…) : toute
    l'application les utilise déjà, seules les valeurs changent.
    ───────────────────────────────────────────────────────────── */
 :root {
-  /* Surfaces — blanc, et deux gris à peine perceptibles pour les zones inertes */
+  /* Surfaces */
   --w:      #FFFFFF;
   --w2:     #FFFFFF;
-  --w3:     #F8FAFC;
+  --w3:     #EFF6FF;  /* blue-50 — sections alternées */
 
   /* Texte */
-  --ink:    #0F172A;  /* slate-900 — titres et texte principal, 17,9:1 */
-  --soft:   #64748B;  /* slate-500 — texte secondaire, 4,8:1 */
-  --faint:  #94A3B8;  /* slate-400 — mentions, jamais porteur de sens seul */
+  --ink:    #1E40AF;  /* blue-800 — texte principal, 8,3:1 */
+  --soft:   #64748B;  /* slate-500 — secondaire, 4,8:1 */
+  --faint:  #94A3B8;  /* slate-400 — mentions */
 
   /* Filets */
-  --line:   #F1F5F9;  /* slate-100 — séparation de section */
-  --line2:  #E2E8F0;  /* slate-200 — filet de colonne, champs */
+  --line:   #DBEAFE;  /* blue-100 */
+  --line2:  #BFDBFE;  /* blue-200 */
 
   /* Marque */
-  --nv:      #0F172A;  /* les titres partagent l'encre : une seule voix */
-  --nv-2:    #1E293B;
-  --nv-wash: #F8FAFC;
-  --nv-line: #E2E8F0;
+  --nv:      #1E3A8A;  /* blue-900 — titres */
+  --nv-2:    #1D4ED8;  /* blue-700 */
+  --nv-wash: #EFF6FF;
+  --nv-line: #DBEAFE;
 
-  /* Action — le bouton est encre pleine ; l'émeraude n'arrive qu'au survol */
-  --or:      #0F172A;
-  --or-h:    #059669;  /* emerald-600 */
+  /* Action — bouton bleu, survol émeraude */
+  --or:      #1D4ED8;  /* blue-700 */
+  --or-h:    #059669;  /* emerald-600 au survol : #10B981 avec du texte blanc
+                          tombe à 2,5:1, illisible ; ce ton reste dans la même
+                          famille et redevient lisible. */
   --or-t:    #047857;  /* emerald-700 — accent TEXTE sur blanc, 5,5:1 */
   --or-2:    #34D399;  /* emerald-400 — accent sur fond sombre */
-  --or-wash: #ECFDF5;  /* emerald-50 — pastille « Recommandé » */
+  --or-wash: #D1FAE5;  /* emerald-100 — pastilles */
   --or-line: #A7F3D0;
 
   /* Sémantiques */
-  --gr:      #059669;  --gr-wash: #ECFDF5;
+  --gr:      #059669;  --gr-wash: #D1FAE5;
   --rd:      #B91C1C;  --rd-wash: #FEF2F2;
 
-  /* Fonds sombres résiduels (écrans applicatifs) */
-  --bg: #0F172A;  --bg2: #1E293B;  --card: #FFFFFF;
-  --d-line: #1E293B;  --d-line2: #334155;
-  --d-txt: #F8FAFC;   --d-dim: #CBD5E1;  --d-faint: #94A3B8;
+  /* Fonds profonds (CTA final, écrans applicatifs) */
+  --bg: #1E3A8A;  --bg2: #1E40AF;  --card: #FFFFFF;
+  --d-line: #1E40AF;  --d-line2: #3B82F6;
+  --d-txt: #FFFFFF;   --d-dim: #BFDBFE;  --d-faint: #93C5FD;
 
-  /* Formes — arrondi discret sur les blocs, plein arrondi sur les boutons */
-  --radius-sm: 6px;
-  --radius:    10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 24px;
   --radius-pill: 100px;
 
-  /* Ombres neutralisées : la hiérarchie passe par l'espace et le filet. */
   --sh:  none;
-  --sh2: none;
-  --sh3: none;
+  --sh2: 0 10px 30px -12px rgba(30, 64, 175, .25);
+  --sh3: 0 18px 50px -16px rgba(16, 185, 129, .28);
 }
 
 @theme inline {
@@ -107,24 +105,20 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.65;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3 {
-  color: var(--ink);
-  letter-spacing: -0.03em;
-  text-wrap: balance;
-}
+h1, h2, h3 { color: var(--nv); text-wrap: balance; }
 
 :focus-visible {
-  outline: 2px solid var(--or-h);
+  outline: 2px solid var(--or);
   outline-offset: 3px;
 }
 
-/* Curseurs du calculateur — filet fin, pastille encre pleine. */
+/* Curseurs du calculateur — trait bleu, pastille bleue pleine. */
 .swipt-range {
   -webkit-appearance: none;
   appearance: none;
@@ -134,17 +128,16 @@ h1, h2, h3 {
   cursor: pointer;
   display: block;
 }
-.swipt-range::-webkit-slider-runnable-track { height: 1px; background: var(--line2); }
-.swipt-range::-moz-range-track { height: 1px; background: var(--line2); }
+.swipt-range::-webkit-slider-runnable-track { height: 2px; background: var(--line2); }
+.swipt-range::-moz-range-track { height: 2px; background: var(--line2); }
 .swipt-range::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--ink); margin-top: -7.5px;
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--or); margin-top: -8px;
 }
 .swipt-range::-moz-range-thumb {
-  width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: none;
+  width: 18px; height: 18px; border-radius: 50%; background: var(--or); border: none;
 }
 
-/* Impression des devis et factures : pas de fond, pas de chrome. */
 @media print {
   body { background: #fff; }
   .print\:hidden { display: none !important; }
@@ -152,18 +145,19 @@ h1, h2, h3 {
 
 /* ── Entrée ──────────────────────────────────────────────────────────────── */
 @keyframes ac-rise {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: none; }
 }
-.ac-rise { animation: ac-rise .7s cubic-bezier(.22,.8,.36,1) backwards; }
-.ac-d1 { animation-delay: .05s; }
+.ac-rise { animation: ac-rise .8s cubic-bezier(.16,1,.3,1) backwards; }
+.ac-d0 { animation-delay: 0s; }
+.ac-d1 { animation-delay: .1s; }
 .ac-d2 { animation-delay: .2s; }
-.ac-d3 { animation-delay: .35s; }
+.ac-d3 { animation-delay: .3s; }
 
 .ac-reveal {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity .6s ease-out, transform .6s cubic-bezier(.22,.8,.36,1);
+  transform: translateY(30px);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1);
 }
 .ac-reveal[data-shown="true"] { opacity: 1; transform: none; }
 
