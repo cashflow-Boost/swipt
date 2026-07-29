@@ -186,6 +186,8 @@ async function verifierZone(
 type OrgProfile = {
   name: string;
   agent_paused: boolean;
+  /** Faux si l'essai est terminé sans abonnement actif : SWIPT ne décroche plus. */
+  access_open: boolean;
   announced_name: string | null;
   trade: string | null;
   zone_center: string | null;
@@ -200,7 +202,11 @@ async function loadProfile(
   orgId: string,
 ): Promise<OrgProfile | null> {
   const [{ data: org }, { data: s }] = await Promise.all([
-    admin.from("organizations").select("name, agent_paused").eq("id", orgId).maybeSingle(),
+    admin
+      .from("organizations")
+      .select("name, agent_paused, trial_ends_at, subscription_status")
+      .eq("id", orgId)
+      .maybeSingle(),
     admin
       .from("agent_settings")
       .select("announced_name, trade, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents")
@@ -208,9 +214,12 @@ async function loadProfile(
       .maybeSingle(),
   ]);
   if (!org) return null;
+  const trialEnd = org.trial_ends_at ? new Date(String(org.trial_ends_at)).getTime() : null;
   return {
     name: org.name as string,
     agent_paused: Boolean(org.agent_paused),
+    access_open:
+      org.subscription_status === "active" || trialEnd === null || trialEnd > Date.now(),
     announced_name: (s?.announced_name as string) ?? null,
     trade: (s?.trade as string) ?? null,
     zone_center: (s?.zone_center as string) ?? null,
@@ -346,6 +355,9 @@ async function logEndOfCall(
     transcript: transcript ?? null,
     extraction: summary ? { summary } : null,
   });
+
+  // Compteur du forfait : volume inclus puis dépassement facturable (SPEC §6).
+  await admin.rpc("count_handled_call", { p_org: orgId });
 }
 
 // ── Point d'entrée ──────────────────────────────────────────────────────────
@@ -391,6 +403,10 @@ export async function POST(req: Request) {
     const profile = await loadProfile(admin, orgId);
     if (!profile) {
       return NextResponse.json({ error: "Compte artisan introuvable." });
+    }
+    // Essai terminé sans abonnement : le service ne décroche plus (SPEC §6).
+    if (!profile.access_open) {
+      return NextResponse.json({ error: "Abonnement SWIPT inactif pour ce compte." });
     }
     const proto = req.headers.get("x-forwarded-proto") ?? "https";
     const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
