@@ -70,6 +70,13 @@ export default function SignupPage() {
             {loading ? "Création…" : "Créer mon compte"}
           </button>
 
+          <p className="mt-4 rounded-sm border border-line bg-w2 px-3 py-2.5 text-[12.5px] leading-relaxed text-soft">
+            Aucune carte bancaire n&apos;est demandée pour l&apos;essai. Au bout de 7 jours, le service
+            s&apos;arrête simplement : rien n&apos;est prélevé et aucun abonnement ne démarre tout seul.
+            Pour continuer, vous choisirez une offre à ce moment-là. Voir les{" "}
+            <Link href="/cgv" className="underline">conditions de vente</Link>.
+          </p>
+
           <p className="mt-4 text-center text-[13px] text-soft">
             Déjà un compte ? <Link href="/login" className="font-medium text-or-t underline">Se connecter</Link>
           </p>
