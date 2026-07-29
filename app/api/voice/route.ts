@@ -89,8 +89,13 @@ async function resolveOrgId(
     if (hit) return hit.id as string;
   }
 
-  // 3) repli : une seule org en test (variable d'env).
-  return process.env.AlloChantier_DEFAULT_ORG_ID ?? null;
+  // 3) repli : une seule org en test (variable d'env). L'ancien nom SWIPT_*
+  // reste accepté pour ne pas casser les déploiements déjà configurés.
+  return (
+    process.env.ALLOCHANTIER_DEFAULT_ORG_ID ??
+    process.env.SWIPT_DEFAULT_ORG_ID ??
+    null
+  );
 }
 
 // ── Outils appelables par l'agent ───────────────────────────────────────────
@@ -195,6 +200,8 @@ type OrgProfile = {
   urgent_triggers: string[] | null;
   refusal_rules: string[] | null;
   callout_fee_cents: number | null;
+  business_hours: Record<string, [string, string][]> | null;
+  price_items: { label: string; unit: string | null; cents: number }[];
 };
 
 async function loadProfile(
@@ -209,10 +216,17 @@ async function loadProfile(
       .maybeSingle(),
     admin
       .from("agent_settings")
-      .select("announced_name, trade, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents")
+      .select("announced_name, trade, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents, business_hours")
       .eq("org_id", orgId)
       .maybeSingle(),
   ]);
+  // La grille de prix est ce qui permet d'annoncer un ordre de grandeur.
+  const { data: prices } = await admin
+    .from("price_items")
+    .select("label, unit, unit_price_cents")
+    .eq("org_id", orgId)
+    .order("label")
+    .limit(40);
   if (!org) return null;
   const trialEnd = org.trial_ends_at ? new Date(String(org.trial_ends_at)).getTime() : null;
   return {
@@ -227,7 +241,31 @@ async function loadProfile(
     urgent_triggers: (s?.urgent_triggers as string[]) ?? null,
     refusal_rules: (s?.refusal_rules as string[]) ?? null,
     callout_fee_cents: (s?.callout_fee_cents as number) ?? null,
+    business_hours: (s?.business_hours as Record<string, [string, string][]>) ?? null,
+    price_items: (prices ?? []).map((p) => ({
+      label: p.label as string,
+      unit: (p.unit as string) ?? null,
+      cents: p.unit_price_cents as number,
+    })),
   };
+}
+
+const DAY_LABELS: Record<string, string> = {
+  mon: "lundi", tue: "mardi", wed: "mercredi", thu: "jeudi",
+  fri: "vendredi", sat: "samedi", sun: "dimanche",
+};
+const DAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
+/** Horaires en une phrase lisible ; repli lundi–vendredi 8 h – 18 h. */
+function formatHours(h: Record<string, [string, string][]> | null): string {
+  const entries = DAY_ORDER.filter((d) => h?.[d]?.[0]);
+  if (!h || entries.length === 0) return "du lundi au vendredi de 8 h à 18 h";
+  return entries
+    .map((d) => {
+      const [from, to] = h[d][0];
+      return `${DAY_LABELS[d]} de ${from.replace(":", " h ")} à ${to.replace(":", " h ")}`;
+    })
+    .join(", ");
 }
 
 /** Construit le script (system prompt) français depuis les réglages de l'org. */
@@ -250,6 +288,14 @@ function buildPrompt(p: OrgProfile): string {
       ? `\n- Si on te demande le prix du déplacement : ${(p.callout_fee_cents / 100).toLocaleString("fr-FR")} € TTC, le reste sur devis confirmé par l'artisan.`
       : "";
 
+  const horaires = formatHours(p.business_hours);
+  const tarifs =
+    p.price_items.length > 0
+      ? `\n\nGRILLE DE PRIX (HT) — donne un ORDRE DE GRANDEUR, jamais un prix ferme, et précise toujours que l'artisan confirme le devis :\n${p.price_items
+          .map((i) => `- ${i.label}${i.unit ? ` (par ${i.unit})` : ""} : ${(i.cents / 100).toLocaleString("fr-FR")} €`)
+          .join("\n")}`
+      : "\n\nAucune grille de prix n'est enregistrée : ne donne AUCUN chiffre, dis que l'artisan établira le devis.";
+
   return `Tu es l'assistant téléphonique de ${nom}, entreprise artisanale de dépannage.${metier} Tu réponds à la place de l'artisan quand il est en intervention.
 
 RÈGLES
@@ -262,8 +308,9 @@ DÉROULÉ
 2. Urgences (${urgences}) : dis que tu alertes immédiatement l'artisan et qu'on rappelle très vite — pas de rendez-vous lointain.
 3. ${zone} Hors zone : décline poliment.
 4. Recueille : nom, numéro de rappel, adresse, description du besoin.
-5. Propose un créneau, confirme-le à voix haute (jour et heure), puis enregistre-le avec l'outil « poser_rendez_vous » (date ISO 8601, fuseau Europe/Paris, calculée depuis la date actuelle fournie).
-6. Récapitule, remercie, termine poliment.
+5. Propose un créneau UNIQUEMENT dans ces horaires : ${horaires}. En dehors, ne promets rien : note la demande et dis que l'artisan rappellera.
+6. Confirme le créneau à voix haute (jour et heure), puis enregistre-le avec l'outil « poser_rendez_vous » (date ISO 8601, fuseau Europe/Paris, calculée depuis la date actuelle fournie).
+7. Récapitule, remercie, termine poliment.${tarifs}
 
 Tu représentes un artisan de confiance : rassurant et professionnel.`;
 }
