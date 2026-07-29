@@ -124,22 +124,49 @@ h1, h2, h3 { color: var(--nv); text-wrap: balance; }
   cursor: pointer;
   display: block;
 }
-.swipt-range::-webkit-slider-runnable-track { height: 4px; background: var(--d-line2); border-radius: 2px; }
-.swipt-range::-moz-range-track { height: 4px; background: var(--d-line2); border-radius: 2px; }
+/* Le calculateur vit sur fond marine : piste claire, pastille orange cerclée
+   de la couleur du panneau pour la détacher du fond. */
+.swipt-range::-webkit-slider-runnable-track { height: 4px; background: #3A5878; border-radius: 2px; }
+.swipt-range::-moz-range-track { height: 4px; background: #3A5878; border-radius: 2px; }
 .swipt-range::-webkit-slider-thumb {
   -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-  background: var(--or); border: 3px solid var(--card); margin-top: -9px;
-  box-shadow: 0 0 0 1px var(--or);
+  background: var(--or); border: 3px solid #17293B; margin-top: -9px;
+  box-shadow: 0 0 0 1.5px var(--or);
 }
 .swipt-range::-moz-range-thumb {
   width: 18px; height: 18px; border-radius: 50%; background: var(--or);
-  border: 3px solid var(--card); box-shadow: 0 0 0 1px var(--or);
+  border: 3px solid #17293B; box-shadow: 0 0 0 1.5px var(--or);
 }
 
 /* Impression des devis et factures : pas de fond, pas de chrome. */
 @media print {
   body { background: #fff; }
   .print\:hidden { display: none !important; }
+}
+
+/* ── Animations d'entrée ─────────────────────────────────────────────────── */
+@keyframes ac-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Séquence du hero : titre, puis sous-titre, puis boutons. */
+.ac-rise {
+  animation: ac-rise .6s cubic-bezier(.22,.8,.36,1) backwards;
+}
+.ac-d1 { animation-delay: .1s; }
+.ac-d2 { animation-delay: .3s; }
+.ac-d3 { animation-delay: .5s; }
+
+/* Révélation au défilement (voir components/Reveal.tsx) */
+.ac-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .55s ease-out, transform .55s cubic-bezier(.22,.8,.36,1);
+}
+.ac-reveal[data-shown="true"] {
+  opacity: 1;
+  transform: none;
 }
 
 /* Mouvement — neutralisation complète en mode réduit */
@@ -149,4 +176,5 @@ h1, h2, h3 { color: var(--nv); text-wrap: balance; }
     transition: none !important;
     animation: none !important;
   }
+  .ac-reveal { opacity: 1; transform: none; }
 }

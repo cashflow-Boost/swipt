@@ -32,19 +32,19 @@ export function Calculator() {
   const net = Math.max(0, Math.round(lost * RECOVERY - offer.cost));
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line bg-w shadow-sh2">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-w2 px-5 py-3">
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-or-t">
+    <div className="overflow-hidden rounded-2xl border border-[#33517A] bg-[#17293B] shadow-sh3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2E4A69] px-6 py-3.5">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-or-2">
           Vos trois chiffres
         </span>
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#7E96B3]">
           Simulation indicative · base {WORKDAYS} jours travaillés
         </span>
       </div>
 
       <div className="grid gap-0 md:grid-cols-2">
         {/* curseurs */}
-        <div className="space-y-7 p-6">
+        <div className="space-y-7 p-7">
           <Dial label="Appels que vous ne décrochez pas, par jour" value={String(calls)}>
             <input
               type="range" min={1} max={12} step={1} value={calls}
@@ -72,7 +72,7 @@ export function Calculator() {
         </div>
 
         {/* résultat */}
-        <div className="border-t border-line bg-nv p-6 text-w md:border-l-0 md:border-t-0">
+        <div className="border-t border-[#2E4A69] bg-[#12202F] p-7 text-w md:border-l md:border-t-0">
           <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-or-2">
             Chiffre d&apos;affaires perdu chaque mois
           </div>
@@ -122,8 +122,8 @@ function Dial({ label, value, children }: { label: string; value: string; childr
   return (
     <div>
       <div className="mb-2.5 flex items-baseline justify-between gap-3">
-        <span className="max-w-[34ch] text-[14.5px] text-ink">{label}</span>
-        <span className="whitespace-nowrap font-mono text-[19px] font-[600] text-or-t">{value}</span>
+        <span className="max-w-[34ch] text-[14.5px] text-[#D6E0EA]">{label}</span>
+        <span className="whitespace-nowrap font-mono text-[20px] font-[600] text-or-2">{value}</span>
       </div>
       {children}
     </div>
@@ -132,7 +132,7 @@ function Dial({ label, value, children }: { label: string; value: string; childr
 
 function Scale({ left, right }: { left: string; right: string }) {
   return (
-    <div className="mt-1 flex justify-between font-mono text-[10.5px] text-faint">
+    <div className="mt-1 flex justify-between font-mono text-[10.5px] text-[#7E96B3]">
       <span>{left}</span>
       <span>{right}</span>
     </div>

@@ -15,9 +15,17 @@ export function Logo({
 }) {
   const mark = (
     <span className={`flex items-center gap-2 text-[19px] font-bold tracking-[-0.02em] ${className}`}>
-      <span className="relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-nv text-[15px] font-bold text-w">
+      <span
+        className={`relative inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[15px] font-bold ${
+          dark ? "bg-w text-nv" : "bg-nv text-w"
+        }`}
+      >
         A
-        <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-or ring-2 ring-w" />
+        <span
+          className={`absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-or ring-2 ${
+            dark ? "ring-nv" : "ring-w"
+          }`}
+        />
       </span>
       <span>
         <span className={dark ? "text-w" : "text-nv"}>Allo</span>
