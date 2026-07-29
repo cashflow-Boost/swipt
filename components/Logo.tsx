@@ -15,8 +15,8 @@ export function Logo({
 }) {
   const mark = (
     <span
-      className={`text-[18px] font-semibold tracking-[-0.03em] ${
-        dark ? "text-w" : "text-ink"
+      className={`text-[20px] font-bold tracking-tight ${
+        dark ? "text-w" : "text-nv"
       } ${className}`}
     >
       AlloChantier
