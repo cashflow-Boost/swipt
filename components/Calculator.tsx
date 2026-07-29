@@ -38,7 +38,7 @@ export function Calculator() {
           Vos trois chiffres
         </span>
         <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
-          Base {WORKDAYS} jours travaillés
+          Simulation indicative · base {WORKDAYS} jours travaillés
         </span>
       </div>
 
@@ -79,6 +79,10 @@ export function Calculator() {
           <div className="mt-2 font-mono text-[clamp(38px,7vw,54px)] font-[700] leading-none tracking-[-0.03em] text-or-2">
             {fmt.format(Math.round(lost))} €
           </div>
+          <p className="mt-2 text-[12px] text-[#9FB2C6]">
+            Estimation calculée à partir des trois valeurs que vous avez réglées. Elle ne constitue
+            ni une mesure de votre activité, ni une promesse de résultat.
+          </p>
 
           <div className="mt-5 space-y-2 border-t border-[#2E4A69] pt-4 text-[13.5px] text-[#B8C6D6]">
             <Line l={`${calls} appel${calls > 1 ? "s" : ""} manqué${calls > 1 ? "s" : ""} × ${WORKDAYS} jours`} r={`${fmt.format(monthly)} appels`} />

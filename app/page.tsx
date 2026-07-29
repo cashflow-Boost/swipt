@@ -116,7 +116,7 @@ export default function Home() {
             L&apos;assistante qui décroche quand vous ne pouvez pas
           </p>
           <h1 className="mx-auto mt-4 max-w-[20ch] text-[clamp(30px,5.6vw,54px)] font-[700] leading-[1.06] tracking-[-0.035em]">
-            Vous perdez 1 client sur 3 parce que vous ne pouvez pas décrocher ?
+            Un appel manqué, c&apos;est un chantier qui part chez le concurrent.
           </h1>
           <p className="mx-auto mt-5 max-w-[54ch] text-[17.5px] text-soft">
             AlloChantier, c&apos;est votre secrétaire téléphonique intelligente. Elle répond à votre
