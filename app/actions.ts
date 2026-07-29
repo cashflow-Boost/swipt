@@ -10,6 +10,7 @@ import { markPaid, issueInvoiceFromQuote } from "@/lib/actions/invoices";
 import { blockSlot } from "@/lib/actions/appointments";
 import { correctExtraction } from "@/lib/actions/calls";
 import { createCustomer } from "@/lib/actions/customers";
+import { createPriceItem, deletePriceItem } from "@/lib/actions/price-items";
 
 // Server Actions : l'interface APPELLE les fonctions de lib/actions/, elle ne
 // contient pas la logique métier (Addendum v1.1 §6).
@@ -139,4 +140,41 @@ export async function blockSlotAction(formData: FormData) {
     notes: str(formData, "notes"),
   });
   revalidatePath("/agenda");
+}
+
+// ── Grille de prix (SPEC §4.3) ───────────────────────────────────────────────
+
+export async function createPriceItemAction(formData: FormData) {
+  const label = str(formData, "label");
+  const euros = num(formData, "unitPriceEuros");
+  if (!label) throw new Error("Le libellé est requis.");
+  const vat = num(formData, "vatRate");
+  await createPriceItem.withContext(await ctx())({
+    label,
+    unit: str(formData, "unit"),
+    unitPriceCents: Math.round((euros ?? 0) * 100),
+    vatRate: (vat === 10 || vat === 5.5 ? vat : 20) as 20 | 10 | 5.5,
+    tradeCategory: str(formData, "tradeCategory"),
+  });
+  revalidatePath("/tarifs");
+}
+
+export async function deletePriceItemAction(formData: FormData) {
+  await deletePriceItem.withContext(await ctx())({ id: String(formData.get("id")) });
+  revalidatePath("/tarifs");
+}
+
+/** Horaires d'ouverture : une plage par jour, jours fermés absents. */
+export async function saveBusinessHoursAction(formData: FormData) {
+  const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const hours: Record<string, [string, string][]> = {};
+  for (const d of days) {
+    if (formData.get(`${d}-open`) !== "on") continue;
+    const from = str(formData, `${d}-from`) || "08:00";
+    const to = str(formData, `${d}-to`) || "18:00";
+    if (from >= to) continue; // plage incohérente : jour ignoré plutôt qu'enregistré faux
+    hours[d] = [[from, to]];
+  }
+  await updateAgentSettings.withContext(await ctx())({ businessHours: hours });
+  revalidatePath("/reglages");
 }

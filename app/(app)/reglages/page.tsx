@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { saveAgentSettingsAction } from "@/app/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Telephony } from "@/components/Telephony";
+import { BusinessHours } from "@/components/BusinessHours";
+import Link from "next/link";
 
 type Settings = {
   announced_name: string | null;
@@ -15,6 +17,7 @@ type Settings = {
   callout_fee_cents: number | null;
   urgent_triggers: string[] | null;
   refusal_rules: string[] | null;
+  business_hours: Record<string, [string, string][]> | null;
 } | null;
 
 export default async function ReglagesPage() {
@@ -149,12 +152,19 @@ export default async function ReglagesPage() {
         />
 
         <div className="flex items-center gap-3 pt-1">
-          <SubmitButton pendingText="Enregistrement…" className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-ink">
+          <SubmitButton pendingText="Enregistrement…" className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-w">
             Enregistrer
           </SubmitButton>
-          <span className="text-[12.5px] text-soft">Bibliothèque de prix : {priceItemsCount} ouvrage{priceItemsCount > 1 ? "s" : ""}</span>
+          <span className="text-[12.5px] text-soft">
+            Grille de prix : {priceItemsCount} ouvrage{priceItemsCount > 1 ? "s" : ""} —{" "}
+            <Link href="/tarifs" className="font-medium text-or-t underline">gérer mes tarifs</Link>
+          </span>
         </div>
       </form>
+
+      <div className="mt-4 max-w-2xl">
+        <BusinessHours hours={s?.business_hours ?? null} />
+      </div>
     </div>
   );
 }
