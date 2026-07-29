@@ -2,58 +2,65 @@
 
 /* ─────────────────────────────────────────────────────────────
    AlloChantier — design tokens.
-   Marque : bleu marine (#1e3a5f) pour les titres, orange (#ff6b35)
-   pour les actions. Contrastes vérifiés WCAG : le texte des boutons
-   orange est encre foncée (6,1:1) — du blanc sur cet orange tomberait
-   à 2,8:1 et serait illisible au soleil, sur un chantier.
+
+   Parti pris : blanc, typographie, espace. Pas de fond coloré, pas
+   d'ombre portée, pas d'icône. L'accent émeraude est rare — trois
+   apparitions au plus sur une page — pour qu'il veuille encore dire
+   quelque chose quand il apparaît.
+
+   Les noms de tokens sont conservés (--or, --nv…) : toute
+   l'application les utilise déjà, seules les valeurs changent.
    ───────────────────────────────────────────────────────────── */
 :root {
-  /* Base */
+  /* Surfaces — blanc, et deux gris à peine perceptibles pour les zones inertes */
   --w:      #FFFFFF;
-  --w2:     #F8FAFC;
-  --w3:     #F1F5F9;
+  --w2:     #FFFFFF;
+  --w3:     #F8FAFC;
 
-  --ink:    #1A1A1A;  /* texte principal — 16,9:1 */
-  --soft:   #52606D;  /* texte secondaire — 7,4:1 */
-  --faint:  #78828C;  /* légendes, méta */
+  /* Texte */
+  --ink:    #0F172A;  /* slate-900 — titres et texte principal, 17,9:1 */
+  --soft:   #64748B;  /* slate-500 — texte secondaire, 4,8:1 */
+  --faint:  #94A3B8;  /* slate-400 — mentions, jamais porteur de sens seul */
 
-  --line:   #E6EAEF;
-  --line2:  #D4DBE3;
+  /* Filets */
+  --line:   #F1F5F9;  /* slate-100 — séparation de section */
+  --line2:  #E2E8F0;  /* slate-200 — filet de colonne, champs */
 
   /* Marque */
-  --nv:      #1E3A5F;  /* bleu marine — titres, aplats sombres */
-  --nv-2:    #2C5183;  /* marine clair — survols */
-  --nv-wash: #EEF3F9;
-  --nv-line: #D3E0EE;
+  --nv:      #0F172A;  /* les titres partagent l'encre : une seule voix */
+  --nv-2:    #1E293B;
+  --nv-wash: #F8FAFC;
+  --nv-line: #E2E8F0;
 
-  --or:      #FF6B35;  /* orange d'action — APLATS (texte encre dessus) */
-  --or-h:    #E55A2B;  /* survol */
-  --or-t:    #B33A06;  /* orange pour TEXTE sur clair — 5,96:1 */
-  --or-2:    #FF8A5C;  /* orange pour texte sur fond sombre */
-  --or-wash: #FFF3EE;
-  --or-line: #FFD9C7;
+  /* Action — le bouton est encre pleine ; l'émeraude n'arrive qu'au survol */
+  --or:      #0F172A;
+  --or-h:    #059669;  /* emerald-600 */
+  --or-t:    #047857;  /* emerald-700 — accent TEXTE sur blanc, 5,5:1 */
+  --or-2:    #34D399;  /* emerald-400 — accent sur fond sombre */
+  --or-wash: #ECFDF5;  /* emerald-50 — pastille « Recommandé » */
+  --or-line: #A7F3D0;
 
   /* Sémantiques */
-  --gr:      #16794A;  --gr-wash: #EDF7F1;  /* succès, payé, gains */
-  --rd:      #B3261E;  --rd-wash: #FDF2F1;  /* retard, perte, alerte */
+  --gr:      #059669;  --gr-wash: #ECFDF5;
+  --rd:      #B91C1C;  --rd-wash: #FEF2F2;
 
-  /* Mode sombre (écrans secondaires, calculateur) */
-  --bg: #12202F;  --bg2: #17293B;  --card: #1D3247;
-  --d-line: #2A4157;  --d-line2: #375270;
-  --d-txt: #F2F5F8;   --d-dim: #A3B2C2;  --d-faint: #738799;
+  /* Fonds sombres résiduels (écrans applicatifs) */
+  --bg: #0F172A;  --bg2: #1E293B;  --card: #FFFFFF;
+  --d-line: #1E293B;  --d-line2: #334155;
+  --d-txt: #F8FAFC;   --d-dim: #CBD5E1;  --d-faint: #94A3B8;
 
-  /* Formes et ombres */
-  --radius-sm: 8px;
-  --radius:    12px;
-  --radius-lg: 16px;
+  /* Formes — arrondi discret sur les blocs, plein arrondi sur les boutons */
+  --radius-sm: 6px;
+  --radius:    10px;
+  --radius-lg: 14px;
   --radius-pill: 100px;
 
-  --sh:  0 1px 2px rgba(30,58,95,.06);
-  --sh2: 0 1px 2px rgba(30,58,95,.05), 0 10px 28px -10px rgba(30,58,95,.14);
-  --sh3: 0 2px 4px rgba(30,58,95,.05), 0 24px 56px -16px rgba(30,58,95,.16);
+  /* Ombres neutralisées : la hiérarchie passe par l'espace et le filet. */
+  --sh:  none;
+  --sh2: none;
+  --sh3: none;
 }
 
-/* Exposition des tokens aux utilitaires Tailwind (bg-w, text-nv, text-or-t…) */
 @theme inline {
   --color-w:        var(--w);
   --color-w2:       var(--w2);
@@ -89,7 +96,6 @@
   --shadow-sh2:     var(--sh2);
   --shadow-sh3:     var(--sh3);
 
-  /* Polices injectées par next/font (voir app/layout.tsx) */
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
@@ -101,20 +107,24 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 16px;
-  line-height: 1.55;
-  font-weight: 450;
+  line-height: 1.6;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3 { color: var(--nv); text-wrap: balance; }
+h1, h2, h3 {
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
 
-/* Focus visible partout */
 :focus-visible {
-  outline: 2px solid var(--or);
+  outline: 2px solid var(--or-h);
   outline-offset: 3px;
 }
 
-/* Curseurs du calculateur */
+/* Curseurs du calculateur — filet fin, pastille encre pleine. */
 .swipt-range {
   -webkit-appearance: none;
   appearance: none;
@@ -124,18 +134,14 @@ h1, h2, h3 { color: var(--nv); text-wrap: balance; }
   cursor: pointer;
   display: block;
 }
-/* Le calculateur vit sur fond marine : piste claire, pastille orange cerclée
-   de la couleur du panneau pour la détacher du fond. */
-.swipt-range::-webkit-slider-runnable-track { height: 4px; background: #3A5878; border-radius: 2px; }
-.swipt-range::-moz-range-track { height: 4px; background: #3A5878; border-radius: 2px; }
+.swipt-range::-webkit-slider-runnable-track { height: 1px; background: var(--line2); }
+.swipt-range::-moz-range-track { height: 1px; background: var(--line2); }
 .swipt-range::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-  background: var(--or); border: 3px solid #17293B; margin-top: -9px;
-  box-shadow: 0 0 0 1.5px var(--or);
+  -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ink); margin-top: -7.5px;
 }
 .swipt-range::-moz-range-thumb {
-  width: 18px; height: 18px; border-radius: 50%; background: var(--or);
-  border: 3px solid #17293B; box-shadow: 0 0 0 1.5px var(--or);
+  width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: none;
 }
 
 /* Impression des devis et factures : pas de fond, pas de chrome. */
@@ -144,37 +150,25 @@ h1, h2, h3 { color: var(--nv); text-wrap: balance; }
   .print\:hidden { display: none !important; }
 }
 
-/* ── Animations d'entrée ─────────────────────────────────────────────────── */
+/* ── Entrée ──────────────────────────────────────────────────────────────── */
 @keyframes ac-rise {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: none; }
 }
+.ac-rise { animation: ac-rise .7s cubic-bezier(.22,.8,.36,1) backwards; }
+.ac-d1 { animation-delay: .05s; }
+.ac-d2 { animation-delay: .2s; }
+.ac-d3 { animation-delay: .35s; }
 
-/* Séquence du hero : titre, puis sous-titre, puis boutons. */
-.ac-rise {
-  animation: ac-rise .6s cubic-bezier(.22,.8,.36,1) backwards;
-}
-.ac-d1 { animation-delay: .1s; }
-.ac-d2 { animation-delay: .3s; }
-.ac-d3 { animation-delay: .5s; }
-
-/* Révélation au défilement (voir components/Reveal.tsx) */
 .ac-reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity .55s ease-out, transform .55s cubic-bezier(.22,.8,.36,1);
+  transform: translateY(16px);
+  transition: opacity .6s ease-out, transform .6s cubic-bezier(.22,.8,.36,1);
 }
-.ac-reveal[data-shown="true"] {
-  opacity: 1;
-  transform: none;
-}
+.ac-reveal[data-shown="true"] { opacity: 1; transform: none; }
 
-/* Mouvement — neutralisation complète en mode réduit */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    transition: none !important;
-    animation: none !important;
-  }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
   .ac-reveal { opacity: 1; transform: none; }
 }

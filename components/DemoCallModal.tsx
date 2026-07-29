@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
  * et on l'annonce honnêtement plutôt que de simuler un appel qui n'arrivera pas.
  */
 export function DemoCallModal({
-  label = "🎧 Écouter un appel démo",
+  label = "Écouter un appel de démonstration",
   className = "",
 }: {
   label?: string;

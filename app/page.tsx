@@ -7,68 +7,47 @@ import { Testimonials } from "@/components/Testimonials";
 import { HeroVisual } from "@/components/HeroVisual";
 import { Reveal } from "@/components/Reveal";
 
-const TRADES = [
-  { e: "🔧", n: "Plombiers" },
-  { e: "🏠", n: "Couvreurs" },
-  { e: "⚡", n: "Électriciens" },
-  { e: "🪚", n: "Menuisiers" },
-  { e: "🎨", n: "Peintres" },
-];
-
-const BENEFITS = [
+const CAPABILITIES = [
   {
-    e: "📞",
-    t: "Elle décroche",
-    d: "En moins de 2 secondes, 24 h/24. Annoncée comme automatique. Transfert si urgence.",
+    t: "Elle décroche en 2 secondes",
+    d: "Votre téléphone sonne quatre fois, puis Lia répond au nom de votre entreprise. Annoncée comme automatique. Transfert immédiat en cas d'urgence.",
   },
   {
-    e: "📅",
-    t: "Elle organise",
-    d: "Rendez-vous posés dans votre agenda. Confirmation SMS. Refus poli hors-zone.",
+    t: "Elle fixe le rendez-vous",
+    d: "Lia consulte votre agenda, propose les créneaux libres, confirme par SMS. Refus poli si le chantier est hors de votre zone.",
   },
   {
-    e: "💶",
-    t: "Elle facture",
-    d: "Devis chiffré depuis vos prix. Validation au doigt. Facture Factur-X. Relance impayés.",
-  },
-  {
-    e: "🔔",
-    t: "Elle relance",
-    d: "Vos clients reçoivent le devis par message. Relance automatique si pas de réponse.",
+    t: "Elle prépare le devis",
+    d: "Chiffré depuis votre grille de prix. Vous validez d'un clic depuis votre téléphone. La facture suit automatiquement.",
   },
 ];
 
 const VS_LEFT = [
   "1 400 € par mois",
-  "Congés payés à financer",
-  "Arrêts maladie",
-  "Présente de 9 h à 17 h seulement",
-  "Formation à assurer",
+  "Congés, absences, formation",
+  "Présente de 9 h à 17 h",
+  "Poste à pourvoir, à gérer",
 ];
 
 const VS_RIGHT = [
-  "Dès 99 € par mois",
-  "Jamais de congés",
-  "Jamais malade",
-  "Disponible 24 h/24, 7 j/7",
-  "Aucune formation",
+  "99 € par mois",
+  "Disponible 24 heures sur 24",
+  "7 jours sur 7, week-ends compris",
+  "Déployé en une heure",
 ];
 
 const STEPS = [
   {
-    e: "⚙️",
     t: "Configurez",
-    d: "Une heure. Vos horaires, votre zone, vos prix. AlloChantier décroche le soir même.",
+    d: "Une heure. Vos horaires, votre zone, votre grille de prix.",
   },
   {
-    e: "🎧",
     t: "Lia décroche",
-    d: "Votre téléphone sonne quatre fois, puis Lia répond au nom de votre entreprise.",
+    d: "Votre ligne sonne quatre fois, puis elle répond au nom de votre entreprise.",
   },
   {
-    e: "💬",
     t: "Vous recevez tout",
-    d: "Résumé, rendez-vous, devis. Directement sur votre téléphone. Vous ne touchez à rien.",
+    d: "Résumé, rendez-vous, devis. Sur votre téléphone. Vous ne touchez à rien.",
   },
 ];
 
@@ -77,31 +56,38 @@ const PLANS = [
     n: "Solo",
     who: "Artisan seul",
     price: 99,
-    feats: ["80 appels traités / mois", "Devis illimités", "Prise de rendez-vous", "Relance des impayés"],
+    feats: [
+      "80 appels inclus",
+      "Devis illimités",
+      "1 utilisateur",
+      "Prise de rendez-vous",
+      "Relance des impayés",
+    ],
   },
   {
     n: "Pro",
-    who: "2 à 3 personnes",
+    who: "Jusqu'à 3 personnes",
     price: 199,
     top: true,
-    feats: ["Appels illimités", "3 utilisateurs", "Planning partagé", "Plusieurs zones d'intervention"],
-  },
-  {
-    n: "Agence",
-    who: "Équipe complète",
-    price: 399,
-    feats: ["Appels illimités", "Utilisateurs illimités", "Affectation automatique", "Interlocuteur dédié"],
+    feats: [
+      "Appels illimités",
+      "Devis illimités",
+      "Jusqu'à 3 utilisateurs",
+      "Planning partagé",
+      "Relance des impayés",
+      "Plusieurs zones d'intervention",
+    ],
   },
 ];
 
 const FAQ = [
   {
     q: "Mes clients savent-ils qu'ils parlent à une machine ?",
-    a: "Oui — c'est annoncé dès le décroché, avec le nom de votre entreprise. Si l'appelant demande à vous parler, l'appel vous est transféré.",
+    a: "Oui. C'est annoncé dès le décroché, avec le nom de votre entreprise. Si l'appelant demande à vous parler, l'appel vous est transféré.",
   },
   {
     q: "Est-ce que je change de numéro ?",
-    a: "Non. Un renvoi conditionnel est activé sur votre ligne : votre téléphone sonne normalement, et l'appel ne bascule sur AlloChantier qu'après quatre sonneries sans réponse.",
+    a: "Non. Un renvoi conditionnel est activé sur votre ligne : votre téléphone sonne normalement, et l'appel ne bascule qu'après quatre sonneries sans réponse.",
   },
   {
     q: "Et si c'est une urgence grave ?",
@@ -117,18 +103,18 @@ export default function Home() {
   return (
     <main className="bg-w">
       {/* 1 — Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-line bg-w/95 shadow-sh backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
+      <nav className="sticky top-0 z-50 border-b border-line bg-w/80 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
           <Logo />
-          <div className="hidden items-center gap-7 md:flex">
-            <a href="#fonctionnalites" className="text-[14.5px] font-medium text-soft transition-colors hover:text-nv">Fonctionnalités</a>
-            <a href="#tarifs" className="text-[14.5px] font-medium text-soft transition-colors hover:text-nv">Tarifs</a>
-            <a href="#questions" className="text-[14.5px] font-medium text-soft transition-colors hover:text-nv">FAQ</a>
-            <Link href="/login" className="text-[14.5px] font-medium text-soft transition-colors hover:text-nv">Se connecter</Link>
+          <div className="hidden items-center gap-8 md:flex">
+            <a href="#fonctionnalites" className="text-[14px] text-soft transition-colors hover:text-ink">Fonctionnalités</a>
+            <a href="#tarifs" className="text-[14px] text-soft transition-colors hover:text-ink">Tarifs</a>
+            <a href="#questions" className="text-[14px] text-soft transition-colors hover:text-ink">FAQ</a>
+            <Link href="/login" className="text-[14px] text-soft transition-colors hover:text-ink">Se connecter</Link>
           </div>
           <Link
             href="/signup"
-            className="rounded-full bg-or px-5 py-2.5 text-[14px] font-semibold text-w transition-all duration-300 hover:bg-or-h"
+            className="rounded-full bg-ink px-5 py-2 text-[14px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
           >
             Essai gratuit
           </Link>
@@ -136,72 +122,51 @@ export default function Home() {
       </nav>
 
       {/* 2 — Hero */}
-      <header className="bg-w">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 sm:py-28 lg:grid-cols-[1.05fr_1fr]">
+      <header className="flex min-h-[calc(100vh-65px)] items-center bg-w">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-16 px-6 py-24 lg:grid-cols-[1.15fr_1fr]">
           <div className="text-center lg:text-left">
-            <h1 className="ac-rise ac-d1 mx-auto max-w-[15ch] text-[clamp(38px,6.5vw,60px)] font-bold leading-[1.03] tracking-[-0.035em] lg:mx-0">
-              Ne perdez plus un seul appel
+            <h1 className="ac-rise ac-d1 mx-auto max-w-[16ch] text-[clamp(44px,7vw,76px)] font-bold leading-[1.02] lg:mx-0">
+              Vous ne perdez plus un seul appel.
             </h1>
-            <p className="ac-rise ac-d2 mx-auto mt-6 max-w-[52ch] text-[19px] leading-relaxed text-soft lg:mx-0">
-              AlloChantier, c&apos;est votre secrétaire téléphonique intelligente. Elle décroche à votre
-              place, fixe vos rendez-vous et prépare vos devis. Même le week-end.
+            <p className="ac-rise ac-d2 mx-auto mt-7 max-w-[54ch] text-[20px] font-light leading-relaxed text-soft lg:mx-0">
+              AlloChantier répond à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
+              recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
             </p>
-            <div className="ac-rise ac-d3 mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+            <div className="ac-rise ac-d3 mt-11">
               <Link
                 href="/signup"
-                className="w-full rounded-full bg-or px-8 py-4 text-center text-[17px] font-semibold text-w shadow-[0_8px_24px_-8px_rgba(255,107,53,.7)] transition-all duration-300 hover:bg-or-h hover:shadow-[0_10px_30px_-8px_rgba(255,107,53,.85)] sm:w-auto"
+                className="inline-block rounded-full bg-ink px-8 py-4 text-[16px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
               >
-                🚀 Essai gratuit 7 jours
+                Démarrer mon essai
               </Link>
-              <DemoCallModal className="w-full rounded-full border border-line2 bg-w px-8 py-4 text-[17px] font-semibold text-nv transition-all duration-300 hover:border-nv sm:w-auto" />
+              <a
+                href="#fonctionnement"
+                className="mt-5 block text-[14px] text-faint transition-colors hover:text-soft"
+              >
+                Voir comment ça marche ↓
+              </a>
             </div>
-            <p className="ac-rise ac-d3 mt-5 text-[14px] text-faint">
-              Sans engagement · Sans carte bancaire
-            </p>
           </div>
-          <div className="ac-rise ac-d2 flex justify-center lg:justify-end">
+          <div className="ac-rise ac-d3 flex justify-center lg:justify-end">
             <HeroVisual />
           </div>
         </div>
       </header>
 
-      {/* 3 — Métiers couverts */}
-      <section className="bg-nv-wash py-10">
-        <div className="mx-auto max-w-5xl px-6">
-          <p className="text-center font-mono text-[11px] uppercase tracking-[0.16em] text-faint">
-            Pensé pour tous les métiers du bâtiment
-          </p>
-          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
-            {TRADES.map((t) => (
-              <li key={t.n} className="flex items-center gap-2.5 text-[15px] font-[600] text-nv">
-                <span className="text-[22px]" aria-hidden="true">{t.e}</span>
-                {t.n}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 4 — Bénéfices */}
-      <section id="fonctionnalites" className="bg-w py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center">
-            <h2 className="mx-auto max-w-[22ch] text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em]">
-              Un seul outil, de la sonnerie à la facture payée
-            </h2>
-            <p className="mx-auto mt-4 max-w-[56ch] text-[17px] text-soft">
-              AlloChantier remplace votre secrétaire, votre agenda et votre logiciel de devis.
-            </p>
-          </div>
-          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {BENEFITS.map((b, i) => (
-              <Reveal key={b.t} delay={i * 90}>
-                <div className="h-full rounded-2xl border border-line bg-w p-8 transition-shadow duration-300 hover:shadow-sh3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-or-wash text-[24px]" aria-hidden="true">
-                    {b.e}
-                  </div>
-                  <h3 className="mt-5 text-[17px] font-bold">{b.t}</h3>
-                  <p className="mt-2 text-[14px] leading-relaxed text-soft">{b.d}</p>
+      {/* 3 — Ce qu'elle fait */}
+      <section id="fonctionnalites" className="border-t border-line py-32">
+        <div className="mx-auto max-w-3xl px-6">
+          <h2 className="max-w-[18ch] text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">
+            Un seul outil. Zéro appel manqué.
+          </h2>
+          <div className="mt-16">
+            {CAPABILITIES.map((c, i) => (
+              <Reveal key={c.t} delay={i * 100}>
+                <div className={i > 0 ? "mt-20" : ""}>
+                  <h3 className="text-[24px] font-semibold">{c.t}</h3>
+                  <p className="mt-3 max-w-[62ch] text-[17px] font-light leading-relaxed text-soft">
+                    {c.d}
+                  </p>
                 </div>
               </Reveal>
             ))}
@@ -209,25 +174,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5 — Comparatif */}
-      <section className="bg-nv-wash py-20">
+      {/* 4 — Comparatif */}
+      <section className="border-t border-line py-32">
         <div className="mx-auto max-w-4xl px-6">
-          <div className="text-center">
-            <h2 className="text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em]">
-              Pourquoi choisir AlloChantier ?
-            </h2>
-            <p className="mx-auto mt-4 max-w-[52ch] text-[17px] text-soft">
-              Le bon point de comparaison n&apos;est pas un logiciel. C&apos;est un poste.
-            </p>
-          </div>
-          <div className="mt-14 grid items-start gap-6 sm:grid-cols-2">
+          <h2 className="max-w-[20ch] text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">
+            Moins cher qu&apos;une demi-journée de secrétaire.
+          </h2>
+          <div className="mt-16 grid gap-12 sm:grid-cols-2 sm:gap-16">
             <Reveal>
-              <div className="rounded-2xl border border-line2 bg-w/60 p-8 opacity-70">
-                <h3 className="text-[18px] font-bold text-soft">Assistante à mi-temps</h3>
-                <ul className="mt-5 space-y-3.5 text-[15px] text-soft">
+              <div>
+                <h3 className="text-[15px] font-medium text-faint">Assistante à mi-temps</h3>
+                <ul className="mt-6 space-y-4">
                   {VS_LEFT.map((x) => (
-                    <li key={x} className="flex gap-3">
-                      <span className="text-rd" aria-hidden="true">✕</span>
+                    <li key={x} className="border-b border-line pb-4 text-[17px] font-light text-faint">
                       {x}
                     </li>
                   ))}
@@ -235,16 +194,19 @@ export default function Home() {
               </div>
             </Reveal>
             <Reveal delay={120}>
-              <div className="relative rounded-2xl border-2 border-or bg-w p-8 shadow-sh3">
-                <span className="absolute -top-3.5 left-8 rounded-full bg-or px-3.5 py-1 text-[11.5px] font-bold text-w">
-                  Recommandé
-                </span>
-                <h3 className="text-[18px] font-bold">AlloChantier</h3>
-                <ul className="mt-5 space-y-3.5 text-[15px] text-soft">
-                  {VS_RIGHT.map((x) => (
-                    <li key={x} className="flex gap-3">
-                      <span className="text-gr" aria-hidden="true">✓</span>
-                      {x}
+              <div>
+                <h3 className="text-[15px] font-medium text-ink">AlloChantier</h3>
+                <ul className="mt-6 space-y-4">
+                  {VS_RIGHT.map((x, i) => (
+                    <li key={x} className="border-b border-line pb-4 text-[17px] font-light">
+                      {i === 0 ? (
+                        <span className="text-[36px] font-bold leading-none tracking-[-0.03em] text-or-t">
+                          99 €
+                          <span className="text-[15px] font-light text-soft"> par mois</span>
+                        </span>
+                      ) : (
+                        x
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -254,43 +216,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6 — Comment ça marche */}
-      <section className="bg-w py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center">
-            <h2 className="text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em]">Comment ça marche ?</h2>
-            <p className="mt-4 text-[17px] text-soft">Trois étapes, zéro effort technique.</p>
-          </div>
-          <ol className="mt-14 grid gap-6 md:grid-cols-3">
+      {/* 5 — Comment ça marche */}
+      <section id="fonctionnement" className="border-t border-line py-32">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">Opérationnel ce soir.</h2>
+          <ol className="mt-16 grid gap-12 md:grid-cols-3">
             {STEPS.map((s, i) => (
-              <Reveal key={s.t} delay={i * 120}>
-                <li className="h-full rounded-2xl border border-line bg-w p-8 transition-shadow duration-300 hover:shadow-sh3">
-                  <div className="font-mono text-[38px] font-bold leading-none tracking-[-0.03em] text-line2">
+              <Reveal key={s.t} delay={i * 110}>
+                <li>
+                  <div className="font-mono text-[76px] font-bold leading-[0.85] tracking-[-0.05em] text-line">
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div className="mt-4 text-[28px]" aria-hidden="true">{s.e}</div>
-                  <h3 className="mt-3 text-[18px] font-bold">{s.t}</h3>
-                  <p className="mt-2 text-[14.5px] leading-relaxed text-soft">{s.d}</p>
+                  <h3 className="mt-5 text-[20px] font-semibold">{s.t}</h3>
+                  <p className="mt-2 text-[16px] font-light leading-relaxed text-soft">{s.d}</p>
                 </li>
               </Reveal>
             ))}
           </ol>
+          <p className="mt-16 text-[14px] text-faint">
+            Vous préférez l&apos;entendre d&apos;abord ?{" "}
+            <DemoCallModal
+              label="Écouter un appel de démonstration"
+              className="text-ink underline underline-offset-4 transition-colors hover:text-or-t"
+            />
+          </p>
         </div>
       </section>
 
-      {/* 7 — Calculateur */}
-      <section id="calcul" className="bg-nv py-20">
+      {/* 6 — Calculateur */}
+      <section id="calcul" className="border-t border-line py-32">
         <div className="mx-auto max-w-4xl px-6">
-          <div className="text-center">
-            <h2 className="mx-auto max-w-[24ch] text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em] text-w">
-              Combien vous coûtent vos appels manqués ?
-            </h2>
-            <p className="mx-auto mt-4 max-w-[50ch] text-[17px] text-[#B8C6D6]">
-              Réglez vos trois chiffres : le calcul s&apos;affiche ligne par ligne, vous pouvez
-              contester chaque étape.
-            </p>
-          </div>
-          <div className="mt-12">
+          <h2 className="max-w-[20ch] text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">
+            Combien vous coûte un appel manqué ?
+          </h2>
+          <div className="mt-16">
             <Calculator />
           </div>
         </div>
@@ -299,134 +258,114 @@ export default function Home() {
       {/* Témoignages — masqués tant qu'il n'y a pas de vrais clients */}
       <Testimonials />
 
-      {/* 8 — Tarifs */}
-      <section id="tarifs" className="bg-w py-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="text-center">
-            <h2 className="text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em]">
-              Un tarif clair, sans engagement
-            </h2>
-          </div>
-          <div className="mt-14 grid items-center gap-8 md:grid-cols-3">
-            {PLANS.map((p) => (
-              <div
-                key={p.n}
-                className={`relative flex flex-col rounded-2xl border bg-w transition-all duration-300 hover:scale-105 ${
-                  p.top
-                    ? "border-2 border-or p-9 shadow-sh3 md:-my-4"
-                    : "border-line p-8 shadow-sh2"
-                }`}
-              >
-                {p.top && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-or px-3.5 py-1 text-[11.5px] font-bold text-w">
-                    Recommandé
-                  </span>
-                )}
-                <div className="text-[18px] font-bold">{p.n}</div>
-                <div className="text-[14px] text-faint">{p.who}</div>
-                <div className="mt-5 text-[clamp(34px,5vw,42px)] font-bold leading-none tracking-[-0.035em]">
-                  {p.price} €
-                  <span className="text-[14px] font-medium text-faint"> /mois HT</span>
+      {/* 7 — Tarifs */}
+      <section id="tarifs" className="border-t border-line py-32">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">
+            Un tarif. Pas de surprise.
+          </h2>
+          <div className="mt-16 grid gap-12 sm:grid-cols-2 sm:gap-0">
+            {PLANS.map((p, i) => (
+              <div key={p.n} className={i > 0 ? "sm:border-l sm:border-line2 sm:pl-16" : "sm:pr-16"}>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-[20px] font-semibold">{p.n}</h3>
+                  {p.top && (
+                    <span className="rounded-full bg-or-wash px-3 py-1 text-[11.5px] font-medium text-or-t">
+                      Recommandé
+                    </span>
+                  )}
                 </div>
-                <ul className="mt-7 flex-1 space-y-3 text-[14.5px] text-soft">
+                <p className="mt-1 text-[14px] text-faint">{p.who}</p>
+                <div className="mt-6 text-[48px] font-bold leading-none tracking-[-0.035em]">
+                  {p.price} €
+                  <span className="text-[15px] font-light text-soft"> /mois HT</span>
+                </div>
+                <ul className="mt-8 space-y-3.5">
                   {p.feats.map((f) => (
-                    <li key={f} className="flex gap-2.5">
-                      <span className="text-or" aria-hidden="true">✓</span>
-                      {f}
-                    </li>
+                    <li key={f} className="text-[16px] font-light text-soft">{f}</li>
                   ))}
                 </ul>
                 <Link
                   href="/signup"
-                  className={`mt-8 rounded-full px-5 py-3.5 text-center text-[15px] font-semibold transition-all duration-300 ${
+                  className={`mt-10 inline-block rounded-full px-7 py-3.5 text-[15px] font-medium transition-colors duration-300 ${
                     p.top
-                      ? "bg-or text-w hover:bg-or-h"
-                      : "border border-line2 text-nv hover:border-nv"
+                      ? "bg-ink text-w hover:bg-or-h"
+                      : "border border-line2 text-ink hover:border-ink"
                   }`}
                 >
-                  Essai gratuit 7 jours
+                  Démarrer mon essai
                 </Link>
-                <p className="mt-3 flex items-center justify-center gap-1.5 text-[11.5px] text-faint">
-                  <LockIcon /> Paiement sécurisé par Stripe
-                </p>
               </div>
             ))}
           </div>
-          <p className="mx-auto mt-10 max-w-[64ch] text-center text-[13.5px] text-faint">
+          <p className="mt-16 max-w-[70ch] text-[14px] font-light leading-relaxed text-faint">
             Au-delà du forfait Solo : 0,79 € par appel traité, facturé le mois suivant — le service ne
-            se coupe jamais. Sans engagement, résiliable au mois.
+            se coupe jamais. Sept jours d&apos;essai sans carte bancaire, sans engagement, résiliable
+            au mois. Une offre Agence est disponible pour les équipes de plus de trois personnes.
           </p>
         </div>
       </section>
 
-      {/* 9 — FAQ */}
-      <section id="questions" className="bg-nv-wash py-20">
+      {/* 8 — FAQ */}
+      <section id="questions" className="border-t border-line py-32">
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center text-[clamp(28px,4.4vw,42px)] font-bold tracking-[-0.03em]">
-            Les points sur lesquels on nous attend
+          <h2 className="text-[clamp(32px,5vw,52px)] font-bold leading-[1.08]">
+            Les points sur lesquels on nous attend.
           </h2>
-          <div className="mt-12 overflow-hidden rounded-2xl border border-line bg-w">
+          <div className="mt-14">
             {FAQ.map((f, i) => (
-              <details key={f.q} open={i === 0} className="group border-b border-line last:border-b-0">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-[16px] font-[600] text-nv">
+              <details key={f.q} open={i === 0} className="group border-b border-line">
+                <summary className="flex cursor-pointer list-none items-baseline justify-between gap-6 py-6 text-[18px] font-medium">
                   {f.q}
-                  <span className="shrink-0 text-[20px] font-normal text-faint transition-transform duration-300 group-open:rotate-45" aria-hidden="true">
+                  <span
+                    className="shrink-0 text-[22px] font-light text-faint transition-transform duration-300 group-open:rotate-45"
+                    aria-hidden="true"
+                  >
                     +
                   </span>
                 </summary>
-                <p className="max-w-[68ch] px-6 pb-5 text-[15px] leading-relaxed text-soft">{f.a}</p>
+                <p className="max-w-[68ch] pb-7 text-[16.5px] font-light leading-relaxed text-soft">
+                  {f.a}
+                </p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 10 — CTA final */}
-      <section className="bg-or py-24 text-center">
-        <div className="mx-auto max-w-2xl px-6">
-          <h2 className="text-[clamp(30px,5vw,46px)] font-bold leading-tight tracking-[-0.035em] text-w">
+      {/* 9 — CTA final */}
+      <section className="border-t border-line py-40 text-center">
+        <div className="mx-auto max-w-3xl px-6">
+          <h2 className="text-[clamp(40px,6.5vw,76px)] font-bold leading-[1.02]">
             Le prochain appel arrive.
           </h2>
-          <p className="mt-2 text-[clamp(20px,3vw,26px)] font-[600] text-w/85">Décidez qui décroche.</p>
+          <p className="mt-5 text-[20px] font-light text-soft">Décidez qui décroche.</p>
           <Link
             href="/signup"
-            className="mt-9 inline-block rounded-full bg-w px-8 py-4 text-[17px] font-bold text-or-t shadow-sh2 transition-all duration-300 hover:scale-105"
+            className="mt-11 inline-block rounded-full bg-ink px-10 py-4 text-[16px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
           >
-            Essai gratuit 7 jours
+            Démarrer mon essai gratuit
           </Link>
-          <p className="mt-5 text-[14px] text-w/80">Sans engagement · Sans carte bancaire</p>
+          <p className="mt-5 text-[14px] text-faint">Sans engagement · Sans carte bancaire</p>
         </div>
       </section>
 
-      {/* 11 — Footer */}
-      <footer className="bg-nv px-6 py-14 text-[#B8C6D6]">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center">
-          <Logo href={null} dark />
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[14px]">
-            <a href="#fonctionnalites" className="transition-colors hover:text-w">Fonctionnalités</a>
-            <a href="#tarifs" className="transition-colors hover:text-w">Tarifs</a>
-            <a href="#questions" className="transition-colors hover:text-w">FAQ</a>
-            <Link href="/mentions-legales" className="transition-colors hover:text-w">Mentions légales</Link>
-            <Link href="/cgv" className="transition-colors hover:text-w">CGV</Link>
-            <Link href="/confidentialite" className="transition-colors hover:text-w">Confidentialité</Link>
+      {/* 10 — Footer */}
+      <footer className="border-t border-line py-12">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 sm:flex-row sm:justify-between">
+          <Logo href={null} />
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[14px] text-faint">
+            <a href="#tarifs" className="transition-colors hover:text-ink">Tarifs</a>
+            <a href="#questions" className="transition-colors hover:text-ink">FAQ</a>
+            <Link href="/mentions-legales" className="transition-colors hover:text-ink">Mentions légales</Link>
+            <Link href="/cgv" className="transition-colors hover:text-ink">CGV</Link>
+            <Link href="/confidentialite" className="transition-colors hover:text-ink">Confidentialité</Link>
           </div>
-          <p className="rounded-full border border-[#33517A] px-4 py-2 text-[13px]">
-            🇫🇷 Conçu en France · Support en français · Données hébergées en Europe
-          </p>
-          <p className="text-[12.5px] text-[#7E96B3]">© 2026 AlloChantier</p>
+          <p className="text-[14px] text-faint">Conçu en France</p>
         </div>
       </footer>
 
       <FloatingHelp phone={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER} />
     </main>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
-      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
-    </svg>
   );
 }
