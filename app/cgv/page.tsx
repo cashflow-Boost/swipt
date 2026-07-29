@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LegalDoc, LSection } from "@/components/LegalDoc";
 
 export const metadata: Metadata = {
-  title: "Conditions générales de vente — SWIPT",
-  description: "Conditions générales de vente et d'utilisation du service d'abonnement SWIPT.",
+  title: "Conditions générales de vente — AlloChantier",
+  description: "Conditions générales de vente et d'utilisation du service d'abonnement AlloChantier.",
 };
 
 export default function CgvPage() {
@@ -11,7 +11,7 @@ export default function CgvPage() {
     <LegalDoc title="Conditions générales de vente" updated="25 juillet 2026">
       <LSection n="1." title="Objet">
         <p>
-          Les présentes conditions régissent l&apos;abonnement au service SWIPT, un standard téléphonique
+          Les présentes conditions régissent l&apos;abonnement au service AlloChantier, un standard téléphonique
           automatisé destiné aux artisans : il répond aux appels, pose des rendez-vous, prépare devis et
           factures et relance les impayés. L&apos;abonnement vaut acceptation des présentes conditions.
         </p>
@@ -20,13 +20,18 @@ export default function CgvPage() {
       <LSection n="2." title="Offres et tarifs">
         <p>Le service est proposé en trois offres, hors taxes, par mois :</p>
         <ul className="ml-4 list-disc space-y-1">
-          <li><b className="text-ink">Solo</b> — 149 € HT / mois — 130 appels traités inclus.</li>
-          <li><b className="text-ink">Équipe</b> — 299 € HT / mois — 260 appels traités inclus.</li>
-          <li><b className="text-ink">Pro</b> — 549 € HT / mois — 480 appels traités inclus.</li>
+          <li><b className="text-ink">Solo</b> — 99 € HT / mois — 80 appels traités inclus.</li>
+          <li><b className="text-ink">Pro</b> — 199 € HT / mois — appels illimités, 3 utilisateurs.</li>
+          <li><b className="text-ink">Agence</b> — 399 € HT / mois — appels illimités, utilisateurs illimités.</li>
         </ul>
         <p>
-          Au-delà du volume inclus, chaque appel traité supplémentaire est facturé <b className="text-ink">0,79 € HT</b>,
-          le mois suivant. Les prix s&apos;entendent hors TVA applicable.
+          Au-delà du volume inclus dans l&apos;offre Solo, chaque appel traité supplémentaire est facturé{" "}
+          <b className="text-ink">0,79 € HT</b>, le mois suivant. Les prix s&apos;entendent hors TVA applicable.
+        </p>
+        <p>
+          Un usage manifestement disproportionné au regard d&apos;une activité artisanale normale
+          (revente du service, automates, volumes sans rapport avec l&apos;offre souscrite) peut faire
+          l&apos;objet d&apos;une régularisation après information de l&apos;abonné.
         </p>
       </LSection>
 
@@ -40,7 +45,7 @@ export default function CgvPage() {
 
       <LSection n="4." title="Paiement">
         <p>
-          Le paiement de l&apos;abonnement s&apos;effectue par <b className="text-ink">PayPal</b>, mensuellement et
+          Le paiement de l&apos;abonnement s&apos;effectue par <b className="text-ink">Stripe</b>, mensuellement et
           d&apos;avance. En cas de défaut de paiement, l&apos;accès au service peut être suspendu après information
           de l&apos;abonné.
         </p>
@@ -64,7 +69,7 @@ export default function CgvPage() {
 
       <LSection n="7." title="Responsabilité">
         <p>
-          SWIPT est un outil d&apos;assistance : la responsabilité finale des rendez-vous, devis et factures
+          AlloChantier est un outil d&apos;assistance : la responsabilité finale des rendez-vous, devis et factures
           transmis aux clients de l&apos;abonné lui incombe. L&apos;éditeur met en œuvre les moyens raisonnables pour
           assurer la continuité du service mais ne peut être tenu responsable des interruptions imputables aux
           opérateurs téléphoniques ou aux prestataires tiers.

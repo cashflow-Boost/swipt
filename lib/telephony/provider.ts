@@ -24,7 +24,7 @@ export interface SmsMessage {
 }
 
 export interface TelephonyProvider {
-  /** Renvoi conditionnel : bascule vers SWIPT après N sonneries sans réponse. */
+  /** Renvoi conditionnel : bascule vers AlloChantier après N sonneries sans réponse. */
   configureConditionalForward(params: {
     orgNumber: PhoneNumber;
     forwardTo: PhoneNumber;

@@ -1,51 +1,59 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────
-   SWIPT — design tokens (SPEC §3). Valeurs échantillonnées au
-   pixel dans le logo puis vérifiées au contraste WCAG.
-   NE PAS modifier à l'œil.
+   AlloChantier — design tokens.
+   Marque : bleu marine (#1e3a5f) pour les titres, orange (#ff6b35)
+   pour les actions. Contrastes vérifiés WCAG : le texte des boutons
+   orange est encre foncée (6,1:1) — du blanc sur cet orange tomberait
+   à 2,8:1 et serait illisible au soleil, sur un chantier.
    ───────────────────────────────────────────────────────────── */
 :root {
-  /* Base — mode clair (par défaut) */
+  /* Base */
   --w:      #FFFFFF;
-  --w2:     #FAFAF8;
-  --w3:     #F4F3F0;
+  --w2:     #F8FAFC;
+  --w3:     #F1F5F9;
 
-  --ink:    #111113;  /* texte principal, boutons pleins — 18,9:1 */
-  --soft:   #6A6660;  /* texte secondaire — 5,7:1 */
-  --faint:  #98948C;  /* légendes, méta — usage non essentiel */
+  --ink:    #1A1A1A;  /* texte principal — 16,9:1 */
+  --soft:   #52606D;  /* texte secondaire — 7,4:1 */
+  --faint:  #78828C;  /* légendes, méta */
 
-  --line:   #E9E7E2;
-  --line2:  #DDDAD3;
+  --line:   #E6EAEF;
+  --line2:  #D4DBE3;
 
   /* Marque */
-  --or:      #F35B0F;  /* orange du logo — APLATS SEULEMENT */
+  --nv:      #1E3A5F;  /* bleu marine — titres, aplats sombres */
+  --nv-2:    #2C5183;  /* marine clair — survols */
+  --nv-wash: #EEF3F9;
+  --nv-line: #D3E0EE;
+
+  --or:      #FF6B35;  /* orange d'action — APLATS (texte encre dessus) */
+  --or-h:    #E55A2B;  /* survol */
   --or-t:    #B33A06;  /* orange pour TEXTE sur clair — 5,96:1 */
-  --or-2:    #F76A20;  /* orange pour texte sur fond sombre — 5,95:1 */
-  --or-wash: #FFF4EC;
-  --or-line: #FBDDC9;
+  --or-2:    #FF8A5C;  /* orange pour texte sur fond sombre */
+  --or-wash: #FFF3EE;
+  --or-line: #FFD9C7;
 
   /* Sémantiques */
-  --gr:      #1F7A3D;  --gr-wash: #F0F7F2;  /* succès, payé */
+  --gr:      #16794A;  --gr-wash: #EDF7F1;  /* succès, payé, gains */
   --rd:      #B3261E;  --rd-wash: #FDF2F1;  /* retard, perte, alerte */
 
   /* Mode sombre (écrans secondaires, calculateur) */
-  --bg: #0E0E0F;  --bg2: #151517;  --card: #1A1A1D;
-  --d-line: #26262A;  --d-line2: #33333A;
-  --d-txt: #F2F0EB;   --d-dim: #9A968D;  --d-faint: #6E6A63;
+  --bg: #12202F;  --bg2: #17293B;  --card: #1D3247;
+  --d-line: #2A4157;  --d-line2: #375270;
+  --d-txt: #F2F5F8;   --d-dim: #A3B2C2;  --d-faint: #738799;
 
-  /* Formes et ombres (SPEC §3.4) */
-  --radius-sm: 7px;
-  --radius:    11px;
-  --radius-lg: 14px;
+  /* Formes et ombres */
+  --radius-sm: 8px;
+  --radius:    12px;
+  --radius-lg: 16px;
   --radius-pill: 100px;
 
-  --sh:  0 1px 2px rgba(17,17,19,.05);
-  --sh2: 0 1px 2px rgba(17,17,19,.04), 0 10px 28px -10px rgba(17,17,19,.12);
-  --sh3: 0 2px 4px rgba(17,17,19,.04), 0 24px 56px -16px rgba(17,17,19,.14);
+  --sh:  0 1px 2px rgba(30,58,95,.06);
+  --sh2: 0 1px 2px rgba(30,58,95,.05), 0 10px 28px -10px rgba(30,58,95,.14);
+  --sh3: 0 2px 4px rgba(30,58,95,.05), 0 24px 56px -16px rgba(30,58,95,.16);
 }
 
-/* Exposition des tokens aux utilitaires Tailwind (bg-w, text-ink, text-or-t…) */
+/* Exposition des tokens aux utilitaires Tailwind (bg-w, text-nv, text-or-t…) */
 @theme inline {
   --color-w:        var(--w);
   --color-w2:       var(--w2);
@@ -55,7 +63,12 @@
   --color-faint:    var(--faint);
   --color-line:     var(--line);
   --color-line2:    var(--line2);
+  --color-nv:       var(--nv);
+  --color-nv-2:     var(--nv-2);
+  --color-nv-wash:  var(--nv-wash);
+  --color-nv-line:  var(--nv-line);
   --color-or:       var(--or);
+  --color-or-h:     var(--or-h);
   --color-or-t:     var(--or-t);
   --color-or-2:     var(--or-2);
   --color-or-wash:  var(--or-wash);
@@ -81,7 +94,7 @@
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
 body {
   background: var(--w);
@@ -93,7 +106,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Focus visible partout (SPEC §3.6) */
+h1, h2, h3 { color: var(--nv); text-wrap: balance; }
+
+/* Focus visible partout */
 :focus-visible {
   outline: 2px solid var(--or);
   outline-offset: 3px;
@@ -109,19 +124,25 @@ body {
   cursor: pointer;
   display: block;
 }
-.swipt-range::-webkit-slider-runnable-track { height: 3px; background: var(--line2); border-radius: 2px; }
-.swipt-range::-moz-range-track { height: 3px; background: var(--line2); border-radius: 2px; }
+.swipt-range::-webkit-slider-runnable-track { height: 4px; background: var(--d-line2); border-radius: 2px; }
+.swipt-range::-moz-range-track { height: 4px; background: var(--d-line2); border-radius: 2px; }
 .swipt-range::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-  background: var(--or); border: 3px solid var(--w); margin-top: -9px;
+  -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--or); border: 3px solid var(--card); margin-top: -9px;
   box-shadow: 0 0 0 1px var(--or);
 }
 .swipt-range::-moz-range-thumb {
-  width: 16px; height: 16px; border-radius: 50%; background: var(--or);
-  border: 3px solid var(--w); box-shadow: 0 0 0 1px var(--or);
+  width: 18px; height: 18px; border-radius: 50%; background: var(--or);
+  border: 3px solid var(--card); box-shadow: 0 0 0 1px var(--or);
 }
 
-/* Mouvement (SPEC §3.5) — neutralisation complète en mode réduit */
+/* Impression des devis et factures : pas de fond, pas de chrome. */
+@media print {
+  body { background: #fff; }
+  .print\:hidden { display: none !important; }
+}
+
+/* Mouvement — neutralisation complète en mode réduit */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

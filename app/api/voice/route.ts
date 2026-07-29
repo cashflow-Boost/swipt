@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Webhook de l'agent vocal (Vapi → SWIPT).
+ * Webhook de l'agent vocal (Vapi → AlloChantier).
  *
  * L'agent parle au client au téléphone ; quand il doit AGIR (poser un
  * rendez-vous, vérifier la zone), Vapi appelle cette route. On identifie
@@ -90,7 +90,7 @@ async function resolveOrgId(
   }
 
   // 3) repli : une seule org en test (variable d'env).
-  return process.env.SWIPT_DEFAULT_ORG_ID ?? null;
+  return process.env.AlloChantier_DEFAULT_ORG_ID ?? null;
 }
 
 // ── Outils appelables par l'agent ───────────────────────────────────────────
@@ -176,17 +176,17 @@ async function verifierZone(
     : `${args.ville} est probablement hors de la zone habituelle (centrée sur ${data?.zone_center}). Proposez un rappel de l'artisan plutôt qu'un rendez-vous ferme.`;
 }
 
-// ── Registre interne : l'assistant est fabriqué par SWIPT à chaque appel ─────
+// ── Registre interne : l'assistant est fabriqué par AlloChantier à chaque appel ─────
 //
 // Vapi ne stocke AUCUNE configuration métier : quand un appel arrive, il envoie
-// « assistant-request » et SWIPT répond avec l'assistant complet, construit à
+// « assistant-request » et AlloChantier répond avec l'assistant complet, construit à
 // partir des Réglages de l'artisan (nom annoncé, métier, zone, urgences,
 // refus). La personnalisation vit dans le SaaS, pas chez le prestataire.
 
 type OrgProfile = {
   name: string;
   agent_paused: boolean;
-  /** Faux si l'essai est terminé sans abonnement actif : SWIPT ne décroche plus. */
+  /** Faux si l'essai est terminé sans abonnement actif : AlloChantier ne décroche plus. */
   access_open: boolean;
   announced_name: string | null;
   trade: string | null;
@@ -313,7 +313,7 @@ function buildAssistant(p: OrgProfile, orgId: string, selfUrl: string) {
   ];
 
   return {
-    name: `SWIPT — ${p.name}`,
+    name: `AlloChantier — ${p.name}`,
     firstMessage: p.agent_paused
       ? `Bonjour, vous êtes bien chez ${nom}. Un instant, je vous explique comment nous joindre.`
       : `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`,
@@ -392,12 +392,12 @@ export async function POST(req: Request) {
 
   const orgId = await resolveOrgId(admin, message);
 
-  // Un appel entre : Vapi demande QUI doit répondre. SWIPT fabrique l'assistant
+  // Un appel entre : Vapi demande QUI doit répondre. AlloChantier fabrique l'assistant
   // à la volée depuis les Réglages de l'artisan — le registre interne du SaaS.
   if (type === "assistant-request") {
     if (!orgId) {
       return NextResponse.json({
-        error: "Numéro non rattaché à un compte SWIPT.",
+        error: "Numéro non rattaché à un compte AlloChantier.",
       });
     }
     const profile = await loadProfile(admin, orgId);
@@ -406,7 +406,7 @@ export async function POST(req: Request) {
     }
     // Essai terminé sans abonnement : le service ne décroche plus (SPEC §6).
     if (!profile.access_open) {
-      return NextResponse.json({ error: "Abonnement SWIPT inactif pour ce compte." });
+      return NextResponse.json({ error: "Abonnement AlloChantier inactif pour ce compte." });
     }
     const proto = req.headers.get("x-forwarded-proto") ?? "https";
     const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";

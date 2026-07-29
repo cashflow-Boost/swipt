@@ -103,7 +103,7 @@ export default async function ReglagesPage() {
           <h2 className="text-[14.5px] font-[650]">Téléphonie</h2>
           <p className="mt-1 text-[13px] text-soft">
             Vous gardez votre numéro. Vos clients continuent de vous appeler normalement —
-            SWIPT ne prend l&apos;appel que si vous ne décrochez pas.
+            AlloChantier ne prend l&apos;appel que si vous ne décrochez pas.
           </p>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <Field
@@ -115,11 +115,11 @@ export default async function ReglagesPage() {
               hint="Celui que vos clients composent."
             />
             <label className="block">
-              <span className="mb-1 block text-[13px] font-medium text-soft">Votre numéro SWIPT</span>
+              <span className="mb-1 block text-[13px] font-medium text-soft">Votre numéro AlloChantier</span>
               <div className="w-full rounded-sm border border-dashed border-line2 bg-w2 px-3 py-2 font-mono text-[14px] text-soft">
                 {swiptNumber ?? "en cours d'attribution"}
               </div>
-              <span className="mt-1 block text-[12px] text-faint">La cible du renvoi. Attribué par SWIPT.</span>
+              <span className="mt-1 block text-[12px] text-faint">La cible du renvoi. Attribué par AlloChantier.</span>
             </label>
           </div>
           <Telephony swiptNumber={swiptNumber} ringCount={s?.ring_count ?? 4} />
@@ -141,7 +141,7 @@ export default async function ReglagesPage() {
           hint="Séparez les cas par « · » ou une virgule."
         />
         <Field
-          label="Ce que SWIPT refuse"
+          label="Ce que AlloChantier refuse"
           name="refusalRules"
           defaultValue={s?.refusal_rules?.join(" · ") ?? ""}
           placeholder="Démarchage · hors zone · hors métier · négociation de prix"
