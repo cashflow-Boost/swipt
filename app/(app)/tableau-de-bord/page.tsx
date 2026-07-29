@@ -42,8 +42,12 @@ export default async function TableauDeBordPage() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {kpis.map((k) => (
-          <div key={k.k} className="rounded-[11px] border border-line bg-w p-4">
+        {kpis.map((k, i) => (
+          <div
+            key={k.k}
+            className="ac-card ac-enter rounded-[11px] border border-line bg-w p-4"
+            style={{ animationDelay: `${i * 40}ms` }}
+          >
             <div className="font-mono text-[10.5px] uppercase tracking-[0.11em] text-faint">{k.k}</div>
             <div className={`mt-1.5 text-[30px] font-[650] tracking-[-0.035em] ${k.hot ? "text-or-t" : ""}`}>{k.v}</div>
             <div className="mt-0.5 text-[12.5px] text-soft">{k.d}</div>
