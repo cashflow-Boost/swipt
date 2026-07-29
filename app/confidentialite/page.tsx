@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import { LegalDoc, LSection } from "@/components/LegalDoc";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité — SWIPT",
-  description: "Comment SWIPT collecte, utilise et protège les données personnelles, conformément au RGPD.",
+  title: "Politique de confidentialité — AlloChantier",
+  description: "Comment AlloChantier collecte, utilise et protège les données personnelles, conformément au RGPD.",
 };
 
 export default function ConfidentialitePage() {
   return (
     <LegalDoc title="Politique de confidentialité" updated="25 juillet 2026">
       <p>
-        Cette politique explique quelles données SWIPT traite, pourquoi, et quels sont vos droits, conformément
+        Cette politique explique quelles données AlloChantier traite, pourquoi, et quels sont vos droits, conformément
         au Règlement général sur la protection des données (RGPD) et à la loi Informatique et Libertés.
       </p>
 
@@ -28,7 +28,7 @@ export default function ConfidentialitePage() {
           <li><b className="text-ink">Réglages professionnels</b> : métier, zone d&apos;intervention, horaires, tarifs.</li>
           <li><b className="text-ink">Appels traités par l&apos;agent</b> : numéro de l&apos;appelant, enregistrement et transcription de l&apos;échange, résumé du besoin.</li>
           <li><b className="text-ink">Clients &amp; interventions</b> : nom, téléphone, adresse, rendez-vous, devis, factures.</li>
-          <li><b className="text-ink">Paiement</b> : les transactions d&apos;abonnement sont gérées par PayPal ; nous ne stockons aucune donnée de carte bancaire.</li>
+          <li><b className="text-ink">Paiement</b> : les transactions d&apos;abonnement sont gérées par Stripe ; nous ne stockons aucune donnée de carte bancaire.</li>
           <li><b className="text-ink">Usage technique</b> : journaux de connexion nécessaires à la sécurité et au bon fonctionnement.</li>
         </ul>
       </LSection>
@@ -52,7 +52,7 @@ export default function ConfidentialitePage() {
           <li><b className="text-ink">Supabase</b> — hébergement de la base de données (Union européenne).</li>
           <li><b className="text-ink">Vercel</b> — hébergement de l&apos;application.</li>
           <li><b className="text-ink">Twilio</b> — acheminement téléphonique et vocal.</li>
-          <li><b className="text-ink">PayPal</b> — traitement des paiements d&apos;abonnement.</li>
+          <li><b className="text-ink">Stripe</b> — traitement des paiements d&apos;abonnement.</li>
         </ul>
         <p>Aucune donnée n&apos;est vendue à des tiers.</p>
       </LSection>
@@ -76,7 +76,7 @@ export default function ConfidentialitePage() {
 
       <LSection n="7." title="Cookies">
         <p>
-          SWIPT n&apos;utilise que les cookies strictement nécessaires à votre connexion et à la sécurité. Aucun
+          AlloChantier n&apos;utilise que les cookies strictement nécessaires à votre connexion et à la sécurité. Aucun
           cookie publicitaire ou de traçage tiers n&apos;est déposé sans votre consentement.
         </p>
       </LSection>

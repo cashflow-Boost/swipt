@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { LogoutButton } from "@/components/LogoutButton";
 import { TakeControlButton } from "@/components/TakeControlButton";
+import { Logo } from "@/components/Logo";
 import { getUserAndOrg } from "@/lib/auth";
 
 /**
@@ -21,13 +22,7 @@ export default async function AppLayout({
   return (
     <div className="min-h-screen bg-w2">
       <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-line bg-w px-5 py-3">
-        <Link href="/tableau-de-bord" className="flex items-center gap-2 text-[19px] font-bold tracking-tight">
-          <span>SWIPT</span>
-          <span className="flex gap-0.5">
-            <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-            <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-          </span>
-        </Link>
+        <Logo href="/tableau-de-bord" />
         <div className="flex items-center gap-3">
           {session.orgName && (
             <span className="hidden text-[13px] font-medium text-soft sm:inline">
@@ -47,13 +42,13 @@ export default async function AppLayout({
 
       {session.agentPaused && (
         <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
-          Vous répondez vous-même — SWIPT est en pause. Cliquez « Rendre la main à SWIPT » pour réactiver la prise d&apos;appels.
+          Vous répondez vous-même — AlloChantier est en pause. Cliquez « Rendre la main à AlloChantier » pour réactiver la prise d&apos;appels.
         </div>
       )}
 
       {!session.accessOpen ? (
         <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
-          Votre essai est terminé. Choisissez une offre pour que SWIPT reprenne vos appels.
+          Votre essai est terminé. Choisissez une offre pour qu&apos;AlloChantier reprenne vos appels.
         </div>
       ) : session.trialDaysLeft !== null && session.trialDaysLeft <= 3 ? (
         <div className="border-b border-or-line bg-or-wash px-5 py-2 text-center text-[13px] font-medium text-or-t">

@@ -31,14 +31,14 @@ export function TakeControlButton({ paused: initial }: { paused: boolean }) {
       onClick={toggle}
       disabled={pending}
       aria-pressed={paused}
-      title={paused ? "SWIPT ne prend plus vos appels" : "SWIPT répond quand vous ne pouvez pas"}
+      title={paused ? "AlloChantier ne prend plus vos appels" : "AlloChantier répond quand vous ne pouvez pas"}
       className={
         paused
           ? "rounded-pill border border-rd bg-rd px-3.5 py-1.5 text-[12.5px] font-semibold text-w disabled:opacity-60"
           : "rounded-pill border border-line2 bg-w px-3.5 py-1.5 text-[12.5px] font-semibold text-rd disabled:opacity-60"
       }
     >
-      {paused ? "▶ Rendre la main à SWIPT" : "⏸ Je reprends la main"}
+      {paused ? "▶ Rendre la main à AlloChantier" : "⏸ Je reprends la main"}
     </button>
   );
 }

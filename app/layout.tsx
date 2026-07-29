@@ -17,9 +17,21 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SWIPT",
+  metadataBase: new URL("https://allochantier.com"),
+  title: {
+    default: "AlloChantier — L'assistante qui décroche quand vous ne pouvez pas",
+    template: "%s — AlloChantier",
+  },
   description:
-    "Le standard téléphonique intelligent des artisans du dépannage.",
+    "AlloChantier répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. Essai gratuit 7 jours, sans carte bancaire.",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "AlloChantier",
+    title: "AlloChantier — L'assistante qui décroche quand vous ne pouvez pas",
+    description:
+      "La secrétaire téléphonique intelligente des artisans. Elle décroche, organise et facture pendant que vous travaillez.",
+  },
 };
 
 export default function RootLayout({

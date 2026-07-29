@@ -1,7 +1,7 @@
 const PLANS = [
-  { n: "Solo", who: "Artisan seul", price: 149, feats: ["130 appels traités / mois", "Devis et factures illimités", "Relance des impayés"] },
-  { n: "Équipe", who: "2 à 5 personnes", price: 299, top: true, feats: ["260 appels traités / mois", "Planning partagé", "Plusieurs zones"] },
-  { n: "Pro", who: "6 à 10 personnes", price: 549, feats: ["480 appels traités / mois", "Affectation automatique", "Interlocuteur dédié"] },
+  { n: "Solo", who: "Artisan seul", price: 99, feats: ["80 appels traités / mois", "Devis et factures illimités", "Relance des impayés"] },
+  { n: "Pro", who: "2 à 3 personnes", price: 199, top: true, feats: ["Appels illimités", "3 utilisateurs", "Planning partagé", "Plusieurs zones"] },
+  { n: "Agence", who: "Équipe complète", price: 399, feats: ["Appels illimités", "Utilisateurs illimités", "Affectation automatique", "Interlocuteur dédié"] },
 ];
 
 export default function AbonnementPage() {
@@ -32,12 +32,13 @@ export default function AbonnementPage() {
       </div>
 
       <div className="mt-6 rounded-[11px] border border-or-line bg-or-wash p-4 text-[13.5px] text-or-t">
-        💳 Le paiement (PayPal) est en cours de branchement. Dès qu&apos;il sera actif, ces boutons
+        💳 Le paiement (Stripe) est en cours de branchement. Dès qu&apos;il sera actif, ces boutons
         lanceront l&apos;abonnement — votre compte et vos données restent en place.
       </div>
 
       <p className="mt-4 text-[13px] text-soft">
-        Au-delà du volume inclus : 0,79 € par appel traité, facturé le mois suivant. Sans engagement, résiliable au mois.
+        Au-delà du volume inclus dans Solo : 0,79 € par appel traité, facturé le mois suivant. Sans
+        engagement, résiliable au mois.
       </p>
     </div>
   );

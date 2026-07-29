@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 /**
  * Coquille commune aux pages légales publiques (mentions légales, CGV,
@@ -18,14 +19,8 @@ export function LegalDoc({
     <main className="bg-w">
       <nav className="sticky top-0 z-50 border-b border-line bg-w/90 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-3.5">
-          <Link href="/" className="flex items-center gap-2 text-[19px] font-bold tracking-tight">
-            <span>SWIPT</span>
-            <span className="flex gap-0.5">
-              <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-              <i className="block h-3.5 w-[7px] bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-            </span>
-          </Link>
-          <Link href="/" className="text-[14px] font-medium text-soft hover:text-ink">
+          <Logo />
+          <Link href="/" className="text-[14px] font-medium text-soft hover:text-nv">
             ← Retour au site
           </Link>
         </div>
@@ -53,7 +48,7 @@ export function LegalDoc({
           <span>·</span>
           <Link href="/confidentialite" className="hover:text-ink">Confidentialité</Link>
         </div>
-        <p className="mt-3">© 2026 SWIPT — France</p>
+        <p className="mt-3">© 2026 AlloChantier — France</p>
       </footer>
     </main>
   );
