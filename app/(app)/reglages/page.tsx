@@ -141,7 +141,7 @@ export default async function ReglagesPage() {
           hint="Séparez les cas par « · » ou une virgule."
         />
         <Field
-          label="Ce que AlloChantier refuse"
+          label="Ce qu'AlloChantier refuse"
           name="refusalRules"
           defaultValue={s?.refusal_rules?.join(" · ") ?? ""}
           placeholder="Démarchage · hors zone · hors métier · négociation de prix"

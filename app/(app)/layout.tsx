@@ -48,7 +48,7 @@ export default async function AppLayout({
 
       {!session.accessOpen ? (
         <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
-          Votre essai est terminé. Choisissez une offre pour que AlloChantier reprenne vos appels.
+          Votre essai est terminé. Choisissez une offre pour qu&apos;AlloChantier reprenne vos appels.
         </div>
       ) : session.trialDaysLeft !== null && session.trialDaysLeft <= 3 ? (
         <div className="border-b border-or-line bg-or-wash px-5 py-2 text-center text-[13px] font-medium text-or-t">

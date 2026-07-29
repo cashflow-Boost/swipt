@@ -64,7 +64,7 @@ export default async function AppelsPage() {
           </section>
 
           <section className="rounded-[11px] border border-line bg-w p-4">
-            <h2 className="mb-2.5 text-[14.5px] font-semibold">Ce que AlloChantier en a retenu</h2>
+            <h2 className="mb-2.5 text-[14.5px] font-semibold">Ce qu&apos;AlloChantier en a retenu</h2>
             <Fld k="Client" v={detail.customer} />
             {address && <Fld k="Adresse" v={address} />}
             <Fld k="Demande" v={request} />
