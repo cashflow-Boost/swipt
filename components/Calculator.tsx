@@ -106,7 +106,7 @@ export function Calculator() {
               </div>
               <Link
                 href="/signup"
-                className="rounded-pill bg-or px-4 py-2.5 text-[14px] font-semibold text-ink hover:bg-or-h"
+                className="rounded-pill bg-or px-4 py-2.5 text-[14px] font-semibold text-w hover:bg-or-h"
               >
                 Essai gratuit
               </Link>

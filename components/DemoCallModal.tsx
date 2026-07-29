@@ -50,22 +50,23 @@ export function DemoCallModal({
             {!sent ? (
               <>
                 <h2 id="demo-title" className="text-[20px] font-[680]">
-                  Recevez un appel de Lia
+                  Démo audio bientôt disponible
                 </h2>
                 <p className="mt-2 text-[14.5px] text-soft">
-                  Laissez votre numéro : Lia vous appelle et vous jouez le client. Vous entendez
-                  exactement ce que vos clients entendront.
+                  La ligne de Lia est en cours de mise en service. Laissez vos coordonnées : vous
+                  serez prévenu dès qu&apos;elle décroche, et vous pourrez l&apos;appeler pour
+                  l&apos;entendre.
                 </p>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     setSent(true);
                   }}
-                  className="mt-5"
+                  className="mt-5 space-y-3"
                 >
                   <label className="block">
                     <span className="mb-1.5 block text-[13px] font-medium text-soft">
-                      Votre numéro de téléphone
+                      Votre téléphone
                     </span>
                     <input
                       type="tel"
@@ -75,28 +76,38 @@ export function DemoCallModal({
                       className="w-full rounded-sm border border-line2 bg-w px-3.5 py-2.5 text-[15px] outline-none focus-visible:border-or"
                     />
                   </label>
+                  <label className="block">
+                    <span className="mb-1.5 block text-[13px] font-medium text-soft">
+                      Votre e-mail
+                    </span>
+                    <input
+                      type="email"
+                      required
+                      placeholder="vous@exemple.fr"
+                      className="w-full rounded-sm border border-line2 bg-w px-3.5 py-2.5 text-[15px] outline-none focus-visible:border-or"
+                    />
+                  </label>
                   <button
                     type="submit"
-                    className="mt-4 w-full rounded-pill bg-or px-5 py-3 text-[15px] font-semibold text-ink hover:bg-or-h"
+                    className="w-full rounded-pill bg-or px-5 py-3 text-[15px] font-semibold text-w hover:bg-or-h"
                   >
-                    Me rappeler maintenant
+                    Me prévenir
                   </button>
                 </form>
                 <p className="mt-3 text-center text-[12px] text-faint">
-                  Gratuit · votre numéro ne sert qu&apos;à cet appel
+                  Vos coordonnées ne servent qu&apos;à vous prévenir du lancement.
                 </p>
               </>
             ) : (
               <>
-                <h2 className="text-[20px] font-[680]">Bientôt disponible</h2>
+                <h2 className="text-[20px] font-[680]">C&apos;est noté</h2>
                 <p className="mt-2 text-[14.5px] text-soft">
-                  L&apos;appel de démonstration arrive très prochainement — la ligne de Lia est en
-                  cours de mise en service. En attendant, l&apos;essai gratuit vous donne accès à
-                  tout, sans carte bancaire.
+                  Vous serez prévenu dès que la démo audio est ouverte. En attendant, l&apos;essai
+                  gratuit vous donne accès à tout, sans carte bancaire.
                 </p>
                 <a
                   href="/signup"
-                  className="mt-5 block rounded-pill bg-or px-5 py-3 text-center text-[15px] font-semibold text-ink hover:bg-or-h"
+                  className="mt-5 block rounded-pill bg-or px-5 py-3 text-center text-[15px] font-semibold text-w hover:bg-or-h"
                 >
                   Démarrer l&apos;essai gratuit
                 </a>

@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { DemoCallModal } from "@/components/DemoCallModal";
 import { FloatingHelp } from "@/components/FloatingHelp";
 import { Testimonials } from "@/components/Testimonials";
+import { HeroVisual } from "@/components/HeroVisual";
 
 const STEPS = [
   {
@@ -102,7 +103,7 @@ export default function Home() {
           </div>
           <Link
             href="/signup"
-            className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-ink hover:bg-or-h"
+            className="rounded-pill bg-or px-4 py-2 text-[14px] font-semibold text-w hover:bg-or-h"
           >
             Essai gratuit
           </Link>
@@ -111,38 +112,43 @@ export default function Home() {
 
       {/* 2 — Hero */}
       <header className="border-b border-line bg-nv-wash">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:py-24">
-          <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">
-            L&apos;assistante qui décroche quand vous ne pouvez pas
-          </p>
-          <h1 className="mx-auto mt-4 max-w-[20ch] text-[clamp(30px,5.6vw,54px)] font-[700] leading-[1.06] tracking-[-0.035em]">
-            Un appel manqué, c&apos;est un chantier qui part chez le concurrent.
-          </h1>
-          <p className="mx-auto mt-5 max-w-[54ch] text-[17.5px] text-soft">
-            AlloChantier, c&apos;est votre secrétaire téléphonique intelligente. Elle répond à votre
-            place, fixe vos rendez-vous, prépare vos devis et relance vos impayés.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <DemoCallModal className="w-full rounded-pill border border-nv bg-w px-6 py-3.5 text-[15.5px] font-semibold text-nv hover:bg-w2 sm:w-auto" />
-            <Link
-              href="/signup"
-              className="w-full rounded-pill bg-or px-6 py-3.5 text-center text-[15.5px] font-semibold text-ink hover:bg-or-h sm:w-auto"
-            >
-              🚀 Essai gratuit 7 jours
-            </Link>
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
+          <div className="text-center lg:text-left">
+            <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">
+              L&apos;assistante qui décroche quand vous ne pouvez pas
+            </p>
+            <h1 className="mx-auto mt-4 max-w-[18ch] text-[clamp(34px,6vw,60px)] font-[700] leading-[1.04] tracking-[-0.035em] lg:mx-0">
+              Un appel manqué, c&apos;est un chantier qui part chez le concurrent.
+            </h1>
+            <p className="mx-auto mt-5 max-w-[52ch] text-[18px] text-soft lg:mx-0">
+              AlloChantier, c&apos;est votre secrétaire téléphonique intelligente. Elle répond à votre
+              place, fixe vos rendez-vous, prépare vos devis et relance vos impayés.
+            </p>
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+              <Link
+                href="/signup"
+                className="w-full rounded-pill bg-or px-6 py-3.5 text-center text-[15.5px] font-semibold text-w shadow-sh2 hover:bg-or-h sm:w-auto"
+              >
+                🚀 Essai gratuit 7 jours
+              </Link>
+              <DemoCallModal className="w-full rounded-pill border border-nv bg-w px-6 py-3.5 text-[15.5px] font-semibold text-nv hover:bg-w2 sm:w-auto" />
+            </div>
+            <p className="mt-4 text-[13.5px] text-faint">
+              Sans engagement · Sans carte bancaire · Résiliable en 1 clic
+            </p>
           </div>
-          <p className="mt-4 text-[13.5px] text-faint">
-            Sans engagement · Sans carte bancaire · Résiliable en 1 clic
-          </p>
+          <div className="flex justify-center lg:justify-end">
+            <HeroVisual />
+          </div>
         </div>
       </header>
 
       {/* 3 — Comment ça marche */}
-      <section className="border-b border-line py-16 sm:py-20">
+      <section className="border-b border-line py-20 sm:py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Comment ça marche</div>
-            <h2 className="mt-3 text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">Trois étapes, zéro effort</h2>
+            <h2 className="mt-3 text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">Trois étapes, zéro effort</h2>
           </div>
           <ol className="mt-12 grid gap-4 md:grid-cols-3">
             {STEPS.map((s, i) => (
@@ -162,19 +168,22 @@ export default function Home() {
       </section>
 
       {/* 4 — Une journée */}
-      <section className="border-b border-line bg-w2 py-16 sm:py-20">
+      <section className="border-b border-line bg-w2 py-20 sm:py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Une journée avec AlloChantier</div>
-            <h2 className="mt-3 text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mt-3 text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Ce qui se passe pendant que vous travaillez
             </h2>
           </div>
           <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {DAY.map((e) => (
               <div key={e.t} className="flex flex-col rounded-lg border border-line bg-w p-5 shadow-sh">
-                <div className="font-mono text-[13px] font-[650] text-or-t">{e.t}</div>
-                <h3 className="mt-2 text-[15px] font-[600] leading-snug">{e.h}</h3>
+                <div className="flex items-center gap-2 text-or-t">
+                  <ClockIcon />
+                  <span className="font-mono text-[13px] font-[650]">{e.t}</span>
+                </div>
+                <h3 className="mt-2.5 text-[15px] font-[600] leading-snug">{e.h}</h3>
                 {e.p && <p className="mt-1.5 text-[13.5px] text-soft">{e.p}</p>}
               </div>
             ))}
@@ -183,13 +192,13 @@ export default function Home() {
       </section>
 
       {/* 5 — Calculateur */}
-      <section id="calcul" className="border-b border-line py-16 sm:py-20">
+      <section id="calcul" className="border-b border-line py-20 sm:py-24">
         <div className="mx-auto max-w-4xl px-6">
           <div className="mb-8 text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">
               Calculez ce que vous perdez chaque mois
             </div>
-            <h2 className="mx-auto mt-3 max-w-[22ch] text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mx-auto mt-3 max-w-[22ch] text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Combien vous coûtent vos appels manqués ?
             </h2>
             <p className="mx-auto mt-3 max-w-[50ch] text-[16px] text-soft">
@@ -201,11 +210,11 @@ export default function Home() {
       </section>
 
       {/* 6 — Ce qu'elle fait */}
-      <section id="fonctionnalites" className="border-b border-line bg-w2 py-16 sm:py-20">
+      <section id="fonctionnalites" className="border-b border-line bg-w2 py-20 sm:py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Le service</div>
-            <h2 className="mx-auto mt-3 max-w-[24ch] text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mx-auto mt-3 max-w-[24ch] text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Ce qu&apos;AlloChantier fait pour vous
             </h2>
           </div>
@@ -228,11 +237,11 @@ export default function Home() {
       </section>
 
       {/* 7 — Comparatif */}
-      <section className="border-b border-line py-16 sm:py-20">
+      <section className="border-b border-line py-20 sm:py-24">
         <div className="mx-auto max-w-4xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Le bon point de comparaison</div>
-            <h2 className="mt-3 text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mt-3 text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Ce n&apos;est pas un logiciel, c&apos;est un poste
             </h2>
           </div>
@@ -273,11 +282,11 @@ export default function Home() {
       <Testimonials />
 
       {/* 9 — Tarifs */}
-      <section id="tarifs" className="border-b border-line bg-w2 py-16 sm:py-20">
+      <section id="tarifs" className="border-b border-line bg-w2 py-20 sm:py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Tarifs</div>
-            <h2 className="mx-auto mt-3 max-w-[22ch] text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mx-auto mt-3 max-w-[22ch] text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Un tarif clair, sans engagement
             </h2>
           </div>
@@ -285,8 +294,8 @@ export default function Home() {
             {PLANS.map((p) => (
               <div
                 key={p.n}
-                className={`relative flex flex-col rounded-lg border bg-w p-6 ${
-                  p.top ? "border-or shadow-sh2 ring-1 ring-or" : "border-line shadow-sh"
+                className={`relative flex flex-col rounded-lg border bg-w p-7 ${
+                  p.top ? "border-or shadow-sh3 ring-1 ring-or" : "border-line shadow-sh2"
                 }`}
               >
                 {p.top && (
@@ -310,12 +319,15 @@ export default function Home() {
                 <Link
                   href="/signup"
                   className={`mt-6 rounded-pill px-4 py-3 text-center text-[14.5px] font-semibold ${
-                    p.top ? "bg-or text-ink hover:bg-or-h" : "border border-nv text-nv hover:bg-nv-wash"
+                    p.top ? "bg-or text-w hover:bg-or-h" : "border border-nv text-nv hover:bg-nv-wash"
                   }`}
                 >
                   Essai gratuit 7 jours
                 </Link>
-                <p className="mt-2 text-center text-[12px] text-faint">Sans engagement · 7 jours gratuits</p>
+                <p className="mt-2.5 text-center text-[12px] text-faint">Sans engagement · 7 jours gratuits</p>
+                <p className="mt-1 flex items-center justify-center gap-1.5 text-center text-[11.5px] text-faint">
+                  <LockIcon /> Paiement sécurisé par Stripe
+                </p>
               </div>
             ))}
           </div>
@@ -327,11 +339,11 @@ export default function Home() {
       </section>
 
       {/* 10 — FAQ */}
-      <section id="questions" className="border-b border-line py-16 sm:py-20">
+      <section id="questions" className="border-b border-line py-20 sm:py-24">
         <div className="mx-auto max-w-2xl px-6">
           <div className="text-center">
             <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Questions</div>
-            <h2 className="mt-3 text-[clamp(26px,4vw,38px)] font-[680] tracking-[-0.03em]">
+            <h2 className="mt-3 text-[clamp(28px,4.4vw,42px)] font-[700] tracking-[-0.03em]">
               Les points sur lesquels on nous attend
             </h2>
           </div>
@@ -347,12 +359,15 @@ export default function Home() {
       </section>
 
       {/* 11 — Qui sommes-nous */}
-      <section id="a-propos" className="border-b border-line bg-w2 py-16 sm:py-20">
+      <section id="a-propos" className="border-b border-line bg-w2 py-20 sm:py-24">
         <div className="mx-auto max-w-3xl px-6">
           <div className="rounded-lg border border-line bg-w p-8 shadow-sh">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-              <div className="flex h-24 w-24 shrink-0 items-center justify-center self-center rounded-full bg-nv-wash text-[13px] font-medium text-faint sm:self-start">
-                Photo
+              <div
+                className="flex h-24 w-24 shrink-0 select-none items-center justify-center self-center rounded-full bg-nv text-[30px] font-[700] tracking-[-0.02em] text-w sm:self-start"
+                aria-hidden="true"
+              >
+                PA
               </div>
               <div>
                 <div className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-or-t">Qui sommes-nous</div>
@@ -387,7 +402,7 @@ export default function Home() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/signup"
-              className="w-full rounded-pill bg-or px-6 py-3.5 text-center text-[15.5px] font-semibold text-ink hover:bg-or-h sm:w-auto"
+              className="w-full rounded-pill bg-or px-6 py-3.5 text-center text-[15.5px] font-semibold text-w hover:bg-or-h sm:w-auto"
             >
               🚀 Essai gratuit 7 jours
             </Link>
@@ -423,6 +438,24 @@ export default function Home() {
 
       <FloatingHelp phone={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER} />
     </main>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5V12l3 2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <rect x="4" y="10.5" width="16" height="10" rx="2.5" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" strokeLinecap="round" />
+    </svg>
   );
 }
 
