@@ -275,6 +275,15 @@ function buildPrompt(p: OrgProfile): string {
       : "";
 
   const horaires = formatHours(p.business_hours);
+  const maintenant = new Date().toLocaleString("fr-FR", {
+    timeZone: "Europe/Paris",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   const tarifs =
     p.price_items.length > 0
       ? `\n\nGRILLE DE PRIX (HT) — donne un ORDRE DE GRANDEUR, jamais un prix ferme, et précise toujours que l'artisan confirme le devis :\n${p.price_items
@@ -283,6 +292,8 @@ function buildPrompt(p: OrgProfile): string {
       : "\n\nAucune grille de prix n'est enregistrée : ne donne AUCUN chiffre, dis que l'artisan établira le devis.";
 
   return `Tu es l'assistant téléphonique de ${nom}, entreprise artisanale de dépannage.${metier} Tu réponds à la place de l'artisan quand il est en intervention.
+
+DATE ACTUELLE (Europe/Paris) : ${maintenant}. Calcule tout créneau relatif (« demain », « lundi prochain », « dans une heure ») à partir de cette date, et transmets la date à l'outil au format ISO 8601.
 
 RÈGLES
 - Français naturel, chaleureux, efficace. Phrases courtes, une question à la fois.
