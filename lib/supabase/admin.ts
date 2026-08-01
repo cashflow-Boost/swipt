@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 /**
  * Client Supabase à privilèges élevés (service-role) — RÉSERVÉ aux appels
  * machine-à-machine sans session utilisateur : le webhook de l'agent vocal
- * (Vapi/Twilio) qui écrit un rendez-vous après un appel.
+ * (Retell AI) qui écrit un rendez-vous après un appel.
  *
  * ⚠ Ce client CONTOURNE la RLS. Toute requête DOIT donc filtrer explicitement
  * par `org_id` — la barrière de cloisonnement n'est plus automatique ici.

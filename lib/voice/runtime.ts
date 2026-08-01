@@ -1,9 +1,9 @@
 /**
  * Abstraction runtime vocal — SPEC §2.1 (règle d'architecture non négociable).
  *
- * Le runtime vocal temps réel (« [À DÉFINIR : Vapi ou équivalent] », SPEC §2)
- * est facturé à l'usage mais DOIT rester encapsulé derrière cette interface.
- * Aucun appel direct au SDK du fournisseur hors d'une implémentation de ce module.
+ * Le runtime vocal temps réel (Retell AI, SPEC §2) est facturé à l'usage mais
+ * DOIT rester encapsulé derrière cette interface. Aucun appel direct au SDK du
+ * fournisseur hors d'une implémentation de ce module.
  *
  * Exigences dures rattachées (SPEC §5.1) :
  *  - latence de décrochage  < 2 s
@@ -69,7 +69,7 @@ let instance: VoiceRuntime | null = null;
 export function getVoiceRuntime(): VoiceRuntime {
   if (instance) return instance;
   switch (process.env.VOICE_RUNTIME) {
-    // case "vapi": instance = new VapiVoiceRuntime(); break;
+    // case "retell": instance = new RetellVoiceRuntime(); break;
     default:
       instance = new NoopVoiceRuntime();
   }

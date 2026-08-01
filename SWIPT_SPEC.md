@@ -46,7 +46,7 @@ Le téléphone de l'artisan sonne normalement. S'il ne décroche pas au bout de 
 | Hébergement | Vercel | Région `cdg1` (Paris) |
 | Paiement | Stripe Billing, abonnements + facturation à l'usage | |
 | IA texte | API Claude — qualification, rédaction devis, relances | |
-| IA voix | Runtime temps réel `[À DÉFINIR : Vapi ou équivalent]` | Doit être derrière une abstraction, voir §2.1 |
+| IA voix | Runtime temps réel `Retell AI` (téléphonie + LLM tout-en-un) | Doit rester derrière une abstraction, voir §2.1 |
 | Téléphonie | `[À DÉFINIR : Twilio ou opérateur FR]` | Numéros FR, renvoi conditionnel |
 | SMS | Même fournisseur que la téléphonie si possible | |
 | Facturation électronique | Plateforme Agréée, `[À DÉFINIR : en propre ou adossement type Iopole]` | Bloquant production |
