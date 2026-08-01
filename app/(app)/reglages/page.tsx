@@ -18,6 +18,8 @@ type Settings = {
   urgent_triggers: string[] | null;
   refusal_rules: string[] | null;
   business_hours: Record<string, [string, string][]> | null;
+  greeting: string | null;
+  custom_instructions: string | null;
 } | null;
 
 export default async function ReglagesPage() {
@@ -84,6 +86,43 @@ export default async function ReglagesPage() {
           <div className="space-y-4">
             <Field label="Nom annoncé" name="announcedName" defaultValue={s?.announced_name ?? ""} placeholder="Plomberie Vasseur" />
             <Field label="Métier" name="trade" defaultValue={s?.trade ?? ""} placeholder="Plomberie et chauffage" />
+          </div>
+        </div>
+
+        {/* Bloc — Ce que dit Lia */}
+        <div className="mb-4 rounded-2xl bg-white p-6">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Ce que dit Lia</h2>
+          <p className="mb-4 text-xs text-slate-400">
+            Sa première phrase au décroché, et vos consignes personnelles. Lia suit vos consignes en
+            priorité — sauf pour la sécurité et l&apos;honnêteté des prix, qui restent garanties.
+          </p>
+          <div className="space-y-4">
+            <label className="block">
+              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                Phrase d&apos;accueil
+              </span>
+              <input
+                name="greeting"
+                defaultValue={s?.greeting ?? ""}
+                placeholder="Plomberie Vasseur, bonjour ! Que puis-je faire pour vous ?"
+                className="h-11 w-full rounded-xl border-0 bg-slate-50 px-4 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+              <span className="mt-1.5 block text-xs text-slate-400">
+                Laissez vide pour la phrase par défaut, avec le nom de votre entreprise.
+              </span>
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                Consignes personnalisées
+              </span>
+              <textarea
+                name="customInstructions"
+                defaultValue={s?.custom_instructions ?? ""}
+                rows={4}
+                placeholder="Ex. : Toujours proposer un créneau le matin en priorité. Prévenir que je facture 45 € le déplacement. Ne jamais donner de délai pour les chaudières."
+                className="w-full rounded-xl border-0 bg-slate-50 px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+            </label>
           </div>
         </div>
 
