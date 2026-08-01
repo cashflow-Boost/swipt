@@ -1,23 +1,35 @@
 import { NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Webhook de l'agent vocal (Vapi → AlloChantier).
+ * Webhook de l'agent vocal (Retell AI → AlloChantier).
  *
- * L'agent parle au client au téléphone ; quand il doit AGIR (poser un
- * rendez-vous, vérifier la zone), Vapi appelle cette route. On identifie
- * l'artisan par le numéro appelé (organizations.phone_number), puis on écrit
- * en base via le client service-role — en filtrant TOUJOURS par org_id, la RLS
- * étant contournée ici (cf. lib/supabase/admin.ts).
+ * AlloChantier tient le « registre interne » : Retell ne stocke AUCUNE
+ * configuration métier. Un seul agent Retell existe, dont le prompt vaut
+ * littéralement « {{system_prompt}} » et le message d'accueil « {{greeting}} ».
+ * Tout le contenu personnalisé (script, horaires, grille de prix, consignes de
+ * l'artisan) est calculé ICI, à chaque appel, depuis les Réglages de l'artisan,
+ * puis injecté dans Retell via les variables dynamiques du webhook entrant.
  *
- * Configuration côté Vapi : Server URL = https://<domaine>/api/voice, et un
- * secret partagé (header X-Vapi-Secret) = variable d'env VAPI_SERVER_SECRET.
+ * Trois familles de requêtes arrivent sur cette route :
+ *  1. Appel entrant  (event = "call_inbound")  → on identifie l'artisan par le
+ *     numéro appelé et on renvoie { call_inbound: { dynamic_variables, metadata } }.
+ *  2. Appel d'outil  (payload avec « name » + « args ») → poser_rendez_vous /
+ *     verifier_zone : on écrit en base et on renvoie un résultat au LLM.
+ *  3. Fin d'appel     (event = "call_ended")   → on journalise l'appel.
+ *
+ * Côté Retell (à configurer une seule fois, cf. README de déploiement) :
+ *  - Numéro de téléphone : Inbound Webhook URL = https://<domaine>/api/voice
+ *  - Agent : General Prompt = {{system_prompt}}, Begin Message = {{greeting}}
+ *  - Deux « custom functions » (poser_rendez_vous, verifier_zone) → même URL
+ *  - Agent Webhook URL = https://<domaine>/api/voice (événements call_ended)
+ *  - Variable d'env RETELL_API_KEY = clé API Retell (badge « webhook ») pour
+ *    vérifier la signature X-Retell-Signature des requêtes entrantes.
  */
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type ToolResult = { toolCallId: string; result: string };
 
 // ── Utilitaires ────────────────────────────────────────────────────────────
 
@@ -26,60 +38,38 @@ function normPhone(v: unknown): string {
   return String(v ?? "").replace(/\D/g, "").slice(-9);
 }
 
-/** Récupère la charge utile d'un appel d'outil, quelle que soit la version d'API Vapi. */
-function extractToolCalls(
-  message: Record<string, unknown>,
-): Array<{ id: string; name: string; args: Record<string, unknown> }> {
-  const parse = (a: unknown): Record<string, unknown> => {
-    if (a && typeof a === "object") return a as Record<string, unknown>;
-    if (typeof a === "string") {
-      try {
-        return JSON.parse(a) as Record<string, unknown>;
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  };
-
-  // Format récent : message.toolCallList = [{ id, function: { name, arguments } }]
-  const list = (message.toolCallList ?? message.toolCalls) as unknown;
-  if (Array.isArray(list)) {
-    return list.map((t) => {
-      const tc = t as Record<string, unknown>;
-      const fn = (tc.function ?? {}) as Record<string, unknown>;
-      return {
-        id: String(tc.id ?? ""),
-        name: String(fn.name ?? ""),
-        args: parse(fn.arguments),
-      };
-    });
-  }
-
-  // Format hérité : message.functionCall = { name, parameters }
-  const fc = message.functionCall as Record<string, unknown> | undefined;
-  if (fc && typeof fc === "object") {
-    return [{ id: "", name: String(fc.name ?? ""), args: parse(fc.parameters) }];
-  }
-
-  return [];
+/**
+ * Vérifie la signature d'un webhook Retell : HMAC-SHA256(rawBody) avec la clé
+ * API en secret, comparé en temps constant à l'en-tête X-Retell-Signature.
+ * Retenu par défaut dès que RETELL_API_KEY est configurée ; RETELL_SKIP_VERIFY=1
+ * offre une échappatoire de dépannage sans redéployer.
+ */
+function verifyRetellSignature(raw: string, signature: string | null, apiKey: string): boolean {
+  if (!signature) return false;
+  const digest = createHmac("sha256", apiKey).update(raw).digest("hex");
+  // Certaines versions préfixent la signature (« v=…,d=<hex> ») : on isole le hex.
+  const provided = signature.includes("d=")
+    ? signature.slice(signature.lastIndexOf("d=") + 2).trim()
+    : signature.trim();
+  const a = Buffer.from(digest, "utf8");
+  const b = Buffer.from(provided, "utf8");
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
-/** Cherche l'organisation par le numéro appelé, avec repli sur une org par défaut. */
+/**
+ * Identifie l'organisation : d'abord les métadonnées posées au décroché, puis
+ * le numéro AlloChantier appelé (organizations.phone_number), enfin le repli
+ * d'env pour les tests. L'ancien nom SWIPT_* reste accepté.
+ */
 async function resolveOrgId(
   admin: ReturnType<typeof createAdminClient>,
-  message: Record<string, unknown>,
+  metadata: Record<string, unknown> | null,
+  dialedNumber: unknown,
 ): Promise<string | null> {
-  // 1) org_id explicite passé dans les métadonnées de l'assistant (multi-tenant propre).
-  const call = (message.call ?? {}) as Record<string, unknown>;
-  const overrides = (call.assistantOverrides ?? {}) as Record<string, unknown>;
-  const meta = (overrides.metadata ?? (message.assistant as Record<string, unknown>)?.metadata ?? {}) as Record<string, unknown>;
-  const metaOrg = meta.orgId ?? meta.org_id;
+  const metaOrg = metadata?.org_id ?? metadata?.orgId;
   if (metaOrg) return String(metaOrg);
 
-  // 2) numéro appelé → organizations.phone_number
-  const phoneObj = (message.phoneNumber ?? call.phoneNumber ?? {}) as Record<string, unknown>;
-  const dialed = normPhone(phoneObj.number ?? call.phoneNumberId ?? "");
+  const dialed = normPhone(dialedNumber);
   if (dialed) {
     const { data } = await admin
       .from("organizations")
@@ -89,8 +79,6 @@ async function resolveOrgId(
     if (hit) return hit.id as string;
   }
 
-  // 3) repli : une seule org en test (variable d'env). L'ancien nom SWIPT_*
-  // reste accepté pour ne pas casser les déploiements déjà configurés.
   return (
     process.env.ALLOCHANTIER_DEFAULT_ORG_ID ??
     process.env.SWIPT_DEFAULT_ORG_ID ??
@@ -181,12 +169,7 @@ async function verifierZone(
     : `${args.ville} est probablement hors de la zone habituelle (centrée sur ${data?.zone_center}). Proposez un rappel de l'artisan plutôt qu'un rendez-vous ferme.`;
 }
 
-// ── Registre interne : l'assistant est fabriqué par AlloChantier à chaque appel ─────
-//
-// Vapi ne stocke AUCUNE configuration métier : quand un appel arrive, il envoie
-// « assistant-request » et AlloChantier répond avec l'assistant complet, construit à
-// partir des Réglages de l'artisan (nom annoncé, métier, zone, urgences,
-// refus). La personnalisation vit dans le SaaS, pas chez le prestataire.
+// ── Registre interne : le script est fabriqué par AlloChantier à chaque appel ─────
 
 type OrgProfile = {
   name: string;
@@ -322,88 +305,57 @@ DÉROULÉ
 Tu représentes un artisan de confiance : rassurant et professionnel.`;
 }
 
-/** Réponse à « assistant-request » : l'assistant complet, personnalisé, à la volée. */
-function buildAssistant(p: OrgProfile, orgId: string, selfUrl: string) {
+/** Phrase d'accueil : celle réglée par l'artisan, sinon un repli au nom de l'entreprise. */
+function buildGreeting(p: OrgProfile): string {
   const nom = p.announced_name || p.name;
-  const secret = process.env.VAPI_SERVER_SECRET;
+  if (p.agent_paused) {
+    return `Bonjour, vous êtes bien chez ${nom}. Un instant, je vous explique comment nous joindre.`;
+  }
+  if (p.greeting && p.greeting.trim()) return p.greeting.trim();
+  return `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`;
+}
 
-  const systemPrompt = p.agent_paused
+/**
+ * Variables dynamiques renvoyées à Retell au décroché. Le prompt de l'agent
+ * Retell vaut « {{system_prompt}} » et son message d'accueil « {{greeting}} » :
+ * tout le contenu métier est donc calculé ici.
+ */
+function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting: string } {
+  const nom = p.announced_name || p.name;
+  const system_prompt = p.agent_paused
     ? `Tu es l'assistant téléphonique de ${nom}. L'artisan a repris la main et gère ses appels lui-même en ce moment. Explique-le poliment, propose de rappeler plus tard ou prends le nom et le numéro de l'appelant pour qu'on le rappelle. Ne pose AUCUN rendez-vous.`
     : buildPrompt(p);
+  return { system_prompt, greeting: buildGreeting(p) };
+}
 
-  const tools = [
-    {
-      type: "function",
-      function: {
-        name: "poser_rendez_vous",
-        description:
-          "Enregistre un rendez-vous dans l'agenda de l'artisan une fois le créneau confirmé avec le client.",
-        parameters: {
-          type: "object",
-          properties: {
-            nom_client: { type: "string", description: "Nom de l'appelant" },
-            telephone: { type: "string", description: "Numéro de rappel" },
-            adresse: { type: "string", description: "Adresse de l'intervention" },
-            description_besoin: { type: "string", description: "Ce qu'il faut réparer" },
-            debut: { type: "string", description: "Début en ISO 8601, fuseau Europe/Paris" },
-            duree_minutes: { type: "number", description: "Durée estimée en minutes (défaut 60)" },
-          },
-          required: ["nom_client", "debut"],
-        },
-      },
-    },
-    {
-      type: "function",
-      function: {
-        name: "verifier_zone",
-        description: "Vérifie si une ville est dans la zone d'intervention de l'artisan.",
-        parameters: {
-          type: "object",
-          properties: { ville: { type: "string", description: "Ville ou commune du client" } },
-          required: ["ville"],
-        },
-      },
-    },
-  ];
-
-  return {
-    name: `AlloChantier — ${p.name}`,
-    firstMessage: p.agent_paused
-      ? `Bonjour, vous êtes bien chez ${nom}. Un instant, je vous explique comment nous joindre.`
-      : (p.greeting && p.greeting.trim())
-        ? p.greeting.trim()
-        : `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`,
-    model: {
-      provider: "openai",
-      model: "gpt-4o-mini",
-      temperature: 0.4,
-      messages: [{ role: "system", content: systemPrompt }],
-      tools,
-    },
-    voice: { provider: "azure", voiceId: "fr-FR-DeniseNeural" },
-    transcriber: { provider: "deepgram", model: "nova-2", language: "fr" },
-    server: { url: selfUrl, ...(secret ? { secret } : {}) },
-    metadata: { orgId },
-  };
+/** Script de repli quand le numéro n'est rattaché à aucun compte AlloChantier actif. */
+function fallbackVariables(reason: "unknown" | "inactive"): { system_prompt: string; greeting: string } {
+  const greeting = "Bonjour, merci de votre appel.";
+  const system_prompt =
+    reason === "inactive"
+      ? "Le compte AlloChantier associé à ce numéro n'est pas actif actuellement. Explique poliment que la ligne n'est pas disponible pour le moment, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix."
+      : "Ce numéro n'est pas encore rattaché à un compte. Explique poliment que tu ne peux pas traiter la demande pour l'instant, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix.";
+  return { system_prompt, greeting };
 }
 
 /** Journalise l'appel terminé (transcription, résumé, enregistrement, durée). */
 async function logEndOfCall(
   admin: ReturnType<typeof createAdminClient>,
   orgId: string,
-  message: Record<string, unknown>,
+  call: Record<string, unknown>,
 ): Promise<void> {
-  const call = (message.call ?? {}) as Record<string, unknown>;
-  const artifact = (message.artifact ?? {}) as Record<string, unknown>;
-  const startedAt = call.createdAt ?? message.startedAt ?? null;
-  const durationSeconds = message.durationSeconds != null ? Math.round(Number(message.durationSeconds)) : null;
-  const recording = (artifact.recordingUrl ?? message.recordingUrl ?? null) as string | null;
-  const summary = (message.summary ?? null) as string | null;
-  const transcript = (artifact.messages ?? message.transcript ?? null) as unknown;
+  const start = call.start_timestamp != null ? Number(call.start_timestamp) : null;
+  const end = call.end_timestamp != null ? Number(call.end_timestamp) : null;
+  const durationSeconds =
+    start != null && end != null && end >= start ? Math.round((end - start) / 1000) : null;
+  const recording = (call.recording_url ?? null) as string | null;
+  const analysis = (call.call_analysis ?? {}) as Record<string, unknown>;
+  const summary = (analysis.call_summary ?? null) as string | null;
+  const transcript = (call.transcript_object ?? call.transcript ?? null) as unknown;
 
   await admin.from("calls").insert({
     org_id: orgId,
-    started_at: startedAt ? new Date(String(startedAt)).toISOString() : new Date().toISOString(),
+    started_at: start != null ? new Date(start).toISOString() : new Date().toISOString(),
     duration_seconds: durationSeconds,
     direction: "inbound",
     status: "handled",
@@ -419,62 +371,66 @@ async function logEndOfCall(
 // ── Point d'entrée ──────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  // Vérification du secret partagé, si configuré.
-  const expected = process.env.VAPI_SERVER_SECRET;
-  if (expected) {
-    const got = req.headers.get("x-vapi-secret");
-    if (got !== expected) {
+  // Corps brut d'abord : la signature Retell porte sur les octets reçus.
+  const raw = await req.text();
+
+  const apiKey = process.env.RETELL_API_KEY;
+  if (apiKey && process.env.RETELL_SKIP_VERIFY !== "1") {
+    const ok = verifyRetellSignature(raw, req.headers.get("x-retell-signature"), apiKey);
+    if (!ok) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
   }
 
   let body: Record<string, unknown>;
   try {
-    body = (await req.json()) as Record<string, unknown>;
+    body = JSON.parse(raw) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
 
-  const message = (body.message ?? body) as Record<string, unknown>;
-  const type = String(message.type ?? "");
+  const event = typeof body.event === "string" ? body.event : "";
+  const fnName = typeof body.name === "string" ? body.name : "";
+  const call = (body.call ?? {}) as Record<string, unknown>;
 
   let admin: ReturnType<typeof createAdminClient>;
   try {
     admin = createAdminClient();
   } catch {
-    // Sans clé service-role, on ne peut rien écrire : on répond proprement.
-    return NextResponse.json({ results: [] });
+    // Sans clé service-role, on ne peut rien écrire : réponse neutre.
+    return NextResponse.json({ error: "service unavailable" }, { status: 200 });
   }
 
-  const orgId = await resolveOrgId(admin, message);
-
-  // Un appel entre : Vapi demande QUI doit répondre. AlloChantier fabrique l'assistant
-  // à la volée depuis les Réglages de l'artisan — le registre interne du SaaS.
-  if (type === "assistant-request") {
+  // 1) Appel entrant : Retell demande la configuration de CET appel. AlloChantier
+  //    fabrique le script à la volée depuis les Réglages de l'artisan.
+  if (event === "call_inbound") {
+    const inbound = (body.call_inbound ?? {}) as Record<string, unknown>;
+    const orgId = await resolveOrgId(admin, null, inbound.to_number);
     if (!orgId) {
-      return NextResponse.json({
-        error: "Numéro non rattaché à un compte AlloChantier.",
-      });
+      return NextResponse.json({ call_inbound: { dynamic_variables: fallbackVariables("unknown") } });
     }
     const profile = await loadProfile(admin, orgId);
     if (!profile) {
-      return NextResponse.json({ error: "Compte artisan introuvable." });
+      return NextResponse.json({ call_inbound: { dynamic_variables: fallbackVariables("unknown") } });
     }
-    // Essai terminé sans abonnement : le service ne décroche plus (SPEC §6).
     if (!profile.access_open) {
-      return NextResponse.json({ error: "Abonnement AlloChantier inactif pour ce compte." });
+      return NextResponse.json({ call_inbound: { dynamic_variables: fallbackVariables("inactive") } });
     }
-    const proto = req.headers.get("x-forwarded-proto") ?? "https";
-    const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
-    const selfUrl = `${proto}://${host}/api/voice`;
-    return NextResponse.json({ assistant: buildAssistant(profile, orgId, selfUrl) });
+    return NextResponse.json({
+      call_inbound: {
+        dynamic_variables: buildDynamicVariables(profile),
+        metadata: { org_id: orgId },
+      },
+    });
   }
 
-  // Appel terminé : on journalise, sans réponse d'outil.
-  if (type === "end-of-call-report") {
+  // 2) Fin d'appel : on journalise (événement terminal, garanti).
+  if (event === "call_ended") {
+    const metadata = (call.metadata ?? null) as Record<string, unknown> | null;
+    const orgId = await resolveOrgId(admin, metadata, call.to_number);
     if (orgId) {
       try {
-        await logEndOfCall(admin, orgId, message);
+        await logEndOfCall(admin, orgId, call);
       } catch {
         /* best-effort */
       }
@@ -482,45 +438,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // Appels d'outils.
-  if (type === "tool-calls" || type === "function-call") {
-    const calls = extractToolCalls(message);
-    if (calls.length === 0) return NextResponse.json({ ok: true });
+  // 3) Appel d'un outil (custom function) : pas d'« event », mais un « name ».
+  if (fnName) {
+    const args = (body.args ?? {}) as Record<string, unknown>;
+    const metadata = (call.metadata ?? null) as Record<string, unknown> | null;
+    const orgId = await resolveOrgId(admin, metadata, call.to_number);
 
-    // « Je reprends la main » (SPEC §4.9) : si l'artisan a mis l'agent en pause,
-    // on ne pose rien — il gère ses appels lui-même.
-    let paused = false;
-    if (orgId) {
-      const { data: org } = await admin
-        .from("organizations")
-        .select("agent_paused")
-        .eq("id", orgId)
-        .maybeSingle();
-      paused = Boolean(org?.agent_paused);
+    if (!orgId) {
+      return NextResponse.json({
+        result: "Compte artisan introuvable pour ce numéro. Un conseiller rappellera.",
+      });
     }
 
-    const results: ToolResult[] = [];
-    for (const c of calls) {
-      let result = "Outil inconnu.";
-      if (!orgId) {
-        result = "Compte artisan introuvable pour ce numéro. Un conseiller rappellera.";
-      } else if (paused) {
-        result = "L'artisan gère ses appels en direct en ce moment. Invitez l'appelant à rappeler ou à laisser ses coordonnées ; ne posez pas de rendez-vous.";
-      } else if (c.name === "poser_rendez_vous") {
-        result = await poserRendezVous(admin, orgId, c.args);
-      } else if (c.name === "verifier_zone") {
-        result = await verifierZone(admin, orgId, c.args);
-      }
-      results.push({ toolCallId: c.id, result });
+    // « Je reprends la main » (SPEC §4.9) : agent en pause → on ne pose rien.
+    const { data: org } = await admin
+      .from("organizations")
+      .select("agent_paused")
+      .eq("id", orgId)
+      .maybeSingle();
+    if (org?.agent_paused) {
+      return NextResponse.json({
+        result:
+          "L'artisan gère ses appels en direct en ce moment. Invitez l'appelant à rappeler ou à laisser ses coordonnées ; ne posez pas de rendez-vous.",
+      });
     }
 
-    // Format hérité (function-call) : réponse à plat.
-    if (type === "function-call") {
-      return NextResponse.json({ result: results[0]?.result ?? "" });
+    let result = "Outil inconnu.";
+    if (fnName === "poser_rendez_vous") {
+      result = await poserRendezVous(admin, orgId, args);
+    } else if (fnName === "verifier_zone") {
+      result = await verifierZone(admin, orgId, args);
     }
-    return NextResponse.json({ results });
+    return NextResponse.json({ result });
   }
 
-  // Tous les autres messages (status-update, transcript, speech-update…) : 200 vide.
+  // Autres événements (call_started, call_analyzed, ping…) : 200 vide.
   return NextResponse.json({ ok: true });
 }
