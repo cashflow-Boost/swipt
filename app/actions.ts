@@ -89,6 +89,8 @@ export async function saveAgentSettingsAction(formData: FormData) {
   await updateAgentSettings.withContext(await ctx())({
     announcedName: str(formData, "announcedName"),
     trade: str(formData, "trade"),
+    greeting: str(formData, "greeting"),
+    customInstructions: str(formData, "customInstructions"),
     businessPhone: str(formData, "businessPhone"),
     zoneCenter: str(formData, "zoneCenter"),
     zoneRadiusKm: num(formData, "zoneRadiusKm"),

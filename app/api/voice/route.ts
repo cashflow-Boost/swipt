@@ -201,6 +201,8 @@ type OrgProfile = {
   refusal_rules: string[] | null;
   callout_fee_cents: number | null;
   business_hours: Record<string, [string, string][]> | null;
+  greeting: string | null;
+  custom_instructions: string | null;
   price_items: { label: string; unit: string | null; cents: number }[];
 };
 
@@ -216,7 +218,7 @@ async function loadProfile(
       .maybeSingle(),
     admin
       .from("agent_settings")
-      .select("announced_name, trade, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents, business_hours")
+      .select("announced_name, trade, greeting, custom_instructions, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents, business_hours")
       .eq("org_id", orgId)
       .maybeSingle(),
   ]);
@@ -242,6 +244,8 @@ async function loadProfile(
     refusal_rules: (s?.refusal_rules as string[]) ?? null,
     callout_fee_cents: (s?.callout_fee_cents as number) ?? null,
     business_hours: (s?.business_hours as Record<string, [string, string][]>) ?? null,
+    greeting: (s?.greeting as string) ?? null,
+    custom_instructions: (s?.custom_instructions as string) ?? null,
     price_items: (prices ?? []).map((p) => ({
       label: p.label as string,
       unit: (p.unit as string) ?? null,
@@ -309,7 +313,11 @@ DÉROULÉ
 4. Recueille : nom, numéro de rappel, adresse, description du besoin.
 5. Propose un créneau UNIQUEMENT dans ces horaires : ${horaires}. En dehors, ne promets rien : note la demande et dis que l'artisan rappellera.
 6. Confirme le créneau à voix haute (jour et heure), puis enregistre-le avec l'outil « poser_rendez_vous » (date ISO 8601, fuseau Europe/Paris, calculée depuis la date actuelle fournie).
-7. Récapitule, remercie, termine poliment.${tarifs}
+7. Récapitule, remercie, termine poliment.${tarifs}${
+    p.custom_instructions && p.custom_instructions.trim()
+      ? `\n\nCONSIGNES DE L'ARTISAN (elles priment sur le reste, sauf sécurité et honnêteté des prix) :\n${p.custom_instructions.trim()}`
+      : ""
+  }
 
 Tu représentes un artisan de confiance : rassurant et professionnel.`;
 }
@@ -362,7 +370,9 @@ function buildAssistant(p: OrgProfile, orgId: string, selfUrl: string) {
     name: `AlloChantier — ${p.name}`,
     firstMessage: p.agent_paused
       ? `Bonjour, vous êtes bien chez ${nom}. Un instant, je vous explique comment nous joindre.`
-      : `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`,
+      : (p.greeting && p.greeting.trim())
+        ? p.greeting.trim()
+        : `Bonjour, vous êtes bien chez ${nom}, je suis l'assistant qui prend vos appels. Que puis-je faire pour vous ?`,
     model: {
       provider: "openai",
       model: "gpt-4o-mini",
