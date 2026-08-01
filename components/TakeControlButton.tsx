@@ -5,14 +5,17 @@ import { useRouter } from "next/navigation";
 import { setAgentPausedAction } from "@/app/actions";
 
 /**
- * « Je reprends la main » (SPEC §4.9). Sa présence visible en permanence est ce
- * qui rend l'artisan prêt à confier ses appels : il sait qu'il peut couper d'un
- * geste. État optimiste pour un retour immédiat, confirmé côté serveur.
+ * « Je reprends la main » (SPEC §4.9), en interrupteur façon iOS.
+ *
+ * Actif = Lia prend les appels ; inactif = l'artisan répond lui-même. Le geste
+ * reste immédiat (état optimiste) et discret : pas d'alerte rouge, juste une
+ * bascule que l'on comprend d'un coup d'œil.
  */
 export function TakeControlButton({ paused: initial }: { paused: boolean }) {
   const [paused, setPaused] = useState(initial);
   const [pending, start] = useTransition();
   const router = useRouter();
+  const active = !paused;
 
   function toggle() {
     const next = !paused;
@@ -28,17 +31,30 @@ export function TakeControlButton({ paused: initial }: { paused: boolean }) {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={active}
+      aria-label={active ? "Lia prend vos appels" : "Vous répondez vous-même"}
       onClick={toggle}
       disabled={pending}
-      aria-pressed={paused}
-      title={paused ? "AlloChantier ne prend plus vos appels" : "AlloChantier répond quand vous ne pouvez pas"}
-      className={
-        paused
-          ? "rounded-pill border border-rd bg-rd px-3.5 py-1.5 text-[12.5px] font-semibold text-w disabled:opacity-60"
-          : "rounded-pill border border-line2 bg-w px-3.5 py-1.5 text-[12.5px] font-semibold text-rd disabled:opacity-60"
-      }
+      className="flex items-center gap-2 disabled:opacity-60"
     >
-      {paused ? "▶ Rendre la main à AlloChantier" : "⏸ Je reprends la main"}
+      <span className={`text-xs font-medium ${active ? "text-soft" : "text-faint"}`}>
+        {active ? "Lia" : "Manuel"}
+      </span>
+      <span
+        className={`relative h-6 w-10 rounded-full transition-colors duration-300 ${
+          active ? "bg-gr" : "bg-[#CBD5E1]"
+        }`}
+        style={{ transitionTimingFunction: "cubic-bezier(.16,1,.3,1)" }}
+      >
+        <span
+          className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300"
+          style={{
+            transform: active ? "translateX(0)" : "translateX(16px)",
+            transitionTimingFunction: "cubic-bezier(.16,1,.3,1)",
+          }}
+        />
+      </span>
     </button>
   );
 }

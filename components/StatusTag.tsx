@@ -1,13 +1,16 @@
+/**
+ * Badge de statut — pastille pastel sans bordure (style iOS). La couleur est
+ * toujours doublée d'un texte, jamais porteuse de sens à elle seule (SPEC §3.6).
+ */
 const VARIANTS = {
-  neutral: "bg-w2 border-line2 text-soft",
-  or: "bg-or-wash border-or-line text-or-t",
-  gr: "bg-gr-wash border-[#CFE6D8] text-gr",
-  rd: "bg-rd-wash border-[#F2D5D2] text-rd",
+  neutral: "bg-slate-100 text-slate-600",
+  or: "bg-amber-50 text-amber-700",
+  gr: "bg-emerald-50 text-emerald-700",
+  rd: "bg-red-50 text-red-700",
 } as const;
 
 export type TagVariant = keyof typeof VARIANTS;
 
-/** Statut toujours doublé d'un texte, jamais porté par la seule couleur (SPEC §3.6). */
 export function StatusTag({
   children,
   variant = "neutral",
@@ -17,7 +20,7 @@ export function StatusTag({
 }) {
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-pill border px-2.5 py-0.5 text-[11.5px] font-semibold ${VARIANTS[variant]}`}
+      className={`inline-block whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${VARIANTS[variant]}`}
     >
       {children}
     </span>

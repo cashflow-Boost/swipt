@@ -164,17 +164,29 @@ export async function deletePriceItemAction(formData: FormData) {
   revalidatePath("/mes-tarifs");
 }
 
-/** Horaires d'ouverture : une plage par jour, jours fermés absents. */
+/**
+ * Horaires d'ouverture : un jeu matin / après-midi appliqué aux jours cochés.
+ * L'après-midi n'est enregistré que s'il est cohérent (fin après début), sinon
+ * la journée reste sur le seul créneau du matin — jamais une plage inversée.
+ */
 export async function saveBusinessHoursAction(formData: FormData) {
   const days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const mFrom = str(formData, "morning-from") || "08:00";
+  const mTo = str(formData, "morning-to") || "12:00";
+  const aFrom = str(formData, "afternoon-from") || "";
+  const aTo = str(formData, "afternoon-to") || "";
+
+  const slots: [string, string][] = [];
+  if (mFrom < mTo) slots.push([mFrom, mTo]);
+  if (aFrom && aTo && aFrom < aTo) slots.push([aFrom, aTo]);
+
   const hours: Record<string, [string, string][]> = {};
-  for (const d of days) {
-    if (formData.get(`${d}-open`) !== "on") continue;
-    const from = str(formData, `${d}-from`) || "08:00";
-    const to = str(formData, `${d}-to`) || "18:00";
-    if (from >= to) continue; // plage incohérente : jour ignoré plutôt qu'enregistré faux
-    hours[d] = [[from, to]];
+  if (slots.length > 0) {
+    for (const d of days) {
+      if (formData.get(`${d}-open`) === "on") hours[d] = slots;
+    }
   }
+
   await updateAgentSettings.withContext(await ctx())({ businessHours: hours });
   revalidatePath("/reglages");
 }

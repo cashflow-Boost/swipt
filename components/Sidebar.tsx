@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Phone, Calendar, FileText, Receipt, Bell, Users, Euro, Settings,
-  PanelLeftClose, PanelLeftOpen, X,
+  ChevronLeft, ChevronRight, X,
 } from "lucide-react";
 import { NAV, type NavIcon } from "@/lib/nav";
 import { LogoMark } from "@/components/Logo";
@@ -92,24 +92,20 @@ export function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean;
     <>
       {/* Colonne — grand écran */}
       <aside
-        className="hidden shrink-0 md:block"
+        className="relative hidden shrink-0 md:block"
         style={{ width: collapsed ? 72 : 240, transition: "width .3s cubic-bezier(.16,1,.3,1)" }}
       >
-        <div className="sticky top-[85px]">
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={collapsed ? "Déplier le menu" : "Replier le menu"}
-            aria-expanded={!collapsed}
-            className={`mb-2 flex items-center gap-2 rounded-lg py-2 text-[12.5px] font-medium text-faint transition-colors hover:text-ink ${
-              collapsed ? "w-full justify-center" : "pl-4 pr-3"
-            }`}
-          >
-            {collapsed ? <PanelLeftOpen size={18} strokeWidth={1.9} /> : <PanelLeftClose size={18} strokeWidth={1.9} />}
-            {!collapsed && "Replier"}
-          </button>
-          {items(collapsed)}
-        </div>
+        {/* Poignée flottante : discrète, chevauche légèrement le contenu. */}
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? "Déplier le menu" : "Replier le menu"}
+          aria-expanded={!collapsed}
+          className="absolute -right-3.5 top-6 z-20 flex h-7 w-7 items-center justify-center rounded-full border border-slate-100 bg-white text-slate-500 shadow-md transition-all duration-200 hover:scale-105 hover:text-slate-900 hover:shadow-lg"
+        >
+          {collapsed ? <ChevronRight size={16} strokeWidth={2.2} /> : <ChevronLeft size={16} strokeWidth={2.2} />}
+        </button>
+        <div className="sticky top-[80px] pt-1">{items(collapsed)}</div>
       </aside>
 
       {/* Tiroir — petit écran */}

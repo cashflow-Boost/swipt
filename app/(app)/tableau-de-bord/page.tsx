@@ -33,39 +33,32 @@ export default async function TableauDeBordPage() {
 
   return (
     <div>
-      <div className="mb-5 border-b border-line pb-4">
-        <h1 className="text-xl font-[650]">Tableau de bord</h1>
-        <p className="mt-1 max-w-[56ch] text-sm text-soft">
-          Ce qui s&apos;est passé pendant que vous travailliez, et ce qui attend
-          une décision de votre part.
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Tableau de bord</h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Ce qui s&apos;est passé pendant que vous travailliez, et ce qui attend une décision.
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((k, i) => (
-          <div
-            key={k.k}
-            className="ac-card ac-enter rounded-[11px] border border-line bg-w p-4"
-            style={{ animationDelay: `${i * 40}ms` }}
-          >
-            <div className="font-mono text-[10.5px] uppercase tracking-[0.11em] text-faint">{k.k}</div>
-            <div className={`mt-1.5 text-[30px] font-[650] tracking-[-0.035em] ${k.hot ? "text-or-t" : ""}`}>{k.v}</div>
-            <div className="mt-0.5 text-[12.5px] text-soft">{k.d}</div>
+          <div key={k.k} className="ac-enter rounded-2xl bg-white p-5" style={{ animationDelay: `${i * 40}ms` }}>
+            <div className="text-[11px] font-medium uppercase tracking-wider text-slate-400">{k.k}</div>
+            <div className={`mt-1 text-3xl font-semibold tracking-tight ${k.hot ? "text-blue-700" : "text-slate-900"}`}>{k.v}</div>
+            <div className="mt-1 text-xs text-slate-500">{k.d}</div>
           </div>
         ))}
       </div>
 
-      <h2 className="mb-3 mt-6 text-[15px] font-semibold">Derniers événements</h2>
+      <h2 className="mb-2 mt-8 text-sm font-semibold text-slate-900">Derniers événements</h2>
       {feed.length === 0 ? (
-        <p className="rounded-[11px] border border-dashed border-line2 bg-w px-4 py-8 text-center text-sm text-soft">
-          Aucun appel pour le moment.
-        </p>
+        <p className="rounded-2xl bg-white px-4 py-10 text-center text-sm text-slate-400">Aucun appel pour le moment.</p>
       ) : (
-        <div className="overflow-hidden rounded-[11px] border border-line">
+        <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white">
           {feed.map((r, i) => (
-            <div key={i} className="grid gap-1 border-b border-line px-4 py-3.5 last:border-b-0 hover:bg-w2 sm:grid-cols-[74px_1fr_auto] sm:items-center sm:gap-4">
-              <div className="font-mono text-[12.5px] text-faint">{r.t}</div>
-              <div><div className="text-[14.5px] font-[550]">{r.ti}</div></div>
+            <div key={i} className="grid gap-1 px-5 py-5 transition-colors duration-150 hover:bg-slate-50/80 sm:grid-cols-[74px_1fr_auto] sm:items-center sm:gap-4">
+              <div className="font-mono text-xs text-slate-400">{r.t}</div>
+              <div className="text-[14.5px] font-medium text-slate-900">{r.ti}</div>
               <div className="sm:justify-self-end"><StatusTag variant={r.v}>{r.tag}</StatusTag></div>
             </div>
           ))}
