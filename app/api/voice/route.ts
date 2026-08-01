@@ -256,15 +256,14 @@ const DAY_LABELS: Record<string, string> = {
 };
 const DAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
-/** Horaires en une phrase lisible ; repli lundi–vendredi 8 h – 18 h. */
+/** Horaires en une phrase lisible ; gère la pause déjeuner ; repli lun–ven 8 h – 18 h. */
 function formatHours(h: Record<string, [string, string][]> | null): string {
-  const entries = DAY_ORDER.filter((d) => h?.[d]?.[0]);
+  const entries = DAY_ORDER.filter((d) => h?.[d]?.length);
   if (!h || entries.length === 0) return "du lundi au vendredi de 8 h à 18 h";
+  const slot = ([from, to]: [string, string]) =>
+    `de ${from.replace(":", " h ")} à ${to.replace(":", " h ")}`;
   return entries
-    .map((d) => {
-      const [from, to] = h[d][0];
-      return `${DAY_LABELS[d]} de ${from.replace(":", " h ")} à ${to.replace(":", " h ")}`;
-    })
+    .map((d) => `${DAY_LABELS[d]} ${h[d].map(slot).join(" et ")}`)
     .join(", ");
 }
 

@@ -21,44 +21,44 @@ export default async function AppLayout({
   if (!session.orgId) redirect("/onboarding");
 
   return (
-    <div className="min-h-screen bg-w2">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <Splash />
-      <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-line bg-w px-5 py-3">
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between gap-4 border-b border-slate-100 bg-white px-5">
         <Logo href="/tableau-de-bord" />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {session.orgName && (
-            <span className="hidden text-[13px] font-medium text-soft sm:inline">
+            <span className="hidden text-[13px] font-medium text-slate-500 sm:inline">
               {session.orgName}
             </span>
           )}
+          <TakeControlButton paused={session.agentPaused} />
           <Link
             href="/abonnement"
-            className="rounded-pill bg-or px-3.5 py-1.5 text-[12.5px] font-semibold text-ink"
+            className="hidden text-[13px] font-medium text-slate-500 transition-colors hover:text-slate-900 sm:inline"
           >
-            S&apos;abonner
+            Mon abonnement
           </Link>
-          <TakeControlButton paused={session.agentPaused} />
           <LogoutButton />
         </div>
       </header>
 
       {session.agentPaused && (
-        <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
-          Vous répondez vous-même — AlloChantier est en pause. Cliquez « Rendre la main à AlloChantier » pour réactiver la prise d&apos;appels.
+        <div className="bg-amber-50 px-5 py-2 text-center text-[13px] font-medium text-amber-700">
+          Vous répondez vous-même — Lia est en pause. Réactivez-la avec l&apos;interrupteur en haut à droite.
         </div>
       )}
 
       {!session.accessOpen ? (
-        <div className="border-b border-rd/30 bg-rd/10 px-5 py-2 text-center text-[13px] font-medium text-rd">
-          Votre essai est terminé. Choisissez une offre pour qu&apos;AlloChantier reprenne vos appels.
+        <div className="bg-red-50 px-5 py-2 text-center text-[13px] font-medium text-red-700">
+          Votre essai est terminé.{" "}
+          <Link href="/abonnement" className="underline">Choisissez une offre</Link> pour que Lia
+          reprenne vos appels.
         </div>
       ) : session.trialDaysLeft !== null && session.trialDaysLeft <= 3 ? (
-        <div className="border-b border-or-line bg-or-wash px-5 py-2 text-center text-[13px] font-medium text-or-t">
+        <div className="bg-blue-50 px-5 py-2 text-center text-[13px] font-medium text-blue-700">
           Essai : {session.trialDaysLeft} jour{session.trialDaysLeft > 1 ? "s" : ""} restant
           {session.trialDaysLeft > 1 ? "s" : ""}.{" "}
-          <Link href="/abonnement" className="underline">
-            Choisir une offre
-          </Link>
+          <Link href="/abonnement" className="underline">Choisir une offre</Link>
         </div>
       ) : null}
 

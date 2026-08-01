@@ -8,13 +8,16 @@ import { LogoMark } from "@/components/Logo";
    `ac-*` de globals.css, donc par le même easing.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/** Écran d'ouverture — s'efface dès que la page est prête. */
+/**
+ * Écran d'ouverture minimaliste : le logo seul, qui apparaît en douceur puis
+ * s'efface. Pas de texte, pas d'anneau, pas de points — juste une respiration.
+ */
 export function Splash() {
   const [gone, setGone] = useState(false);
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setGone(true), 650);
+    const t = setTimeout(() => setGone(true), 1200);
     return () => clearTimeout(t);
   }, []);
 
@@ -29,16 +32,10 @@ export function Splash() {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-w ${gone ? "ac-splash-out" : ""}`}
+      className={`fixed inset-0 z-[200] flex items-center justify-center bg-white ${gone ? "ac-splash-out" : ""}`}
     >
-      <span className="ac-ring relative inline-flex">
+      <span className="ac-splash-mark">
         <LogoMark size={56} />
-      </span>
-      <span className="mt-7 text-[17px] font-bold tracking-tight text-nv">AlloChantier</span>
-      <span className="mt-3 flex gap-1.5">
-        <i className="ac-dot h-[5px] w-[5px] rounded-full bg-or" />
-        <i className="ac-dot h-[5px] w-[5px] rounded-full bg-or" />
-        <i className="ac-dot h-[5px] w-[5px] rounded-full bg-or" />
       </span>
     </div>
   );
