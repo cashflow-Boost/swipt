@@ -322,20 +322,26 @@ function buildGreeting(p: OrgProfile): string {
  */
 function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting: string } {
   const nom = p.announced_name || p.name;
-  const system_prompt = p.agent_paused
+  const greeting = buildGreeting(p);
+  const base = p.agent_paused
     ? `Tu es l'assistant téléphonique de ${nom}. L'artisan a repris la main et gère ses appels lui-même en ce moment. Explique-le poliment, propose de rappeler plus tard ou prends le nom et le numéro de l'appelant pour qu'on le rappelle. Ne pose AUCUN rendez-vous.`
     : buildPrompt(p);
-  return { system_prompt, greeting: buildGreeting(p) };
+  // La phrase d'accueil est intégrée AU PROMPT : l'agent Retell n'a donc pas
+  // besoin d'un champ « Begin Message » séparé (absent de certaines UI). La
+  // variable {{greeting}} reste renvoyée pour qui voudrait l'utiliser à part.
+  const opening = `Tu ouvres l'appel : ta TOUTE PREMIÈRE parole, dès le décroché, doit être exactement, mot pour mot : « ${greeting} » — ne dis rien d'autre avant, puis enchaîne naturellement.\n\n`;
+  return { system_prompt: opening + base, greeting };
 }
 
 /** Script de repli quand le numéro n'est rattaché à aucun compte AlloChantier actif. */
 function fallbackVariables(reason: "unknown" | "inactive"): { system_prompt: string; greeting: string } {
   const greeting = "Bonjour, merci de votre appel.";
-  const system_prompt =
+  const base =
     reason === "inactive"
       ? "Le compte AlloChantier associé à ce numéro n'est pas actif actuellement. Explique poliment que la ligne n'est pas disponible pour le moment, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix."
       : "Ce numéro n'est pas encore rattaché à un compte. Explique poliment que tu ne peux pas traiter la demande pour l'instant, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix.";
-  return { system_prompt, greeting };
+  const opening = `Ta toute première parole doit être, mot pour mot : « ${greeting} ». Puis :\n`;
+  return { system_prompt: opening + base, greeting };
 }
 
 /** Journalise l'appel terminé (transcription, résumé, enregistrement, durée). */
