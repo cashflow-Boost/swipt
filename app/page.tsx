@@ -101,7 +101,7 @@ export default function Home() {
               Démarrer mon essai gratuit
             </Link>
             <p className="mt-4 text-[12px] tracking-wide text-faint">
-              7 jours gratuits · Sans carte bancaire · Sans engagement
+              5 appels gratuits · Sans carte bancaire · Sans engagement
             </p>
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function Home() {
             Démarrer mon essai gratuit
           </Link>
           <p className="mt-4 text-[14px] tracking-wide text-[#93C5FD]">
-            Sans engagement · Sans carte bancaire · 7 jours gratuits
+            Sans engagement · Sans carte bancaire · 5 appels gratuits
           </p>
         </div>
       </section>

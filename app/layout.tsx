@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s — AlloChantier",
   },
   description:
-    "AlloChantier répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. Essai gratuit 7 jours, sans carte bancaire.",
+    "AlloChantier répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. 5 appels gratuits, sans carte bancaire.",
   openGraph: {
     type: "website",
     locale: "fr_FR",

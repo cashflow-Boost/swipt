@@ -50,14 +50,14 @@ export default async function AppLayout({
 
       {!session.accessOpen ? (
         <div className="bg-red-50 px-5 py-2 text-center text-[13px] font-medium text-red-700">
-          Votre essai est terminé.{" "}
+          Vos appels gratuits sont épuisés.{" "}
           <Link href="/abonnement" className="underline">Choisissez une offre</Link> pour que Lia
           reprenne vos appels.
         </div>
-      ) : session.trialDaysLeft !== null && session.trialDaysLeft <= 3 ? (
+      ) : session.freeCallsLeft !== null && session.freeCallsLeft <= 3 ? (
         <div className="bg-blue-50 px-5 py-2 text-center text-[13px] font-medium text-blue-700">
-          Essai : {session.trialDaysLeft} jour{session.trialDaysLeft > 1 ? "s" : ""} restant
-          {session.trialDaysLeft > 1 ? "s" : ""}.{" "}
+          Il vous reste {session.freeCallsLeft} appel{session.freeCallsLeft > 1 ? "s" : ""} gratuit
+          {session.freeCallsLeft > 1 ? "s" : ""}.{" "}
           <Link href="/abonnement" className="underline">Choisir une offre</Link>
         </div>
       ) : null}

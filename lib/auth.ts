@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { FREE_CALL_QUOTA } from "@/lib/plans";
 
 export interface UserAndOrg {
   userId: string;
@@ -6,9 +7,9 @@ export interface UserAndOrg {
   orgId: string | null;
   orgName: string | null;
   agentPaused: boolean;
-  /** Jours restants d'essai (négatif si terminé), null si abonnement actif. */
-  trialDaysLeft: number | null;
-  /** Accès ouvert : abonnement actif, ou essai encore en cours. */
+  /** Appels gratuits restants (offre de découverte), null si abonnement actif. */
+  freeCallsLeft: number | null;
+  /** Accès ouvert : abonnement actif, ou appels gratuits non épuisés. */
   accessOpen: boolean;
 }
 
@@ -42,10 +43,16 @@ export async function getUserAndOrg(): Promise<UserAndOrg | null> {
   const orgRow = Array.isArray(org) ? (org[0] ?? null) : org;
 
   const subscribed = orgRow?.subscription_status === "active";
-  let trialDaysLeft: number | null = null;
-  if (!subscribed && orgRow?.trial_ends_at) {
-    const ms = new Date(orgRow.trial_ends_at).getTime() - Date.now();
-    trialDaysLeft = Math.ceil(ms / 86_400_000);
+  // Offre de découverte : on compte les appels déjà TRAITÉS ; il en reste
+  // FREE_CALL_QUOTA moins ceux-là, jusqu'à épuisement.
+  let freeCallsLeft: number | null = null;
+  if (!subscribed && data?.org_id) {
+    const { count } = await supabase
+      .from("calls")
+      .select("*", { count: "exact", head: true })
+      .eq("org_id", data.org_id as string)
+      .eq("status", "handled");
+    freeCallsLeft = Math.max(0, FREE_CALL_QUOTA - (count ?? 0));
   }
 
   return {
@@ -54,9 +61,9 @@ export async function getUserAndOrg(): Promise<UserAndOrg | null> {
     orgId: (data?.org_id as string) ?? null,
     orgName: orgRow?.name ?? null,
     agentPaused: orgRow?.agent_paused ?? false,
-    trialDaysLeft,
+    freeCallsLeft,
     // Sans org (avant onboarding) l'accès n'est pas encore la question.
-    accessOpen: subscribed || trialDaysLeft === null || trialDaysLeft > 0,
+    accessOpen: subscribed || freeCallsLeft === null || freeCallsLeft > 0,
   };
 }
 

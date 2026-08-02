@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { FREE_CALL_QUOTA } from "@/lib/plans";
 
 /**
  * Webhook de l'agent vocal (Retell AI → AlloChantier).
@@ -213,12 +214,18 @@ async function loadProfile(
     .order("label")
     .limit(40);
   if (!org) return null;
-  const trialEnd = org.trial_ends_at ? new Date(String(org.trial_ends_at)).getTime() : null;
+  // Offre de découverte : accès ouvert tant que l'abonnement est actif OU que
+  // le quota d'appels TRAITÉS offerts n'est pas épuisé (plus de limite de temps).
+  const { count: handledCount } = await admin
+    .from("calls")
+    .select("*", { count: "exact", head: true })
+    .eq("org_id", orgId)
+    .eq("status", "handled");
   return {
     name: org.name as string,
     agent_paused: Boolean(org.agent_paused),
     access_open:
-      org.subscription_status === "active" || trialEnd === null || trialEnd > Date.now(),
+      org.subscription_status === "active" || (handledCount ?? 0) < FREE_CALL_QUOTA,
     announced_name: (s?.announced_name as string) ?? null,
     trade: (s?.trade as string) ?? null,
     zone_center: (s?.zone_center as string) ?? null,
