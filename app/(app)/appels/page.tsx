@@ -71,7 +71,7 @@ export default async function AppelsPage() {
             <Fld k="Urgence" v={URGENCY[urgency] ?? "—"} hot={urgency === "high" || urgency === "critical"} />
 
             <details className="mt-3">
-              <summary className="cursor-pointer list-none rounded-pill border border-or bg-or px-3.5 py-2 text-center text-[13px] font-semibold text-ink">
+              <summary className="cursor-pointer list-none rounded-pill border border-or bg-or px-3.5 py-2 text-center text-[13px] font-semibold text-w">
                 Corriger la fiche
               </summary>
               <form action={correctExtractionAction} className="mt-3 space-y-3">

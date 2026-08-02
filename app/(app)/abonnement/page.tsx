@@ -17,7 +17,7 @@ export default function AbonnementPage() {
       <div className="grid gap-4 md:grid-cols-3">
         {PLANS.map((p) => (
           <div key={p.n} className={`relative flex flex-col rounded-[14px] border bg-w p-6 ${p.top ? "border-or shadow-[0_0_0_1px_var(--or)]" : "border-line shadow-sh"}`}>
-            {p.top && <span className="absolute -top-3 left-6 rounded-pill bg-or px-3 py-1 text-[11px] font-[650] text-ink">Recommandé</span>}
+            {p.top && <span className="absolute -top-3 left-6 rounded-pill bg-or px-3 py-1 text-[11px] font-[650] text-w">Recommandé</span>}
             <div className="text-[17px] font-[650]">{p.n}</div>
             <div className="text-[14px] text-faint">{p.who}</div>
             <div className="mt-4 text-[34px] font-[650] tracking-[-0.035em]">{p.price} €<span className="text-[13px] font-[500] text-faint"> /mois HT</span></div>

@@ -80,7 +80,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-pill bg-or px-4 py-2.5 text-[14.5px] font-semibold text-ink disabled:opacity-60"
+            className="w-full rounded-pill bg-or px-4 py-2.5 text-[14.5px] font-semibold text-w disabled:opacity-60"
           >
             {loading ? "Connexion…" : "Se connecter"}
           </button>

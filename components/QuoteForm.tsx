@@ -97,7 +97,7 @@ export function QuoteForm({ customers }: { customers: { id: string; name: string
         </div>
       </div>
 
-      <SubmitButton pendingText="Création…" className="rounded-pill bg-or px-5 py-2.5 text-[14.5px] font-semibold text-ink">
+      <SubmitButton pendingText="Création…" className="rounded-pill bg-or px-5 py-2.5 text-[14.5px] font-semibold text-w">
         Créer le devis
       </SubmitButton>
     </form>
