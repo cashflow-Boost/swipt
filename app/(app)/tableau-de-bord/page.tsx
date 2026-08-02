@@ -18,7 +18,7 @@ export default async function TableauDeBordPage() {
   const rdvAgent = appts.filter((a) => a.source === "agent").length;
 
   const kpis: { k: string; v: string; d: string; hot?: boolean }[] = [
-    { k: "Appels traités aujourd'hui", v: String(calls.length), d: "pris par AlloChantier" },
+    { k: "Appels traités aujourd'hui", v: String(calls.length), d: "pris par Gildra" },
     { k: "Rendez-vous posés", v: String(rdvAgent), d: "par l'agent" },
     { k: "Devis qui vous attendent", v: String(toValidate.length), d: `à valider — ${formatEuros(toValidateSum)}`, hot: true },
     { k: "Argent qui dort", v: formatEuros(sleeping), d: "devis sans réponse + factures en retard" },

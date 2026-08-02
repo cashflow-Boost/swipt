@@ -48,7 +48,7 @@ export function LegalDoc({
           <span>·</span>
           <Link href="/confidentialite" className="hover:text-ink">Confidentialité</Link>
         </div>
-        <p className="mt-3">© 2026 AlloChantier — France</p>
+        <p className="mt-3">© 2026 Gildra — France</p>
       </footer>
     </main>
   );

@@ -59,7 +59,7 @@ export function CheckoutForm({ planId }: { planId: PlanId }) {
       )}
 
       <p className="mt-6 max-w-[64ch] text-[13px] font-light leading-relaxed text-faint">
-        Le paiement est traité par Stripe. AlloChantier ne conserve aucune donnée de carte bancaire.
+        Le paiement est traité par Stripe. Gildra ne conserve aucune donnée de carte bancaire.
       </p>
     </form>
   );

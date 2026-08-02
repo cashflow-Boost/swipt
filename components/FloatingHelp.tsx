@@ -26,7 +26,7 @@ export function FloatingHelp({ phone }: { phone?: string }) {
 
   return (
     <a
-      href={`https://wa.me/${number}?text=${encodeURIComponent("Bonjour, j'ai une question sur AlloChantier")}`}
+      href={`https://wa.me/${number}?text=${encodeURIComponent("Bonjour, j'ai une question sur Gildra")}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Nous écrire sur WhatsApp"
