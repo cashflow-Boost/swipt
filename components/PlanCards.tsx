@@ -46,7 +46,7 @@ export function PlanCards({ mode = "trial" }: { mode?: "trial" | "checkout" }) {
         })}
       </div>
       <p className="mx-auto mt-8 max-w-[68ch] text-center text-[14px] font-light tracking-wide text-faint">
-        Au-delà du forfait Solo : 0,79 € par appel. Vos 5 premiers appels gérés sont offerts, sans carte bancaire, sans
+        Au-delà du forfait Solo : 0,79 € par appel. Vos 7 premiers appels gérés sont offerts, sans carte bancaire, sans
         engagement.
       </p>
     </>

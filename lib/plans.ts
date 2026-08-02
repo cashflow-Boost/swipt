@@ -9,7 +9,7 @@
  * bancaire. Au-delà, il faut un abonnement pour que Lia continue de décrocher.
  * (Remplace l'ancien essai limité dans le temps.)
  */
-export const FREE_CALL_QUOTA = 5;
+export const FREE_CALL_QUOTA = 7;
 
 export const PLANS = [
   {

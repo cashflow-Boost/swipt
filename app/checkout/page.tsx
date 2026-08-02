@@ -53,7 +53,7 @@ export default async function CheckoutPage({
           </ul>
 
           <div className="mt-6 rounded-[10px] bg-or-wash px-4 py-3 text-[13.5px] text-or-t">
-            Vos 5 premiers appels sont offerts. Rien n&apos;est prélevé aujourd&apos;hui, et aucun
+            Vos 7 premiers appels sont offerts. Rien n&apos;est prélevé aujourd&apos;hui, et aucun
             abonnement ne démarre automatiquement à la fin de l&apos;essai.
           </div>
         </div>

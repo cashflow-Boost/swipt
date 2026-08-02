@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s — Gildra",
   },
   description:
-    "Gildra répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. 5 appels gratuits, sans carte bancaire.",
+    "Gildra répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. 7 appels gratuits, sans carte bancaire.",
   openGraph: {
     type: "website",
     locale: "fr_FR",

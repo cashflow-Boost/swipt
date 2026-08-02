@@ -50,7 +50,7 @@ export default function SignupPage() {
 
         <form onSubmit={onSubmit} className="rounded-[14px] border border-line bg-w p-6 shadow-sh2">
           <h1 className="text-lg font-[650]">Créer un compte</h1>
-          <p className="mb-5 mt-1 text-[13.5px] text-soft">Vos 5 premiers appels sont offerts, sans carte bancaire.</p>
+          <p className="mb-5 mt-1 text-[13.5px] text-soft">Vos 7 premiers appels sont offerts, sans carte bancaire.</p>
 
           <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="email">Adresse e-mail</label>
           <input id="email" type="email" autoComplete="email" required value={email}
@@ -71,7 +71,7 @@ export default function SignupPage() {
           </button>
 
           <p className="mt-4 rounded-sm border border-line bg-w2 px-3 py-2.5 text-[12.5px] leading-relaxed text-soft">
-            Aucune carte bancaire n&apos;est demandée. Après vos 5 appels offerts, le service
+            Aucune carte bancaire n&apos;est demandée. Après vos 7 appels offerts, le service
             s&apos;arrête simplement : rien n&apos;est prélevé et aucun abonnement ne démarre tout seul.
             Pour continuer, vous choisirez une offre à ce moment-là. Voir les{" "}
             <Link href="/cgv" className="underline">conditions de vente</Link>.
