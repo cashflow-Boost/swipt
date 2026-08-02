@@ -481,10 +481,14 @@ export async function POST(req: Request) {
       });
     }
 
+    // Association tolérante : on reconnaît l'outil par mot-clé, quel que soit le
+    // nom exact donné dans Retell (« verifier_zone », « zone_de_verification »,
+    // « poser_rendez_vous », « prendre_rdv »…), pour ne pas dépendre d'un libellé.
+    const lname = fnName.toLowerCase().replace(/[^a-z]/g, "");
     let result = "Outil inconnu.";
-    if (fnName === "poser_rendez_vous") {
+    if (lname.includes("rendez") || lname.includes("rdv") || lname.includes("appointment")) {
       result = await poserRendezVous(admin, orgId, args);
-    } else if (fnName === "verifier_zone") {
+    } else if (lname.includes("zone")) {
       result = await verifierZone(admin, orgId, args);
     }
     return NextResponse.json({ result });
