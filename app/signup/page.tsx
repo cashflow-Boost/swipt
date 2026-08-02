@@ -66,7 +66,7 @@ export default function SignupPage() {
           {info && <p className="mb-4 rounded-sm border border-or-line bg-or-wash px-3 py-2 text-[13px] text-or-t">{info}</p>}
 
           <button type="submit" disabled={loading}
-            className="w-full rounded-pill bg-or px-4 py-2.5 text-[14.5px] font-semibold text-ink disabled:opacity-60">
+            className="w-full rounded-pill bg-or px-4 py-2.5 text-[14.5px] font-semibold text-w disabled:opacity-60">
             {loading ? "Création…" : "Créer mon compte"}
           </button>
 

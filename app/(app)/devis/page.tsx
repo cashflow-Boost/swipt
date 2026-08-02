@@ -41,7 +41,7 @@ export default async function DevisPage() {
                 </div>
                 <form action={validateQuoteAction} className="sm:justify-self-end">
                   <input type="hidden" name="id" value={q.id} />
-                  <button type="submit" className="rounded-pill border border-or bg-or px-3.5 py-2 text-[13px] font-semibold text-ink">
+                  <button type="submit" className="rounded-pill border border-or bg-or px-3.5 py-2 text-[13px] font-semibold text-w">
                     Valider et envoyer
                   </button>
                 </form>
