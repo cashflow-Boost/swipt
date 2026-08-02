@@ -37,7 +37,7 @@ export default function CgvPage() {
 
       <LSection n="3." title="Période d'essai">
         <p>
-          L&apos;abonnement débute par une période d&apos;essai gratuite de <b className="text-ink">7 jours</b>, sans
+          L&apos;abonnement débute par une offre de découverte : vos <b className="text-ink">5 premiers appels traités</b> sont offerts, sans
           carte bancaire et sans engagement. À l&apos;issue de l&apos;essai, l&apos;accès au service se poursuit
           uniquement après souscription d&apos;une offre payante.
         </p>

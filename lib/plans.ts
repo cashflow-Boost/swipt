@@ -3,6 +3,14 @@
  * d'achat et la page Abonnement lisent tous ici : un prix ne peut plus être
  * juste à un endroit et faux à un autre.
  */
+
+/**
+ * Offre de découverte : les premiers appels TRAITÉS sont offerts, sans carte
+ * bancaire. Au-delà, il faut un abonnement pour que Lia continue de décrocher.
+ * (Remplace l'ancien essai limité dans le temps.)
+ */
+export const FREE_CALL_QUOTA = 5;
+
 export const PLANS = [
   {
     id: "solo",

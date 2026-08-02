@@ -5,7 +5,7 @@ import { PlanCards } from "@/components/PlanCards";
 
 export const metadata: Metadata = {
   title: "Tarifs",
-  description: "Solo 99 €, Pro 199 €, Agence 399 € par mois. Sept jours d'essai sans carte bancaire.",
+  description: "Solo 99 €, Pro 199 €, Agence 399 € par mois. Vos 5 premiers appels gérés sont offerts, sans carte bancaire.",
 };
 
 export default function TarifsPage() {
@@ -26,7 +26,7 @@ export default function TarifsPage() {
             Un tarif. Pas de surprise.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-center text-[19px] font-light leading-relaxed tracking-wide text-soft">
-            Sept jours pour essayer, sans carte bancaire. Vous choisissez votre offre seulement
+            Vos 5 premiers appels gérés sont offerts, sans carte bancaire. Vous choisissez votre offre seulement
             ensuite.
           </p>
           <div className="mt-16">
