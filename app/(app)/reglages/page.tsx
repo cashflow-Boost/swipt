@@ -135,7 +135,7 @@ export default async function ReglagesPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Votre numéro professionnel" name="businessPhone" type="tel" defaultValue={s?.business_phone ?? ""} placeholder="06 12 34 56 78" />
             <label className="block">
-              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400">Numéro AlloChantier</span>
+              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400">Numéro Gildra</span>
               <div className="flex h-11 items-center rounded-xl bg-slate-50 px-4 font-mono text-sm text-slate-400">
                 {swiptNumber ?? "en cours d'attribution"}
               </div>

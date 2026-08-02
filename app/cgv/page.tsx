@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { LegalDoc, LSection } from "@/components/LegalDoc";
 
 export const metadata: Metadata = {
-  title: "Conditions générales de vente — AlloChantier",
-  description: "Conditions générales de vente et d'utilisation du service d'abonnement AlloChantier.",
+  title: "Conditions générales de vente — Gildra",
+  description: "Conditions générales de vente et d'utilisation du service d'abonnement Gildra.",
 };
 
 export default function CgvPage() {
@@ -11,7 +11,7 @@ export default function CgvPage() {
     <LegalDoc title="Conditions générales de vente" updated="25 juillet 2026">
       <LSection n="1." title="Objet">
         <p>
-          Les présentes conditions régissent l&apos;abonnement au service AlloChantier, un standard téléphonique
+          Les présentes conditions régissent l&apos;abonnement au service Gildra, un standard téléphonique
           automatisé destiné aux artisans : il répond aux appels, pose des rendez-vous, prépare devis et
           factures et relance les impayés. L&apos;abonnement vaut acceptation des présentes conditions.
         </p>
@@ -69,7 +69,7 @@ export default function CgvPage() {
 
       <LSection n="7." title="Responsabilité">
         <p>
-          AlloChantier est un outil d&apos;assistance : la responsabilité finale des rendez-vous, devis et factures
+          Gildra est un outil d&apos;assistance : la responsabilité finale des rendez-vous, devis et factures
           transmis aux clients de l&apos;abonné lui incombe. L&apos;éditeur met en œuvre les moyens raisonnables pour
           assurer la continuité du service mais ne peut être tenu responsable des interruptions imputables aux
           opérateurs téléphoniques ou aux prestataires tiers.

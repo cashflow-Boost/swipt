@@ -9,7 +9,7 @@ import { PlanCards } from "@/components/PlanCards";
 
 /** Coordonnées — à régler dans Vercel avant d'envoyer du trafic. */
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE;
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@allochantier.com";
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@gildra.fr";
 
 const TRADES = ["Plombiers", "Couvreurs", "Électriciens", "Menuisiers", "Peintres", "Maçons"];
 
@@ -67,7 +67,7 @@ const FAQ = [
   },
   {
     q: "Combien de temps pour démarrer ?",
-    a: "Environ une heure pour enregistrer votre zone, vos horaires et vos prix. AlloChantier décroche le soir même.",
+    a: "Environ une heure pour enregistrer votre zone, vos horaires et vos prix. Gildra décroche le soir même.",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function Home() {
             Vous ne perdez plus un seul appel.
           </h1>
           <p className="ac-rise ac-d2 mx-auto mt-7 max-w-2xl text-[20px] font-light leading-relaxed tracking-wide text-soft">
-            AlloChantier répond à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
+            Gildra répond à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
             recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
           </p>
           <div className="ac-rise ac-d3">
@@ -126,7 +126,7 @@ export default function Home() {
             Votre assistant fait votre travail en moins de temps.
           </h2>
           <p className={`${LEDE} mx-auto mt-5 max-w-2xl text-center`}>
-            Pendant que vous êtes sur le chantier, AlloChantier gère votre téléphone.
+            Pendant que vous êtes sur le chantier, Gildra gère votre téléphone.
           </p>
           <div className="mt-16 grid gap-12 md:grid-cols-3">
             {GAINS.map((g, i) => (

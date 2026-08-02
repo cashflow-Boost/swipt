@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 /**
- * Identité AlloChantier.
+ * Identité Gildra.
  * — LogoMark : le casque seul (navbar compacte, splash, favicon).
  * — Logo : la version horizontale, combiné + mot + point vert.
  * Le point vert signale « en ligne, quelqu'un décroche » : c'est la promesse.
@@ -15,7 +15,7 @@ export function LogoMark({ size = 32, className = "" }: { size?: number; classNa
       viewBox="0 0 64 64"
       className={className}
       role="img"
-      aria-label="AlloChantier"
+      aria-label="Gildra"
     >
       <path d="M16 32C16 14 24 6 32 6s16 8 16 26" stroke="#1D4ED8" strokeWidth="5" strokeLinecap="round" fill="none" />
       <rect x="10" y="28" width="14" height="22" rx="6" fill="#1D4ED8" />
@@ -59,7 +59,7 @@ export function Logo({
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <PhoneMark dark={dark} />
       <span className={`text-[20px] font-bold tracking-tight ${dark ? "text-w" : "text-nv"}`}>
-        AlloChantier
+        Gildra
       </span>
       <span className="mb-0.5 inline-block h-[7px] w-[7px] shrink-0 self-end rounded-full bg-gr" aria-hidden="true" />
     </span>
@@ -67,7 +67,7 @@ export function Logo({
 
   if (!href) return mark;
   return (
-    <Link href={href} aria-label="AlloChantier — accueil">
+    <Link href={href} aria-label="Gildra — accueil">
       {mark}
     </Link>
   );

@@ -12,7 +12,7 @@ export default async function AgendaPage() {
         <div>
           <h1 className="text-xl font-[650]">Agenda</h1>
           <p className="mt-1 max-w-[56ch] text-sm text-soft">
-            Vos rendez-vous et ceux posés par AlloChantier. Un créneau bloqué par vous
+            Vos rendez-vous et ceux posés par Gildra. Un créneau bloqué par vous
             est intouchable par l&apos;agent.
           </p>
         </div>
@@ -40,7 +40,7 @@ export default async function AgendaPage() {
 
       <div className="mt-4 flex flex-wrap gap-4 text-[12.5px] text-soft">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-[3px] border border-or-line bg-or-wash" /> Posé par AlloChantier
+          <span className="inline-block h-3 w-3 rounded-[3px] border border-or-line bg-or-wash" /> Posé par Gildra
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-[3px] border border-line2 bg-w3" /> Posé par vous

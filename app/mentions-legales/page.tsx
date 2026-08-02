@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import { LegalDoc, LSection } from "@/components/LegalDoc";
 
 export const metadata: Metadata = {
-  title: "Mentions légales — AlloChantier",
-  description: "Mentions légales du service AlloChantier, standard téléphonique intelligent des artisans du dépannage.",
+  title: "Mentions légales — Gildra",
+  description: "Mentions légales du service Gildra, standard téléphonique intelligent des artisans du dépannage.",
 };
 
 export default function MentionsLegalesPage() {
   return (
     <LegalDoc title="Mentions légales" updated="25 juillet 2026">
       <LSection n="1." title="Éditeur du site">
-        <p>Le site et le service AlloChantier sont édités par :</p>
+        <p>Le site et le service Gildra sont édités par :</p>
         <ul className="ml-4 list-disc space-y-1">
           <li>Raison sociale : <b className="text-ink">[Raison sociale]</b></li>
           <li>Forme juridique : <b className="text-ink">[SAS / SASU / EURL / auto-entrepreneur…]</b></li>
@@ -37,7 +37,7 @@ export default function MentionsLegalesPage() {
 
       <LSection n="3." title="Propriété intellectuelle">
         <p>
-          L&apos;ensemble des éléments du site (marque « AlloChantier », logo, textes, interface, code) est protégé par
+          L&apos;ensemble des éléments du site (marque « Gildra », logo, textes, interface, code) est protégé par
           le droit de la propriété intellectuelle et reste la propriété exclusive de l&apos;éditeur. Toute
           reproduction ou représentation, totale ou partielle, sans autorisation écrite, est interdite.
         </p>

@@ -41,7 +41,7 @@ export default function SignupPage() {
     <main className="flex min-h-screen items-center justify-center bg-w2 px-6">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-center gap-2 text-[22px] font-bold tracking-tight">
-          <span>AlloChantier</span>
+          <span>Gildra</span>
           <span className="flex gap-0.5">
             <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
             <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
