@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Calculator } from "@/components/Calculator";
 import { Logo } from "@/components/Logo";
-import { DemoCallForm } from "@/components/DemoCallForm";
 import { Testimonials } from "@/components/Testimonials";
 import { Reveal } from "@/components/Reveal";
 import { LandingNav } from "@/components/LandingNav";
@@ -101,7 +100,7 @@ export default function Home() {
               Démarrer mon essai gratuit
             </Link>
             <p className="mt-4 text-[12px] tracking-wide text-faint">
-              5 appels gratuits · Sans carte bancaire · Sans engagement
+              7 appels gratuits · Sans carte bancaire · Sans engagement
             </p>
           </div>
         </div>
@@ -184,15 +183,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7 — Démonstration */}
+      {/* 7 — Essayez vous-même */}
       <section className="bg-w3 py-24">
         <div className={`${WRAP} text-center`}>
-          <h2 className={H2}>Vous préférez l&apos;entendre d&apos;abord ?</h2>
+          <h2 className={H2}>Essayez Lia vous-même.</h2>
           <p className={`${LEDE} mx-auto mt-5 max-w-2xl`}>
-            Laissez votre numéro : dès que la ligne de Lia est ouverte, elle vous appelle et vous
-            jouez le client.
+            Créez votre compte, réglez vos horaires et vos tarifs en quelques minutes, et Lia
+            décroche vos 7 premiers appels — gratuitement, sans carte bancaire.
           </p>
-          <DemoCallForm />
+          <Link
+            href="/signup"
+            className="mt-10 inline-block rounded-full bg-or px-10 py-4 text-[16px] font-medium text-w shadow-sh2 transition-all duration-300 hover:scale-[1.03] hover:bg-or-h"
+          >
+            Créer mon compte
+          </Link>
         </div>
       </section>
 
@@ -258,7 +262,7 @@ export default function Home() {
             Démarrer mon essai gratuit
           </Link>
           <p className="mt-4 text-[14px] tracking-wide text-[#93C5FD]">
-            Sans engagement · Sans carte bancaire · 5 appels gratuits
+            Sans engagement · Sans carte bancaire · 7 appels gratuits
           </p>
         </div>
       </section>
