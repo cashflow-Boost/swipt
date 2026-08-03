@@ -29,7 +29,10 @@ export function Calculator() {
   const jobs = (monthly * rate) / 10;
   const lost = jobs * ticket;
   const offer = bestOffer(monthly);
-  const net = Math.max(0, Math.round(lost * RECOVERY - offer.cost));
+  const recovered = lost * RECOVERY;
+  const net = Math.max(0, Math.round(recovered - offer.cost));
+  // Part récupérée nette, pour la barre visuelle (bornée à 100 %).
+  const netPct = lost > 0 ? Math.min(100, Math.max(4, (net / lost) * 100)) : 0;
 
   return (
     <div className="grid gap-16 md:grid-cols-2">
@@ -76,18 +79,41 @@ export function Calculator() {
           <Line l={`× ${fmt.format(ticket)} € l'intervention`} r={`${fmt.format(Math.round(lost))} €`} />
         </dl>
 
-        <div className="mt-10 border-t border-line pt-7">
-          <p className="text-[16px] font-light leading-relaxed text-soft">
-            Pour environ <span className="font-medium text-ink">{fmt.format(monthly)} appels par mois</span>,
-            la formule adaptée est <span className="font-medium text-ink">{offer.n}</span>, à{" "}
-            {fmt.format(Math.round(offer.cost))} € par mois. Récupéré net :{" "}
-            <span className="font-bold text-or-t">{fmt.format(net)} € par mois</span>.
+        {/* Barre : la part que Gildra vous fait récupérer, net de l'abonnement */}
+        <div className="mt-9">
+          <div className="flex h-2.5 overflow-hidden rounded-full bg-line2">
+            <div
+              className="rounded-full bg-gr transition-[width] duration-500"
+              style={{ width: `${netPct}%`, transitionTimingFunction: "cubic-bezier(.16,1,.3,1)" }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-[12px] font-medium">
+            <span className="text-or-t">Récupérable net</span>
+            <span className="text-faint">Coût {offer.n} · {fmt.format(Math.round(offer.cost))} €/mois</span>
+          </div>
+        </div>
+
+        {/* Résultat net mis en avant */}
+        <div className="mt-6 rounded-[20px] border border-or-line bg-gradient-to-br from-or-wash to-w p-7">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-or-t">
+            Récupéré net avec Gildra
+          </p>
+          <div className="mt-2 flex items-end gap-2">
+            <span className="text-[clamp(38px,6vw,52px)] font-bold leading-none tracking-tighter text-or-t">
+              {fmt.format(net)} €
+            </span>
+            <span className="mb-1 text-[15px] font-light text-soft">/ mois</span>
+          </div>
+          <p className="mt-3 text-[14.5px] font-light leading-relaxed text-soft">
+            Pour environ <span className="font-medium text-ink">{fmt.format(monthly)} appels/mois</span>,
+            l&apos;offre <span className="font-medium text-ink">{offer.n}</span> à{" "}
+            {fmt.format(Math.round(offer.cost))} €/mois suffit.
           </p>
           <Link
             href="/signup"
-            className="mt-7 inline-block rounded-full bg-or px-8 py-4 text-[15px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
+            className="mt-6 inline-block rounded-full bg-or px-8 py-4 text-[15px] font-medium text-w transition-colors duration-300 hover:bg-or-h"
           >
-            Démarrer mon essai
+            Démarrer gratuitement
           </Link>
         </div>
 
