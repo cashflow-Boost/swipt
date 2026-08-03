@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Wrench, Zap, Flame, KeyRound, Grid3x3, PaintRoller, HardHat, Hammer } from "lucide-react";
 import { Calculator } from "@/components/Calculator";
 import { Logo } from "@/components/Logo";
+import { HeroPhone } from "@/components/HeroPhone";
 import { Testimonials } from "@/components/Testimonials";
 import { Reveal } from "@/components/Reveal";
 import { LandingNav } from "@/components/LandingNav";
@@ -10,7 +12,16 @@ import { PlanCards } from "@/components/PlanCards";
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE;
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@gildra.fr";
 
-const TRADES = ["Plombiers", "Couvreurs", "Électriciens", "Menuisiers", "Peintres", "Maçons"];
+const TRADES = [
+  { icon: Wrench, label: "Plombier" },
+  { icon: Zap, label: "Électricien" },
+  { icon: Flame, label: "Chauffagiste" },
+  { icon: KeyRound, label: "Serrurier" },
+  { icon: Grid3x3, label: "Carreleur" },
+  { icon: PaintRoller, label: "Peintre" },
+  { icon: HardHat, label: "Couvreur" },
+  { icon: Hammer, label: "Menuisier" },
+];
 
 const GAINS = [
   {
@@ -80,40 +91,60 @@ export default function Home() {
       <LandingNav />
 
       {/* Hero */}
-      <header className="flex min-h-[90vh] items-center bg-gradient-to-b from-w to-w3">
-        <div className={`${WRAP} py-24 text-center`}>
-          <span className="ac-rise ac-d0 mb-7 inline-block rounded-full bg-or-wash px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-or-t">
-            L&apos;assistante des artisans
-          </span>
-          <h1 className="ac-rise ac-d1 mx-auto max-w-[16ch] text-[clamp(46px,8vw,80px)] font-bold leading-[1.02] tracking-tighter text-nv">
-            Vous ne perdez plus un seul appel.
-          </h1>
-          <p className="ac-rise ac-d2 mx-auto mt-7 max-w-2xl text-[20px] font-light leading-relaxed tracking-wide text-soft">
-            Gildra répond à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
-            recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
-          </p>
-          <div className="ac-rise ac-d3">
-            <Link
-              href="/signup"
-              className="mt-10 inline-block rounded-full bg-or px-10 py-4 text-[16px] font-medium text-w shadow-sh2 transition-all duration-300 hover:scale-[1.03] hover:bg-or-h"
-            >
-              Démarrer mon essai gratuit
-            </Link>
-            <p className="mt-4 text-[12px] tracking-wide text-faint">
-              7 appels gratuits · Sans carte bancaire · Sans engagement
+      <header className="relative overflow-hidden bg-gradient-to-b from-w to-w3">
+        <div className={`${WRAP} grid items-center gap-12 py-16 md:grid-cols-[1.05fr_.95fr] md:gap-8 md:py-24`}>
+          {/* Colonne texte */}
+          <div className="text-center md:text-left">
+            <span className="ac-rise ac-d0 mb-6 inline-block rounded-full bg-or-wash px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-or-t">
+              L&apos;assistante des artisans
+            </span>
+            <h1 className="ac-rise ac-d1 mx-auto max-w-[15ch] text-[clamp(40px,6vw,66px)] font-bold leading-[1.04] tracking-tighter text-nv md:mx-0">
+              Vous ne perdez plus un seul appel.
+            </h1>
+            <p className="ac-rise ac-d2 mx-auto mt-6 max-w-xl text-[19px] font-light leading-relaxed tracking-wide text-soft md:mx-0">
+              Gildra décroche à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
+              recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
             </p>
+            <div className="ac-rise ac-d3 mt-9">
+              <Link
+                href="/signup"
+                className="inline-block rounded-full bg-or px-9 py-4 text-[16px] font-medium text-w shadow-sh2 transition-all duration-300 hover:scale-[1.03] hover:bg-or-h"
+              >
+                Démarrer gratuitement
+              </Link>
+              <p className="mt-4 text-[12px] tracking-wide text-faint">
+                7 appels gratuits · Sans carte bancaire · Sans engagement
+              </p>
+            </div>
+          </div>
+
+          {/* Colonne téléphone animé */}
+          <div className="ac-rise ac-d2">
+            <HeroPhone />
           </div>
         </div>
       </header>
 
       {/* 3 — Métiers */}
-      <section className="border-b border-line bg-w py-12">
+      <section className="border-b border-line bg-w py-14">
         <div className={WRAP}>
           <p className="text-center text-[12px] uppercase tracking-[0.18em] text-faint">
-            Conçu pour tous les artisans
+            Un assistant pour chaque métier
           </p>
-          <p className="mt-3 text-center text-[15px] font-light tracking-wide text-soft">
-            {TRADES.join(" · ")}
+          <div className="mx-auto mt-8 flex max-w-4xl flex-wrap justify-center gap-2.5">
+            {TRADES.map(({ icon: Icon, label }) => (
+              <span
+                key={label}
+                className="ac-card inline-flex items-center gap-2 rounded-full border border-line2 bg-w px-4 py-2 text-[14px] font-medium text-nv"
+              >
+                <Icon size={17} strokeWidth={1.9} className="text-or" />
+                {label}
+              </span>
+            ))}
+          </div>
+          <p className="mx-auto mt-6 max-w-2xl text-center text-[14.5px] font-light tracking-wide text-soft">
+            Plombier, électricien, serrurier, carreleur… Gildra s&apos;adapte à votre métier, votre
+            zone et vos tarifs.
           </p>
         </div>
       </section>

@@ -261,8 +261,36 @@ textarea:focus {
 }
 .ac-reveal[data-shown="true"] { opacity: 1; transform: none; }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   Hero vivant : un téléphone reçoit un appel, puis Lia décroche et pose le RDV.
+   Tout est en CSS (aucune image externe) et se fige proprement si l'utilisateur
+   a désactivé les animations (l'écran « en ligne » reste affiché).
+   ═════════════════════════════════════════════════════════════════════════ */
+@keyframes ac-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+.ac-float { animation: ac-float 6s var(--ease) infinite; }
+
+/* Ondes concentriques autour de l'appel entrant. */
+@keyframes ac-ring-wave { 0% { transform: scale(.55); opacity: .5; } 100% { transform: scale(2); opacity: 0; } }
+.ac-ring-wave { animation: ac-ring-wave 2.4s var(--ease) infinite; }
+
+/* Égaliseur (la voix de Lia). Le délai par barre est posé en style inline. */
+@keyframes ac-eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+.ac-eq-bar { transform-origin: bottom; animation: ac-eq .9s var(--ease) infinite; }
+
+/* Bascule des deux écrans (boucle 9 s) : entrant -> décroché -> retour. */
+@keyframes ac-scene-in  { 0%, 34% { opacity: 1; } 44%, 94% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes ac-scene-out { 0%, 34% { opacity: 0; } 44%, 94% { opacity: 1; } 100% { opacity: 0; } }
+.ac-scene-incoming { opacity: 0; animation: ac-scene-in 9s var(--ease) infinite; }
+.ac-scene-live     { opacity: 1; animation: ac-scene-out 9s var(--ease) infinite; }
+
+/* Bulles de transcription qui apparaissent une à une. */
+@keyframes ac-bubble { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.ac-bubble { animation: ac-bubble .6s var(--ease) backwards; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
   .ac-reveal { opacity: 1; transform: none; }
+  .ac-scene-incoming { opacity: 0; }
+  .ac-scene-live { opacity: 1; }
 }
