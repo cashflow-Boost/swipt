@@ -2,7 +2,7 @@ import { LogoMark } from "@/components/Logo";
 
 /**
  * Maquette de téléphone animée (100 % CSS, aucune image externe).
- * Elle joue en boucle la scène clé du produit : un appel entre, puis Lia
+ * Elle joue en boucle la scène clé du produit : un appel entre, puis Sonia
  * décroche, discute et pose le rendez-vous. Se fige sur l'écran « en ligne »
  * si l'utilisateur a désactivé les animations.
  */
@@ -50,7 +50,7 @@ export function HeroPhone() {
             </div>
           </div>
 
-          {/* ── Écran 2 : Lia en ligne, elle pose le RDV ─────────────── */}
+          {/* ── Écran 2 : Sonia en ligne, elle pose le RDV ─────────────── */}
           <div className="ac-scene-live absolute inset-0 flex flex-col px-5 pt-14 pb-6">
             <div className="flex items-center gap-2">
               <span className="ac-pulse h-2.5 w-2.5 rounded-full bg-gr" />
@@ -58,7 +58,7 @@ export function HeroPhone() {
               <span className="ml-auto font-mono text-[12px] text-faint">00:12</span>
             </div>
 
-            {/* Égaliseur — la voix de Lia */}
+            {/* Égaliseur — la voix de Sonia */}
             <div className="mt-4 flex h-8 items-end justify-center gap-1">
               {[0, 1, 2, 3, 4, 5, 6].map((i) => (
                 <span

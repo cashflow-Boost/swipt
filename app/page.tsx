@@ -32,7 +32,7 @@ const GAINS = [
   {
     n: "3×",
     t: "plus de rendez-vous fixés",
-    d: "Lia répond en 2 secondes, même à 20 h. Vos clients ne raccrochent plus.",
+    d: "Sonia répond en 2 secondes, même à 20 h. Vos clients ne raccrochent plus.",
   },
   {
     n: "0",
@@ -44,11 +44,11 @@ const GAINS = [
 const CAPABILITIES = [
   {
     t: "Elle décroche en 2 secondes",
-    d: "Votre téléphone sonne quatre fois, puis Lia répond au nom de votre entreprise. Annoncée comme automatique. Transfert immédiat en cas d'urgence.",
+    d: "Votre téléphone sonne quatre fois, puis Sonia répond au nom de votre entreprise. Annoncée comme automatique. Transfert immédiat en cas d'urgence.",
   },
   {
     t: "Elle fixe le rendez-vous",
-    d: "Lia consulte votre agenda, propose les créneaux libres, confirme par SMS. Refus poli si le chantier est hors de votre zone.",
+    d: "Sonia consulte votre agenda, propose les créneaux libres, confirme par SMS. Refus poli si le chantier est hors de votre zone.",
   },
   {
     t: "Elle prépare le devis",
@@ -58,7 +58,7 @@ const CAPABILITIES = [
 
 const STEPS = [
   { t: "Configurez", d: "Une heure. Vos horaires, votre zone, votre grille de prix." },
-  { t: "Lia décroche", d: "Votre ligne sonne quatre fois, puis elle répond au nom de votre entreprise." },
+  { t: "Sonia décroche", d: "Votre ligne sonne quatre fois, puis elle répond au nom de votre entreprise." },
   { t: "Vous recevez tout", d: "Résumé, rendez-vous, devis. Sur votre téléphone. Vous ne touchez à rien." },
 ];
 
@@ -91,11 +91,11 @@ export default function Home() {
       <LandingNav />
 
       {/* Hero */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-w to-w3">
+      <header className="relative overflow-hidden bg-gradient-to-b from-w to-wood-wash">
         <div className={`${WRAP} grid items-center gap-12 py-16 md:grid-cols-[1.05fr_.95fr] md:gap-8 md:py-24`}>
           {/* Colonne texte */}
           <div className="text-center md:text-left">
-            <span className="ac-rise ac-d0 mb-6 inline-block rounded-full bg-or-wash px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-or-t">
+            <span className="ac-rise ac-d0 mb-6 inline-block rounded-full bg-wood-wash px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-wood">
               L&apos;assistante des artisans
             </span>
             <h1 className="ac-rise ac-d1 mx-auto max-w-[15ch] text-[clamp(40px,6vw,66px)] font-bold leading-[1.04] tracking-tighter text-nv md:mx-0">
@@ -135,9 +135,9 @@ export default function Home() {
             {TRADES.map(({ icon: Icon, label }) => (
               <span
                 key={label}
-                className="ac-card inline-flex items-center gap-2 rounded-full border border-line2 bg-w px-4 py-2 text-[14px] font-medium text-nv"
+                className="ac-card inline-flex items-center gap-2 rounded-full border border-wood-line bg-w px-4 py-2 text-[14px] font-medium text-nv"
               >
-                <Icon size={17} strokeWidth={1.9} className="text-or" />
+                <Icon size={17} strokeWidth={1.9} className="text-wood" />
                 {label}
               </span>
             ))}
@@ -175,7 +175,7 @@ export default function Home() {
       </section>
 
       {/* 5 — Fonctionnalités */}
-      <section id="fonctionnalites" className="bg-w3 py-24">
+      <section id="fonctionnalites" className="bg-wood-wash py-24">
         <div className={WRAP}>
           <h2 className={`${H2} text-center`}>Un seul outil. Zéro appel manqué.</h2>
           <div className="mx-auto mt-16 max-w-3xl">
@@ -217,9 +217,9 @@ export default function Home() {
       {/* 7 — Essayez vous-même */}
       <section className="bg-w3 py-24">
         <div className={`${WRAP} text-center`}>
-          <h2 className={H2}>Essayez Lia vous-même.</h2>
+          <h2 className={H2}>Essayez Sonia vous-même.</h2>
           <p className={`${LEDE} mx-auto mt-5 max-w-2xl`}>
-            Créez votre compte, réglez vos horaires et vos tarifs en quelques minutes, et Lia
+            Créez votre compte, réglez vos horaires et vos tarifs en quelques minutes, et Sonia
             décroche vos 7 premiers appels — gratuitement, sans carte bancaire.
           </p>
           <Link
@@ -245,7 +245,7 @@ export default function Home() {
       <Testimonials />
 
       {/* 9 — Tarifs */}
-      <section id="tarifs" className="bg-gradient-to-b from-w to-w3 py-24">
+      <section id="tarifs" className="bg-gradient-to-b from-w to-wood-wash py-24">
         <div className={WRAP}>
           <h2 className={`${H2} text-center`}>Un tarif. Pas de surprise.</h2>
           <div className="mt-16">

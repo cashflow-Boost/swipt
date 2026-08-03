@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /**
- * Formulaire de rappel pour la démonstration. La ligne de Lia n'est pas encore
+ * Formulaire de rappel pour la démonstration. La ligne de Sonia n'est pas encore
  * ouverte : on recueille le numéro et on le dit franchement, plutôt que de
  * promettre un appel « dans 2 minutes » qui n'arrivera pas.
  */
@@ -13,7 +13,7 @@ export function DemoCallForm() {
   if (sent) {
     return (
       <p className="mx-auto mt-8 max-w-md text-[15px] font-light leading-relaxed tracking-wide text-soft">
-        C&apos;est noté. Vous serez prévenu dès que la ligne de Lia est ouverte — en attendant,
+        C&apos;est noté. Vous serez prévenu dès que la ligne de Sonia est ouverte — en attendant,
         l&apos;essai gratuit vous donne accès à tout, sans carte bancaire.
       </p>
     );

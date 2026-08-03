@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 /**
  * « Écouter un appel démo » — l'artisan saisit son numéro et reçoit un appel
- * de Lia. La téléphonie n'est pas encore branchée : on recueille l'intention
+ * de Sonia. La téléphonie n'est pas encore branchée : on recueille l'intention
  * et on l'annonce honnêtement plutôt que de simuler un appel qui n'arrivera pas.
  */
 export function DemoCallModal({
@@ -53,7 +53,7 @@ export function DemoCallModal({
                   Démo audio bientôt disponible
                 </h2>
                 <p className="mt-2 text-[14.5px] text-soft">
-                  La ligne de Lia est en cours de mise en service. Laissez vos coordonnées : vous
+                  La ligne de Sonia est en cours de mise en service. Laissez vos coordonnées : vous
                   serez prévenu dès qu&apos;elle décroche, et vous pourrez l&apos;appeler pour
                   l&apos;entendre.
                 </p>

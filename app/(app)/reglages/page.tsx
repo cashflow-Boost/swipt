@@ -89,11 +89,11 @@ export default async function ReglagesPage() {
           </div>
         </div>
 
-        {/* Bloc — Ce que dit Lia */}
+        {/* Bloc — Ce que dit Sonia */}
         <div className="mb-4 rounded-2xl bg-white p-6">
-          <h2 className="mb-1 text-sm font-semibold text-slate-900">Ce que dit Lia</h2>
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Ce que dit Sonia</h2>
           <p className="mb-4 text-xs text-slate-400">
-            Sa première phrase au décroché, et vos consignes personnelles. Lia suit vos consignes en
+            Sa première phrase au décroché, et vos consignes personnelles. Sonia suit vos consignes en
             priorité — sauf pour la sécurité et l&apos;honnêteté des prix, qui restent garanties.
           </p>
           <div className="space-y-4">
@@ -130,7 +130,7 @@ export default async function ReglagesPage() {
         <div className="mb-4 rounded-2xl bg-white p-6">
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Téléphonie</h2>
           <p className="mb-4 text-xs text-slate-400">
-            Vous gardez votre numéro. Lia ne prend l&apos;appel que si vous ne décrochez pas.
+            Vous gardez votre numéro. Sonia ne prend l&apos;appel que si vous ne décrochez pas.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Votre numéro professionnel" name="businessPhone" type="tel" defaultValue={s?.business_phone ?? ""} placeholder="06 12 34 56 78" />
@@ -155,7 +155,7 @@ export default async function ReglagesPage() {
           </div>
           <div className="mt-4 grid gap-4">
             <Field label="Urgences à transférer" name="urgentTriggers" defaultValue={s?.urgent_triggers?.join(" · ") ?? ""} placeholder="Fuite active · odeur de gaz · personne bloquée" />
-            <Field label="Ce que Lia refuse" name="refusalRules" defaultValue={s?.refusal_rules?.join(" · ") ?? ""} placeholder="Démarchage · hors zone · négociation de prix" />
+            <Field label="Ce que Sonia refuse" name="refusalRules" defaultValue={s?.refusal_rules?.join(" · ") ?? ""} placeholder="Démarchage · hors zone · négociation de prix" />
           </div>
 
           <div className="mt-5 flex items-center gap-4">
