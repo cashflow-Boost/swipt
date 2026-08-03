@@ -107,6 +107,18 @@ async function poserRendezVous(
   }
   const fin = new Date(debut.getTime() + duree * 60_000);
 
+  // Anti double-réservation : on refuse un créneau qui en chevauche un autre.
+  const { data: clash } = await admin
+    .from("appointments")
+    .select("id")
+    .eq("org_id", orgId)
+    .lt("starts_at", fin.toISOString())
+    .gt("ends_at", debut.toISOString())
+    .limit(1);
+  if (clash && clash.length > 0) {
+    return "Ce créneau est déjà pris dans l'agenda. Propose un autre horaire au client.";
+  }
+
   // Client existant (par téléphone) ou création.
   let customerId: string | null = null;
   if (phone) {
@@ -178,6 +190,7 @@ type OrgProfile = {
   /** Faux si l'essai est terminé sans abonnement actif : Rimova ne décroche plus. */
   access_open: boolean;
   announced_name: string | null;
+  business_phone: string | null;
   trade: string | null;
   zone_center: string | null;
   zone_radius_km: number | null;
@@ -202,7 +215,7 @@ async function loadProfile(
       .maybeSingle(),
     admin
       .from("agent_settings")
-      .select("announced_name, trade, greeting, custom_instructions, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents, business_hours")
+      .select("announced_name, business_phone, trade, greeting, custom_instructions, zone_center, zone_radius_km, urgent_triggers, refusal_rules, callout_fee_cents, business_hours")
       .eq("org_id", orgId)
       .maybeSingle(),
   ]);
@@ -227,6 +240,7 @@ async function loadProfile(
     access_open:
       org.subscription_status === "active" || (handledCount ?? 0) < FREE_CALL_QUOTA,
     announced_name: (s?.announced_name as string) ?? null,
+    business_phone: (s?.business_phone as string) ?? null,
     trade: (s?.trade as string) ?? null,
     zone_center: (s?.zone_center as string) ?? null,
     zone_radius_km: (s?.zone_radius_km as number) ?? null,
@@ -306,11 +320,15 @@ RÈGLES
 - Parle EXCLUSIVEMENT en français, jamais un mot d'anglais. Français naturel, chaleureux, efficace. Phrases courtes, une question à la fois.
 - Dis toujours les heures au format français 24 heures : « dix-huit heures », « treize heures trente », jamais « six heures du soir » ni un format anglais (pas de « three to six », pas de « PM/AM »). Prononce les nombres, montants (« quarante-cinq euros ») et dates en toutes lettres, à la française.
 - Tu es un assistant automatique : simple et humain, jamais robotique.
+- Une seule question à la fois ; laisse l'appelant finir, ne l'interromps pas, reformule pour montrer que tu as compris.
+- Confirme les informations importantes en les répétant : fais épeler le nom en cas de doute, redis l'adresse et le numéro de rappel chiffre par chiffre.
+- N'invente JAMAIS un prix, un délai ou une disponibilité que tu n'as pas : en cas de doute, dis simplement que l'artisan confirmera.
+- Si l'appelant demande expressément à parler à l'artisan (un humain), transfère l'appel avec l'outil « transferer_appel ».
 - Ne promets jamais un prix ferme ni un délai non garanti ; l'artisan confirme le devis.${refus}${deplacement}
 
 DÉROULÉ — suis cet ordre :
 1. Tu as déjà salué. Demande ce qui l'amène : quel est le problème, depuis quand.
-2. SÉCURITÉ D'ABORD (prioritaire sur tout le reste) : si c'est une urgence (${urgences}), n'attends pas — dis que tu préviens immédiatement l'artisan et qu'on rappelle en urgence. Ne déroule pas le budget ni un rendez-vous lointain.
+2. SÉCURITÉ D'ABORD (prioritaire sur tout le reste) : si c'est une urgence (${urgences}), n'attends pas — transfère l'appel à l'artisan avec l'outil « transferer_appel ». Si le transfert n'aboutit pas, prends le nom et le numéro, dis que tu alertes immédiatement l'artisan et qu'on rappelle en urgence. Ne déroule ni le budget ni un rendez-vous lointain.
 3. Annonce un ORDRE DE GRANDEUR du budget à partir de la grille de prix, adapté à son besoin. Dis TOUJOURS que c'est une estimation « environ », jamais un prix ferme, et que l'artisan confirme le devis.
 4. Demande sa ville ou son secteur, et vérifie la zone (outil « verifier_zone »). ${zone} Hors zone : décline poliment ou propose que l'artisan rappelle.
 5. Recueille ses coordonnées : nom, numéro de rappel, adresse précise.
@@ -339,7 +357,7 @@ function buildGreeting(p: OrgProfile): string {
  * Retell vaut « {{system_prompt}} » et son message d'accueil « {{greeting}} » :
  * tout le contenu métier est donc calculé ici.
  */
-function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting: string } {
+function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting: string; business_phone: string } {
   const nom = p.announced_name || p.name;
   const greeting = buildGreeting(p);
   const base = p.agent_paused
@@ -349,18 +367,20 @@ function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting
   // besoin d'un champ « Begin Message » séparé (absent de certaines UI). La
   // variable {{greeting}} reste renvoyée pour qui voudrait l'utiliser à part.
   const opening = `Tu ouvres l'appel : ta TOUTE PREMIÈRE parole, dès le décroché, doit être exactement, mot pour mot : « ${greeting} » — ne dis rien d'autre avant, puis enchaîne naturellement.\n\n`;
-  return { system_prompt: opening + base, greeting };
+  // business_phone alimente l'outil « transferer_appel » de Retell (destination
+  // du transfert = {{business_phone}}), pour joindre l'artisan en cas d'urgence.
+  return { system_prompt: opening + base, greeting, business_phone: p.business_phone ?? "" };
 }
 
 /** Script de repli quand le numéro n'est rattaché à aucun compte Rimova actif. */
-function fallbackVariables(reason: "unknown" | "inactive"): { system_prompt: string; greeting: string } {
+function fallbackVariables(reason: "unknown" | "inactive"): { system_prompt: string; greeting: string; business_phone: string } {
   const greeting = "Bonjour, merci de votre appel.";
   const base =
     reason === "inactive"
       ? "Le compte Rimova associé à ce numéro n'est pas actif actuellement. Explique poliment que la ligne n'est pas disponible pour le moment, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix."
       : "Ce numéro n'est pas encore rattaché à un compte. Explique poliment que tu ne peux pas traiter la demande pour l'instant, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix.";
   const opening = `Ta toute première parole doit être, mot pour mot : « ${greeting} ». Puis :\n`;
-  return { system_prompt: opening + base, greeting };
+  return { system_prompt: opening + base, greeting, business_phone: "" };
 }
 
 /** Journalise l'appel terminé (transcription, résumé, enregistrement, durée). */
