@@ -1,4 +1,4 @@
--- Gildra — nouvelle grille tarifaire.
+-- Rimova — nouvelle grille tarifaire.
 -- Solo 99 € (80 appels inclus) · Pro 199 € et Agence 399 € (appels illimités).
 alter table public.organizations
   drop constraint if exists organizations_plan_check;

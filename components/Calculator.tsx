@@ -79,7 +79,7 @@ export function Calculator() {
           <Line l={`× ${fmt.format(ticket)} € l'intervention`} r={`${fmt.format(Math.round(lost))} €`} />
         </dl>
 
-        {/* Barre : la part que Gildra vous fait récupérer, net de l'abonnement */}
+        {/* Barre : la part que Rimova vous fait récupérer, net de l'abonnement */}
         <div className="mt-9">
           <div className="flex h-2.5 overflow-hidden rounded-full bg-line2">
             <div
@@ -96,7 +96,7 @@ export function Calculator() {
         {/* Résultat net mis en avant */}
         <div className="mt-6 rounded-[20px] border border-or-line bg-gradient-to-br from-or-wash to-w p-7">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-or-t">
-            Récupéré net avec Gildra
+            Récupéré net avec Rimova
           </p>
           <div className="mt-2 flex items-end gap-2">
             <span className="text-[clamp(38px,6vw,52px)] font-bold leading-none tracking-tighter text-or-t">

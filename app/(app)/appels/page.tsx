@@ -23,7 +23,7 @@ export default async function AppelsPage() {
         <div>
           <h1 className="text-xl font-[650]">Journal des appels</h1>
           <p className="mt-1 max-w-[56ch] text-sm text-soft">
-            Chaque appel pris par Gildra, avec sa transcription et la fiche extraite.
+            Chaque appel pris par Rimova, avec sa transcription et la fiche extraite.
             Vous pouvez tout relire et corriger.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default async function AppelsPage() {
           </section>
 
           <section className="rounded-[11px] border border-line bg-w p-4">
-            <h2 className="mb-2.5 text-[14.5px] font-semibold">Ce qu&apos;Gildra en a retenu</h2>
+            <h2 className="mb-2.5 text-[14.5px] font-semibold">Ce que Rimova en a retenu</h2>
             <Fld k="Client" v={detail.customer} />
             {address && <Fld k="Adresse" v={address} />}
             <Fld k="Demande" v={request} />

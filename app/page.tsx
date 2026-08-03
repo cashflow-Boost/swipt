@@ -10,7 +10,7 @@ import { PlanCards } from "@/components/PlanCards";
 
 /** Coordonnées — à régler dans Vercel avant d'envoyer du trafic. */
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE;
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@gildra.fr";
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@rimova.fr";
 
 const TRADES = [
   { icon: Wrench, label: "Plombier" },
@@ -77,7 +77,7 @@ const FAQ = [
   },
   {
     q: "Combien de temps pour démarrer ?",
-    a: "Environ une heure pour enregistrer votre zone, vos horaires et vos prix. Gildra décroche le soir même.",
+    a: "Environ une heure pour enregistrer votre zone, vos horaires et vos prix. Rimova décroche le soir même.",
   },
 ];
 
@@ -102,7 +102,7 @@ export default function Home() {
               Vous ne perdez plus un seul appel.
             </h1>
             <p className="ac-rise ac-d2 mx-auto mt-6 max-w-xl text-[19px] font-light leading-relaxed tracking-wide text-soft md:mx-0">
-              Gildra décroche à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
+              Rimova décroche à votre place, qualifie vos clients et fixe vos rendez-vous. Vous
               recevez tout sur votre téléphone. Même à 21 heures, même le dimanche.
             </p>
             <div className="ac-rise ac-d3 mt-9">
@@ -143,7 +143,7 @@ export default function Home() {
             ))}
           </div>
           <p className="mx-auto mt-6 max-w-2xl text-center text-[14.5px] font-light tracking-wide text-soft">
-            Plombier, électricien, serrurier, carreleur… Gildra s&apos;adapte à votre métier, votre
+            Plombier, électricien, serrurier, carreleur… Rimova s&apos;adapte à votre métier, votre
             zone et vos tarifs.
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function Home() {
             Votre assistant fait votre travail en moins de temps.
           </h2>
           <p className={`${LEDE} mx-auto mt-5 max-w-2xl text-center`}>
-            Pendant que vous êtes sur le chantier, Gildra gère votre téléphone.
+            Pendant que vous êtes sur le chantier, Rimova gère votre téléphone.
           </p>
           <div className="mt-16 grid gap-12 md:grid-cols-3">
             {GAINS.map((g, i) => (

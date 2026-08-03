@@ -1,4 +1,4 @@
--- Gildra — ce que dit l'agent : phrase d'accueil et consignes libres.
+-- Rimova — ce que dit l'agent : phrase d'accueil et consignes libres.
 alter table public.agent_settings
   add column if not exists greeting text,
   add column if not exists custom_instructions text;
