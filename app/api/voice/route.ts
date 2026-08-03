@@ -40,6 +40,20 @@ function normPhone(v: unknown): string {
 }
 
 /**
+ * Convertit un numéro français en E.164 (+33…) pour le transfert Retell, qui
+ * exige un format international appelable. Repli : renvoie l'entrée nettoyée.
+ */
+function toE164FR(v: string | null): string {
+  const d = String(v ?? "").replace(/[^\d+]/g, "");
+  if (!d) return "";
+  if (d.startsWith("+")) return d;
+  if (d.startsWith("0033")) return "+" + d.slice(2);
+  if (d.startsWith("33") && d.length >= 11) return "+" + d;
+  if (d.startsWith("0") && d.length === 10) return "+33" + d.slice(1);
+  return d;
+}
+
+/**
  * Vérifie la signature d'un webhook Retell : HMAC-SHA256(rawBody) avec la clé
  * API en secret, comparé en temps constant à l'en-tête X-Retell-Signature.
  * Retenu par défaut dès que RETELL_API_KEY est configurée ; RETELL_SKIP_VERIFY=1
@@ -369,7 +383,7 @@ function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting
   const opening = `Tu ouvres l'appel : ta TOUTE PREMIÈRE parole, dès le décroché, doit être exactement, mot pour mot : « ${greeting} » — ne dis rien d'autre avant, puis enchaîne naturellement.\n\n`;
   // business_phone alimente l'outil « transferer_appel » de Retell (destination
   // du transfert = {{business_phone}}), pour joindre l'artisan en cas d'urgence.
-  return { system_prompt: opening + base, greeting, business_phone: p.business_phone ?? "" };
+  return { system_prompt: opening + base, greeting, business_phone: toE164FR(p.business_phone) };
 }
 
 /** Script de repli quand le numéro n'est rattaché à aucun compte Rimova actif. */
