@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import { LegalDoc, LSection } from "@/components/LegalDoc";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité — Gildra",
-  description: "Comment Gildra collecte, utilise et protège les données personnelles, conformément au RGPD.",
+  title: "Politique de confidentialité — Rimova",
+  description: "Comment Rimova collecte, utilise et protège les données personnelles, conformément au RGPD.",
 };
 
 export default function ConfidentialitePage() {
   return (
     <LegalDoc title="Politique de confidentialité" updated="25 juillet 2026">
       <p>
-        Cette politique explique quelles données Gildra traite, pourquoi, et quels sont vos droits, conformément
+        Cette politique explique quelles données Rimova traite, pourquoi, et quels sont vos droits, conformément
         au Règlement général sur la protection des données (RGPD) et à la loi Informatique et Libertés.
       </p>
 
@@ -76,7 +76,7 @@ export default function ConfidentialitePage() {
 
       <LSection n="7." title="Cookies">
         <p>
-          Gildra n&apos;utilise que les cookies strictement nécessaires à votre connexion et à la sécurité. Aucun
+          Rimova n&apos;utilise que les cookies strictement nécessaires à votre connexion et à la sécurité. Aucun
           cookie publicitaire ou de traçage tiers n&apos;est déposé sans votre consentement.
         </p>
       </LSection>

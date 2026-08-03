@@ -54,7 +54,7 @@ export function HeroPhone() {
           <div className="ac-scene-live absolute inset-0 flex flex-col px-5 pt-14 pb-6">
             <div className="flex items-center gap-2">
               <span className="ac-pulse h-2.5 w-2.5 rounded-full bg-gr" />
-              <span className="text-[13px] font-semibold text-nv">En ligne · Gildra</span>
+              <span className="text-[13px] font-semibold text-nv">En ligne · Rimova</span>
               <span className="ml-auto font-mono text-[12px] text-faint">00:12</span>
             </div>
 

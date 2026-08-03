@@ -17,18 +17,18 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://gildra.fr"),
+  metadataBase: new URL("https://rimova.fr"),
   title: {
-    default: "Gildra — L'assistante qui décroche quand vous ne pouvez pas",
-    template: "%s — Gildra",
+    default: "Rimova — L'assistante qui décroche quand vous ne pouvez pas",
+    template: "%s — Rimova",
   },
   description:
-    "Gildra répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. 7 appels gratuits, sans carte bancaire.",
+    "Rimova répond à votre place, fixe vos rendez-vous, prépare vos devis et relance vos impayés. 7 appels gratuits, sans carte bancaire.",
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    siteName: "Gildra",
-    title: "Gildra — L'assistante qui décroche quand vous ne pouvez pas",
+    siteName: "Rimova",
+    title: "Rimova — L'assistante qui décroche quand vous ne pouvez pas",
     description:
       "La secrétaire téléphonique intelligente des artisans. Elle décroche, organise et facture pendant que vous travaillez.",
   },

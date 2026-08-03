@@ -7,7 +7,7 @@ import { CheckoutForm } from "@/components/CheckoutForm";
 
 export const metadata: Metadata = {
   title: "Souscription",
-  description: "Récapitulatif de votre offre Gildra avant paiement.",
+  description: "Récapitulatif de votre offre Rimova avant paiement.",
 };
 
 export default async function CheckoutPage({

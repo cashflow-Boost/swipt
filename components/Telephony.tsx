@@ -4,7 +4,7 @@ import { useState } from "react";
 
 /**
  * Branchement téléphonique (SPEC §3) — l'artisan garde SON numéro. Un renvoi
- * conditionnel bascule vers le numéro Gildra après N sonneries sans réponse.
+ * conditionnel bascule vers le numéro Rimova après N sonneries sans réponse.
  * Les codes affichés sont les codes GSM standard, composés depuis le mobile
  * de l'artisan : aucune démarche chez l'opérateur.
  */
@@ -38,11 +38,11 @@ export function Telephony({
 
   return (
     <div className="mt-3 rounded-[11px] border border-line bg-w2 p-4">
-      <h3 className="text-[13.5px] font-[650]">Activer le renvoi vers Gildra</h3>
+      <h3 className="text-[13.5px] font-[650]">Activer le renvoi vers Rimova</h3>
 
       {!n ? (
         <p className="mt-2 text-[13px] text-soft">
-          Votre numéro Gildra n&apos;est pas encore attribué. Dès qu&apos;il l&apos;est, les codes
+          Votre numéro Rimova n&apos;est pas encore attribué. Dès qu&apos;il l&apos;est, les codes
           de renvoi s&apos;affichent ici — vous n&apos;aurez qu&apos;à les composer depuis votre mobile.
         </p>
       ) : (

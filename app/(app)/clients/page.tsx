@@ -11,7 +11,7 @@ export default async function ClientsPage() {
         <div>
           <h1 className="text-xl font-[650]">Clients</h1>
           <p className="mt-1 max-w-[60ch] text-sm text-soft">
-            L&apos;historique de chaque client. Gildra s&apos;en sert pendant l&apos;appel pour reconnaître un habitué.
+            L&apos;historique de chaque client. Rimova s&apos;en sert pendant l&apos;appel pour reconnaître un habitué.
           </p>
         </div>
         <details>

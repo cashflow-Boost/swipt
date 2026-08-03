@@ -4,9 +4,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { FREE_CALL_QUOTA } from "@/lib/plans";
 
 /**
- * Webhook de l'agent vocal (Retell AI → Gildra).
+ * Webhook de l'agent vocal (Retell AI → Rimova).
  *
- * Gildra tient le « registre interne » : Retell ne stocke AUCUNE
+ * Rimova tient le « registre interne » : Retell ne stocke AUCUNE
  * configuration métier. Un seul agent Retell existe, dont le prompt vaut
  * littéralement « {{system_prompt}} » et le message d'accueil « {{greeting}} ».
  * Tout le contenu personnalisé (script, horaires, grille de prix, consignes de
@@ -59,7 +59,7 @@ function verifyRetellSignature(raw: string, signature: string | null, apiKey: st
 
 /**
  * Identifie l'organisation : d'abord les métadonnées posées au décroché, puis
- * le numéro Gildra appelé (organizations.phone_number), enfin le repli
+ * le numéro Rimova appelé (organizations.phone_number), enfin le repli
  * d'env pour les tests. L'ancien nom SWIPT_* reste accepté.
  */
 async function resolveOrgId(
@@ -170,12 +170,12 @@ async function verifierZone(
     : `${args.ville} est probablement hors de la zone habituelle (centrée sur ${data?.zone_center}). Proposez un rappel de l'artisan plutôt qu'un rendez-vous ferme.`;
 }
 
-// ── Registre interne : le script est fabriqué par Gildra à chaque appel ─────
+// ── Registre interne : le script est fabriqué par Rimova à chaque appel ─────
 
 type OrgProfile = {
   name: string;
   agent_paused: boolean;
-  /** Faux si l'essai est terminé sans abonnement actif : Gildra ne décroche plus. */
+  /** Faux si l'essai est terminé sans abonnement actif : Rimova ne décroche plus. */
   access_open: boolean;
   announced_name: string | null;
   trade: string | null;
@@ -352,12 +352,12 @@ function buildDynamicVariables(p: OrgProfile): { system_prompt: string; greeting
   return { system_prompt: opening + base, greeting };
 }
 
-/** Script de repli quand le numéro n'est rattaché à aucun compte Gildra actif. */
+/** Script de repli quand le numéro n'est rattaché à aucun compte Rimova actif. */
 function fallbackVariables(reason: "unknown" | "inactive"): { system_prompt: string; greeting: string } {
   const greeting = "Bonjour, merci de votre appel.";
   const base =
     reason === "inactive"
-      ? "Le compte Gildra associé à ce numéro n'est pas actif actuellement. Explique poliment que la ligne n'est pas disponible pour le moment, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix."
+      ? "Le compte Rimova associé à ce numéro n'est pas actif actuellement. Explique poliment que la ligne n'est pas disponible pour le moment, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix."
       : "Ce numéro n'est pas encore rattaché à un compte. Explique poliment que tu ne peux pas traiter la demande pour l'instant, invite l'appelant à réessayer plus tard, puis termine l'appel. Ne pose aucun rendez-vous et ne donne aucun prix.";
   const opening = `Ta toute première parole doit être, mot pour mot : « ${greeting} ». Puis :\n`;
   return { system_prompt: opening + base, greeting };
@@ -426,7 +426,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "service unavailable" }, { status: 200 });
   }
 
-  // 1) Appel entrant : Retell demande la configuration de CET appel. Gildra
+  // 1) Appel entrant : Retell demande la configuration de CET appel. Rimova
   //    fabrique le script à la volée depuis les Réglages de l'artisan.
   if (event === "call_inbound") {
     const inbound = (body.call_inbound ?? {}) as Record<string, unknown>;
