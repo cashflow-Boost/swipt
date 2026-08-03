@@ -4,6 +4,6 @@ alter table public.agent_settings
   add column if not exists custom_instructions text;
 
 comment on column public.agent_settings.greeting is
-  'Première phrase de Lia au décroché ; repli sur une phrase générée si vide.';
+  'Première phrase de Sonia au décroché ; repli sur une phrase générée si vide.';
 comment on column public.agent_settings.custom_instructions is
   'Consignes libres de l''artisan, injectées dans le script de l''agent.';

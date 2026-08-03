@@ -44,14 +44,14 @@ export default async function AppLayout({
 
       {session.agentPaused && (
         <div className="bg-amber-50 px-5 py-2 text-center text-[13px] font-medium text-amber-700">
-          Vous répondez vous-même — Lia est en pause. Réactivez-la avec l&apos;interrupteur en haut à droite.
+          Vous répondez vous-même — Sonia est en pause. Réactivez-la avec l&apos;interrupteur en haut à droite.
         </div>
       )}
 
       {!session.accessOpen ? (
         <div className="bg-red-50 px-5 py-2 text-center text-[13px] font-medium text-red-700">
           Vos appels gratuits sont épuisés.{" "}
-          <Link href="/abonnement" className="underline">Choisissez une offre</Link> pour que Lia
+          <Link href="/abonnement" className="underline">Choisissez une offre</Link> pour que Sonia
           reprenne vos appels.
         </div>
       ) : session.freeCallsLeft !== null && session.freeCallsLeft <= 3 ? (

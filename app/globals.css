@@ -44,6 +44,13 @@
   --gr:      #059669;  --gr-wash: #D1FAE5;
   --rd:      #B91C1C;  --rd-wash: #FEF2F2;
 
+  /* Accent artisanal chaud (bois / ocre) — touches « atelier », en complément
+     du bleu de marque. Réservé aux eyebrows, icônes métiers et fonds de section. */
+  --wood:      #B45309;  /* amber-700 — accent texte chaud, lisible sur blanc (4,9:1) */
+  --wood-2:    #C2703D;  /* terracotta */
+  --wood-wash: #FBF3E9;  /* crème chaude — fonds de section alternés */
+  --wood-line: #EFE1CE;  /* filet chaud */
+
   /* Fonds profonds (CTA final, écrans applicatifs) */
   --bg: #1E3A8A;  --bg2: #1E40AF;  --card: #FFFFFF;
   --d-line: #1E40AF;  --d-line2: #3B82F6;
@@ -82,6 +89,10 @@
   --color-gr-wash:  var(--gr-wash);
   --color-rd:       var(--rd);
   --color-rd-wash:  var(--rd-wash);
+  --color-wood:      var(--wood);
+  --color-wood-2:    var(--wood-2);
+  --color-wood-wash: var(--wood-wash);
+  --color-wood-line: var(--wood-line);
   --color-bg:       var(--bg);
   --color-bg2:      var(--bg2);
   --color-card:     var(--card);

@@ -7,7 +7,7 @@ import { setAgentPausedAction } from "@/app/actions";
 /**
  * « Je reprends la main » (SPEC §4.9), en interrupteur façon iOS.
  *
- * Actif = Lia prend les appels ; inactif = l'artisan répond lui-même. Le geste
+ * Actif = Sonia prend les appels ; inactif = l'artisan répond lui-même. Le geste
  * reste immédiat (état optimiste) et discret : pas d'alerte rouge, juste une
  * bascule que l'on comprend d'un coup d'œil.
  */
@@ -33,13 +33,13 @@ export function TakeControlButton({ paused: initial }: { paused: boolean }) {
       type="button"
       role="switch"
       aria-checked={active}
-      aria-label={active ? "Lia prend vos appels" : "Vous répondez vous-même"}
+      aria-label={active ? "Sonia prend vos appels" : "Vous répondez vous-même"}
       onClick={toggle}
       disabled={pending}
       className="flex items-center gap-2 disabled:opacity-60"
     >
       <span className={`text-xs font-medium ${active ? "text-soft" : "text-faint"}`}>
-        {active ? "Lia" : "Manuel"}
+        {active ? "Sonia" : "Manuel"}
       </span>
       <span
         className={`relative h-6 w-10 rounded-full transition-colors duration-300 ${

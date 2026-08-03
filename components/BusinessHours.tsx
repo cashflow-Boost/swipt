@@ -66,7 +66,7 @@ export function BusinessHours({ hours }: { hours: Hours }) {
       </div>
 
       <p className="mt-2 text-xs text-slate-400">
-        Lia ne posera pas de rendez-vous en dehors de ces créneaux. Laissez l&apos;après-midi vide
+        Sonia ne posera pas de rendez-vous en dehors de ces créneaux. Laissez l&apos;après-midi vide
         pour une journée continue le matin.
       </p>
 

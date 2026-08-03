@@ -1,6 +1,6 @@
 /**
  * Maquette produit du hero — ce que l'artisan reçoit après un appel pris par
- * Lia. Pas une illustration : l'interface réelle, en filets fins et texte, dans
+ * Sonia. Pas une illustration : l'interface réelle, en filets fins et texte, dans
  * la même palette que la page.
  */
 export function HeroVisual() {

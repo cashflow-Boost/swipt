@@ -6,7 +6,7 @@
 
 /**
  * Offre de découverte : les premiers appels TRAITÉS sont offerts, sans carte
- * bancaire. Au-delà, il faut un abonnement pour que Lia continue de décrocher.
+ * bancaire. Au-delà, il faut un abonnement pour que Sonia continue de décrocher.
  * (Remplace l'ancien essai limité dans le temps.)
  */
 export const FREE_CALL_QUOTA = 7;
