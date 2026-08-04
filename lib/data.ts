@@ -106,7 +106,7 @@ export async function getLatestCallDetail() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("calls")
-    .select("id, started_at, duration_seconds, status, urgency, transcript, extraction, customers(full_name)")
+    .select("id, started_at, duration_seconds, status, urgency, transcript, extraction, recording_url, customers(full_name)")
     .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -117,6 +117,7 @@ export async function getLatestCallDetail() {
     duration: data.duration_seconds as number | null,
     customer: custName(data.customers),
     status: data.status as string | null,
+    recordingUrl: (data.recording_url as string | null) ?? null,
     transcript: (data.transcript as { role: string; text: string }[] | null) ?? [],
     extraction: (data.extraction as Record<string, unknown> | null) ?? {},
   };

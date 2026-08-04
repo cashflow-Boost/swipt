@@ -56,11 +56,13 @@ export default async function AppelsPage() {
             ) : (
               <p className="text-[13.5px] text-soft">Transcription non disponible pour cet appel.</p>
             )}
-            <div className="mt-3.5 flex flex-wrap gap-2">
-              <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
-                Écouter l&apos;enregistrement
-              </button>
-            </div>
+            {detail.recordingUrl && (
+              <div className="mt-3.5">
+                <audio controls src={detail.recordingUrl} className="w-full">
+                  <a href={detail.recordingUrl}>Écouter l&apos;enregistrement</a>
+                </audio>
+              </div>
+            )}
           </section>
 
           <section className="rounded-[11px] border border-line bg-w p-4">
