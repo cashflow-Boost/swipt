@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LogoMark } from "@/components/Logo";
 
@@ -18,6 +18,25 @@ export default function OnboardingPage() {
   const [radius, setRadius] = useState("20");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Sécurité : un compte DÉJÀ configuré ne doit jamais revoir l'onboarding.
+  // On file droit au tableau de bord (et vers /login si la session a expiré).
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.assign("/login");
+        return;
+      }
+      const { data } = await supabase
+        .from("users")
+        .select("org_id")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (data?.org_id) window.location.assign("/tableau-de-bord");
+    })();
+  }, []);
 
   const canNext =
     step === 0 ? true : step === 1 ? orgName.trim().length > 1 : true;
