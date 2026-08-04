@@ -30,9 +30,6 @@ export default async function FacturesPage() {
             Elles découlent du devis signé. Format Factur-X, conforme à l&apos;échéance de septembre 2026.
           </p>
         </div>
-        <button type="button" className="rounded-pill border border-line2 bg-w px-3.5 py-2 text-[13.5px] font-semibold">
-          Exporter pour le comptable
-        </button>
       </div>
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

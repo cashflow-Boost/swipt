@@ -111,3 +111,28 @@ export const validateQuote = defineAction({
     return { id: data.id as string };
   },
 });
+
+/**
+ * Marque un devis envoyé comme accepté par le client (« signé ») : il devient
+ * facturable. En pratique l'artisan le coche après un accord (téléphone, signature…).
+ */
+export const markSigned = defineAction({
+  name: "markSigned",
+  description:
+    "Marque un devis envoyé comme accepté/signé par le client ; il devient facturable.",
+  input: z.object({ quoteId: z.string().uuid() }),
+  handler: async (input, ctx) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("quotes")
+      .update({ status: "signed", signed_at: new Date().toISOString() })
+      .eq("id", input.quoteId)
+      .eq("org_id", ctx.orgId)
+      .eq("status", "sent")
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error("Devis introuvable ou déjà traité.");
+    return { id: data.id as string };
+  },
+});

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionOrg } from "@/lib/auth";
 import { updateAgentSettings } from "@/lib/actions/agent-settings";
-import { createQuote, validateQuote } from "@/lib/actions/quotes";
+import { createQuote, validateQuote, markSigned } from "@/lib/actions/quotes";
 import { markPaid, issueInvoiceFromQuote } from "@/lib/actions/invoices";
 import { blockSlot } from "@/lib/actions/appointments";
 import { correctExtraction } from "@/lib/actions/calls";
@@ -62,6 +62,12 @@ export async function createQuoteAction(formData: FormData) {
 
 export async function validateQuoteAction(formData: FormData) {
   await validateQuote.withContext(await ctx())({ quoteId: String(formData.get("id")) });
+  revalidatePath("/devis");
+  revalidatePath("/tableau-de-bord");
+}
+
+export async function markQuoteSignedAction(formData: FormData) {
+  await markSigned.withContext(await ctx())({ quoteId: String(formData.get("id")) });
   revalidatePath("/devis");
   revalidatePath("/tableau-de-bord");
 }

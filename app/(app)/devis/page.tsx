@@ -3,7 +3,7 @@ import { StatusTag } from "@/components/StatusTag";
 import { getQuotes } from "@/lib/data";
 import { formatEuros } from "@/lib/money";
 import Link from "next/link";
-import { validateQuoteAction, issueInvoiceAction } from "@/app/actions";
+import { validateQuoteAction, issueInvoiceAction, markQuoteSignedAction } from "@/app/actions";
 
 export default async function DevisPage() {
   const quotes = await getQuotes();
@@ -51,8 +51,8 @@ export default async function DevisPage() {
         )}
       </div>
 
-      <QuoteList title="Envoyés — en attente de signature" items={sent} tag="En attente" variant="neutral" />
-      <QuoteList title="Signés — prêts à facturer" items={signed} tag="Signé" variant="gr" invoiceButton />
+      <QuoteList title="Envoyés — en attente de réponse" items={sent} tag="En attente" variant="neutral" signButton />
+      <QuoteList title="Acceptés — prêts à facturer" items={signed} tag="Accepté" variant="gr" invoiceButton />
 
       <p className="mt-6 text-[13px] text-soft">
         Données lues en direct depuis Supabase (RLS). Chiffrage via{" "}
@@ -68,12 +68,14 @@ function QuoteList({
   tag,
   variant,
   invoiceButton,
+  signButton,
 }: {
   title: string;
   items: { id: string; number: string | null; customer: string; totalTtcCents: number }[];
   tag: string;
   variant: "neutral" | "gr";
   invoiceButton?: boolean;
+  signButton?: boolean;
 }) {
   return (
     <>
@@ -92,6 +94,14 @@ function QuoteList({
               <div className="flex items-center gap-2 sm:justify-self-end">
                 <StatusTag variant={variant}>{tag}</StatusTag>
                 <PdfButton href={`/document/devis/${q.id}`} />
+                {signButton && (
+                  <form action={markQuoteSignedAction}>
+                    <input type="hidden" name="id" value={q.id} />
+                    <button type="submit" className="rounded-pill border border-or bg-or px-3 py-1.5 text-[12.5px] font-semibold text-w">
+                      Marquer accepté
+                    </button>
+                  </form>
+                )}
                 {invoiceButton && (
                   <form action={issueInvoiceAction}>
                     <input type="hidden" name="id" value={q.id} />
