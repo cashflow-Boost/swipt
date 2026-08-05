@@ -7,7 +7,12 @@ import { LogoMark } from "@/components/Logo";
 /** Vidéo de démo facultative : renseignez NEXT_PUBLIC_ONBOARDING_VIDEO_URL dans Vercel. */
 const VIDEO_URL = process.env.NEXT_PUBLIC_ONBOARDING_VIDEO_URL;
 
-const STEPS = ["Bienvenue", "Entreprise", "Téléphone", "Zone"] as const;
+const STEPS = ["Bienvenue", "Entreprise", "Téléphone", "Zone", "Horaires", "Urgences"] as const;
+
+const DAYS = [
+  { k: "mon", l: "Lun" }, { k: "tue", l: "Mar" }, { k: "wed", l: "Mer" },
+  { k: "thu", l: "Jeu" }, { k: "fri", l: "Ven" }, { k: "sat", l: "Sam" }, { k: "sun", l: "Dim" },
+];
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(0);
@@ -16,8 +21,19 @@ export default function OnboardingPage() {
   const [phone, setPhone] = useState("");
   const [zone, setZone] = useState("");
   const [radius, setRadius] = useState("20");
+  const [openDays, setOpenDays] = useState<string[]>(["mon", "tue", "wed", "thu", "fri"]);
+  const [mFrom, setMFrom] = useState("08:00");
+  const [mTo, setMTo] = useState("12:00");
+  const [aFrom, setAFrom] = useState("13:30");
+  const [aTo, setATo] = useState("18:00");
+  const [urgent, setUrgent] = useState("Fuite active · Odeur de gaz · Panne totale de courant");
+  const [callout, setCallout] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  function toggleDay(k: string) {
+    setOpenDays((d) => (d.includes(k) ? d.filter((x) => x !== k) : [...d, k]));
+  }
 
   // Sécurité : un compte DÉJÀ configuré ne doit jamais revoir l'onboarding.
   // On file droit au tableau de bord (et vers /login si la session a expiré).
@@ -54,15 +70,33 @@ export default function OnboardingPage() {
       setLoading(false);
       return;
     }
-    // Complète les réglages recueillis pendant le parcours (best-effort).
-    await supabase
+    // Horaires : un même créneau matin/après-midi appliqué aux jours cochés.
+    const slots: [string, string][] = [];
+    if (mFrom < mTo) slots.push([mFrom, mTo]);
+    if (aFrom && aTo && aFrom < aTo) slots.push([aFrom, aTo]);
+    const hours: Record<string, [string, string][]> = {};
+    if (slots.length > 0) for (const d of openDays) hours[d] = slots;
+
+    const euros = Number(callout.replace(",", "."));
+
+    // Complète les réglages recueillis pendant le parcours.
+    const { error: e2 } = await supabase
       .from("agent_settings")
       .update({
         business_phone: phone.trim() || null,
         zone_center: zone.trim() || null,
         zone_radius_km: radius ? Number(radius) : null,
+        business_hours: Object.keys(hours).length > 0 ? hours : null,
+        urgent_triggers: urgent
+          .split(/[·,;]/).map((s) => s.trim()).filter(Boolean),
+        callout_fee_cents: Number.isFinite(euros) && euros > 0 ? Math.round(euros * 100) : null,
       })
       .eq("org_id", orgId as string);
+    if (e2) {
+      setError(e2.message);
+      setLoading(false);
+      return;
+    }
     window.location.assign("/tableau-de-bord");
   }
 
@@ -126,14 +160,14 @@ export default function OnboardingPage() {
           {/* ── Étape 2 : Téléphone ── */}
           {step === 2 && (
             <div>
-              <h1 className="text-lg font-[650] text-nv">Votre téléphone</h1>
+              <h1 className="text-lg font-[650] text-nv">Votre numéro</h1>
               <p className="mb-5 mt-1 text-[13.5px] text-soft">
-                Votre numéro professionnel — celui où arrivent vos appels aujourd&apos;hui.
+                Celui sur lequel vous répondez d&apos;habitude à vos clients.
               </p>
-              <Field label="Numéro professionnel" value={phone} onChange={setPhone} placeholder="06 12 34 56 78" type="tel" autoFocus />
+              <Field label="Votre numéro professionnel" value={phone} onChange={setPhone} placeholder="06 12 34 56 78" type="tel" autoFocus />
               <p className="mt-2 rounded-lg bg-nv-wash px-3 py-2.5 text-[12.5px] leading-relaxed text-soft">
-                Vous gardez ce numéro. Rimova vous attribue un numéro dédié, et Sonia ne prend l&apos;appel
-                que si vous ne décrochez pas. Les urgences vous sont transférées sur ce numéro.
+                Vous gardez votre numéro, vous n&apos;en changez pas. C&apos;est aussi sur celui-ci
+                que Sonia vous transfère les urgences.
               </p>
             </div>
           )}
@@ -148,7 +182,66 @@ export default function OnboardingPage() {
               <Field label="Ville de référence" value={zone} onChange={setZone} placeholder="Poissy" autoFocus />
               <Field label="Rayon (km)" value={radius} onChange={setRadius} placeholder="20" type="number" />
               <p className="mt-2 text-[12.5px] text-soft">
-                Vous pourrez régler vos horaires et vos tarifs juste après, dans « Réglages ».
+                Vous pourrez tout affiner plus tard dans « Réglages ».
+              </p>
+            </div>
+          )}
+
+          {/* ── Étape 4 : Horaires ── */}
+          {step === 4 && (
+            <div>
+              <h1 className="text-lg font-[650] text-nv">Vos horaires</h1>
+              <p className="mb-4 mt-1 text-[13.5px] text-soft">
+                Sonia ne posera jamais de rendez-vous en dehors de ces créneaux.
+              </p>
+              <div className="mb-4 flex flex-wrap gap-1.5">
+                {DAYS.map((d) => (
+                  <button
+                    key={d.k}
+                    type="button"
+                    onClick={() => toggleDay(d.k)}
+                    className={`rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                      openDays.includes(d.k) ? "bg-or text-w" : "bg-w2 text-soft border border-line2"
+                    }`}
+                  >
+                    {d.l}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Matin — début" value={mFrom} onChange={setMFrom} type="time" />
+                <Field label="Matin — fin" value={mTo} onChange={setMTo} type="time" />
+                <Field label="Après-midi — début" value={aFrom} onChange={setAFrom} type="time" />
+                <Field label="Après-midi — fin" value={aTo} onChange={setATo} type="time" />
+              </div>
+            </div>
+          )}
+
+          {/* ── Étape 5 : Urgences ── */}
+          {step === 5 && (
+            <div>
+              <h1 className="text-lg font-[650] text-nv">Urgences et déplacement</h1>
+              <p className="mb-5 mt-1 text-[13.5px] text-soft">
+                Ce qui doit vous être transféré immédiatement, sans attendre.
+              </p>
+              <Field
+                label="Urgences à vous transférer"
+                value={urgent}
+                onChange={setUrgent}
+                placeholder="Fuite active · Odeur de gaz · Personne bloquée"
+                autoFocus
+              />
+              <p className="-mt-2 mb-4 text-[12px] text-faint">Séparez par «&nbsp;·&nbsp;» ou une virgule.</p>
+              <Field
+                label="Forfait déplacement (€ TTC, facultatif)"
+                value={callout}
+                onChange={setCallout}
+                placeholder="45"
+                type="number"
+              />
+              <p className="text-[12.5px] text-soft">
+                Sonia l&apos;annoncera si un client demande le prix du déplacement. Laissez vide si
+                vous préférez ne rien annoncer.
               </p>
             </div>
           )}
