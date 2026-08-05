@@ -33,11 +33,6 @@ export function LegalDoc({
 
         <div className="legal mt-10 space-y-7 text-[15px] leading-[1.65] text-soft">{children}</div>
 
-        <div className="mt-12 rounded-[11px] border border-or-line bg-or-wash p-4 text-[13px] text-or-t">
-          ⚠ Ce document contient des champs entre crochets <code className="font-mono">[…]</code> à compléter
-          avec vos informations réelles (raison sociale, SIRET, adresse…) avant la mise en ligne définitive.
-          Faites-le relire par un professionnel si vous avez un doute.
-        </div>
       </article>
 
       <footer className="border-t border-line px-6 py-8 text-center text-[12.5px] text-faint">
