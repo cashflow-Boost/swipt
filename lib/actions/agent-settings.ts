@@ -73,6 +73,19 @@ export const updateAgentSettings = defineAction({
       .from("agent_settings")
       .upsert(patch, { onConflict: "org_id" });
     if (error) throw new Error(error.message);
+
+    // Le nom annoncé EST le nom commercial : on le répercute sur l'organisation
+    // pour que l'en-tête de l'application et les documents restent cohérents.
+    const org: Record<string, string> = {};
+    if (input.announcedName?.trim()) org.name = input.announcedName.trim();
+    if (input.trade?.trim()) org.trade = input.trade.trim();
+    if (Object.keys(org).length > 0) {
+      const { error: orgErr } = await supabase
+        .from("organizations")
+        .update(org)
+        .eq("id", ctx.orgId);
+      if (orgErr) throw new Error(orgErr.message);
+    }
     return { ok: true as const };
   },
 });
