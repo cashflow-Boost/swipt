@@ -77,6 +77,8 @@ export function Calculator() {
           <Line l={`${calls} appel${calls > 1 ? "s" : ""} manqué${calls > 1 ? "s" : ""} × ${WORKDAYS} jours`} r={`${fmt.format(monthly)} appels`} />
           <Line l={`dont ${rate} sur 10 deviennent un chantier`} r={`${fmt1.format(jobs)} chantiers`} />
           <Line l={`× ${fmt.format(ticket)} € l'intervention`} r={`${fmt.format(Math.round(lost))} €`} />
+          <Line l={`dont ${Math.round(RECOVERY * 100)} % réellement rattrapés`} r={`${fmt.format(Math.round(recovered))} €`} />
+          <Line l={`− abonnement ${offer.n}`} r={`− ${fmt.format(Math.round(offer.cost))} €`} />
         </dl>
 
         {/* Barre : la part que Rimova vous fait récupérer, net de l'abonnement */}

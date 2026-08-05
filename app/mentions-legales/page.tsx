@@ -6,22 +6,27 @@ export const metadata: Metadata = {
   description: "Mentions légales du service Rimova, standard téléphonique intelligent des artisans du dépannage.",
 };
 
+/** Adresse de contact — à régler dans Vercel (NEXT_PUBLIC_SUPPORT_EMAIL). */
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "contact@rimova.fr";
+
 export default function MentionsLegalesPage() {
   return (
     <LegalDoc title="Mentions légales" updated="25 juillet 2026">
       <LSection n="1." title="Éditeur du site">
-        <p>Le site et le service Rimova sont édités par :</p>
-        <ul className="ml-4 list-disc space-y-1">
-          <li>Raison sociale : <b className="text-ink">[Raison sociale]</b></li>
-          <li>Forme juridique : <b className="text-ink">[SAS / SASU / EURL / auto-entrepreneur…]</b></li>
-          <li>Capital social : <b className="text-ink">[montant] €</b></li>
-          <li>Siège social : <b className="text-ink">[Adresse complète du siège]</b></li>
-          <li>SIRET : <b className="text-ink">[numéro SIRET]</b></li>
-          <li>RCS / RM : <b className="text-ink">[ville et numéro d&apos;immatriculation]</b></li>
-          <li>N° de TVA intracommunautaire : <b className="text-ink">[FR…]</b></li>
-          <li>Directeur de la publication : <b className="text-ink">[Nom et prénom]</b></li>
-          <li>Contact : <b className="text-ink">[adresse e-mail de contact]</b></li>
-        </ul>
+        <p>
+          Rimova est actuellement diffusé en <b className="text-ink">version bêta gratuite</b>. Le service
+          est édité par un particulier, à titre non commercial : aucun paiement n&apos;est collecté et
+          aucun abonnement n&apos;est commercialisé à ce stade.
+        </p>
+        <p>
+          Pour toute question relative au site ou à vos données, écrivez à{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-or-t underline">{CONTACT_EMAIL}</a>.
+        </p>
+        <p>
+          Les mentions d&apos;identification complètes (dénomination, forme juridique, siège, SIRET,
+          TVA, directeur de la publication) seront publiées ici dès l&apos;immatriculation de la
+          structure, préalablement à toute mise en service payante.
+        </p>
       </LSection>
 
       <LSection n="2." title="Hébergement">
