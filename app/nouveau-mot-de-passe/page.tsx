@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LogoMark } from "@/components/Logo";
+import { PasswordField } from "@/components/PasswordField";
 
 /** Choix du nouveau mot de passe, après clic sur le lien reçu par e-mail. */
 export default function NouveauMotDePassePage() {
@@ -40,18 +41,16 @@ export default function NouveauMotDePassePage() {
           <h1 className="text-lg font-[650]">Nouveau mot de passe</h1>
           <p className="mb-5 mt-1 text-[13.5px] text-soft">Choisissez un mot de passe d&apos;au moins 8 caractères.</p>
 
-          <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="password">
-            Nouveau mot de passe
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
+          <PasswordField
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mb-5 w-full rounded-sm border border-line2 bg-w px-3 py-2.5 text-[15px] outline-none focus-visible:border-or"
+            onChange={setPassword}
+            autoComplete="new-password"
+            minLength={8}
+            label={
+              <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="password">
+                Nouveau mot de passe
+              </label>
+            }
           />
 
           {error && (

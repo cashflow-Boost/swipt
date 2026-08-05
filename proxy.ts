@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE_OPTIONS } from "@/lib/supabase/cookies";
 
 /**
  * Proxy (ex-Middleware, renommé en Next.js 16) — rafraîchit la session Supabase
@@ -20,6 +21,9 @@ export async function proxy(request: NextRequest) {
     url,
     anonKey,
     {
+      // Session persistante (30 jours) : sans durée explicite, les cookies
+      // disparaissaient à la fermeture du navigateur.
+      cookieOptions: SESSION_COOKIE_OPTIONS,
       cookies: {
         getAll() {
           return request.cookies.getAll();

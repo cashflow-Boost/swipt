@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordField } from "@/components/PasswordField";
+import { LogoMark } from "@/components/Logo";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -59,12 +61,9 @@ export default function SignupPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-w2 px-6">
       <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center justify-center gap-2 text-[22px] font-bold tracking-tight">
-          <span>Rimova</span>
-          <span className="flex gap-0.5">
-            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-          </span>
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <LogoMark size={26} />
+          <span className="text-[20px] font-bold tracking-tight text-nv">Rimova</span>
         </div>
 
         <form onSubmit={onSubmit} className="rounded-[14px] border border-line bg-w p-6 shadow-sh2">
@@ -76,10 +75,17 @@ export default function SignupPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="mb-4 w-full rounded-sm border border-line2 bg-w px-3 py-2.5 text-[15px] outline-none focus-visible:border-or" />
 
-          <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="password">Mot de passe</label>
-          <input id="password" type="password" autoComplete="new-password" required minLength={8} value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mb-5 w-full rounded-sm border border-line2 bg-w px-3 py-2.5 text-[15px] outline-none focus-visible:border-or" />
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            minLength={8}
+            label={
+              <label className="mb-1 block text-[13px] font-medium text-soft" htmlFor="password">
+                Mot de passe
+              </label>
+            }
+          />
 
           {error && <p className="mb-4 rounded-sm border border-[#F2D5D2] bg-rd-wash px-3 py-2 text-[13px] text-rd">{error}</p>}
           {info && <p className="mb-4 rounded-sm border border-or-line bg-or-wash px-3 py-2 text-[13px] text-or-t">{info}</p>}
