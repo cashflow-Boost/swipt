@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordField } from "@/components/PasswordField";
+import { LogoMark } from "@/components/Logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,12 +30,9 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-w2 px-6">
       <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center justify-center gap-2 text-[22px] font-bold tracking-tight">
-          <span>Rimova</span>
-          <span className="flex gap-0.5">
-            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-            <i className="block h-4 w-2 bg-or [clip-path:polygon(0_0,52%_0,100%_50%,52%_100%,0_100%,48%_50%)]" />
-          </span>
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <LogoMark size={26} />
+          <span className="text-[20px] font-bold tracking-tight text-nv">Rimova</span>
         </div>
 
         <form
@@ -58,22 +57,19 @@ export default function LoginPage() {
             className="mb-4 w-full rounded-sm border border-line2 bg-w px-3 py-2.5 text-[15px] outline-none focus-visible:border-or"
           />
 
-          <div className="mb-1 flex items-baseline justify-between gap-3">
-            <label className="block text-[13px] font-medium text-soft" htmlFor="password">
-              Mot de passe
-            </label>
-            <Link href="/mot-de-passe-oublie" className="text-[12.5px] text-or-t underline">
-              Mot de passe oublié ?
-            </Link>
-          </div>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
+          <PasswordField
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mb-5 w-full rounded-sm border border-line2 bg-w px-3 py-2.5 text-[15px] outline-none focus-visible:border-or"
+            onChange={setPassword}
+            label={
+              <div className="mb-1 flex items-baseline justify-between gap-3">
+                <label className="block text-[13px] font-medium text-soft" htmlFor="password">
+                  Mot de passe
+                </label>
+                <Link href="/mot-de-passe-oublie" className="text-[12.5px] text-or-t underline">
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+            }
           />
 
           {error && (
