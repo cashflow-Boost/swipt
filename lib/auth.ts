@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { FREE_CALL_QUOTA } from "@/lib/plans";
 
@@ -19,8 +20,12 @@ export interface UserAndOrg {
  * - orgId/orgName à null si l'utilisateur n'a pas encore fait l'onboarding
  *   (→ /onboarding).
  * La RLS (SPEC §7) garantit que seule l'org de l'utilisateur est lisible.
+ *
+ * Mémoïsé par requête (React cache) : la mise en page ET la page appellent tous
+ * deux cette fonction ; sans cela chaque navigation payait deux fois les mêmes
+ * allers-retours réseau — c'était la principale source de lenteur ressentie.
  */
-export async function getUserAndOrg(): Promise<UserAndOrg | null> {
+export const getUserAndOrg = cache(async function getUserAndOrg(): Promise<UserAndOrg | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -65,7 +70,7 @@ export async function getUserAndOrg(): Promise<UserAndOrg | null> {
     // Sans org (avant onboarding) l'accès n'est pas encore la question.
     accessOpen: subscribed || freeCallsLeft === null || freeCallsLeft > 0,
   };
-}
+});
 
 export interface SessionOrg {
   userId: string;

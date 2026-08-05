@@ -16,9 +16,28 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
+
+    // Cet e-mail a-t-il déjà un compte ? Si oui on connecte au lieu d'en créer
+    // un second : c'est ce qui faisait « repartir de zéro » avec un espace vide.
+    const existing = await supabase.auth.signInWithPassword({ email, password });
+    if (!existing.error) {
+      window.location.assign("/tableau-de-bord");
+      return;
+    }
+
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      setError(error.message);
+      setError(
+        /already|exists|registered/i.test(error.message)
+          ? "Un compte existe déjà avec cet e-mail. Connectez-vous (le mot de passe saisi ne correspond pas)."
+          : error.message,
+      );
+      setLoading(false);
+      return;
+    }
+    // Supabase renvoie un utilisateur sans identités quand l'e-mail est déjà pris.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      setError("Un compte existe déjà avec cet e-mail. Utilisez « Se connecter ».");
       setLoading(false);
       return;
     }
