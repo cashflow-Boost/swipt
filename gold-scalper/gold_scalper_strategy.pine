@@ -1,0 +1,362 @@
+// This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © gold-scalper — Stratégie XAU/USD basée sur le moteur multi-facteurs
+//
+// MÊME moteur que gold_scalper.pine, mais exécutable comme STRATÉGIE pour
+// obtenir des statistiques de backtest (win-rate, profit factor, drawdown).
+// Le backtest est le SEUL juge de valeur : un biais riche ne vaut rien sans lui.
+// Résultats passés ≠ résultats futurs. Trading = risque de perte.
+
+//@version=6
+strategy("Gold Scalper Pro — Strategy", shorttitle="XAU Scalper Strat", overlay=true,
+     default_qty_type=strategy.percent_of_equity, default_qty_value=10,
+     initial_capital=10000, slippage=2, commission_type=strategy.commission.cash_per_order, commission_value=0.0,
+     max_labels_count=500, calc_on_order_fills=false, process_orders_on_close=true)
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+f_clamp(x, lo, hi) => math.max(lo, math.min(hi, x))
+
+// ============================================================================
+// RÉGLAGES (identiques à l'indicateur)
+// ============================================================================
+grpGen   = "① Général"
+htf1     = input.timeframe("15",  "HTF confirmation 1", group=grpGen)
+htf2     = input.timeframe("60",  "HTF confirmation 2", group=grpGen)
+biasThreshold = input.int(35, "Seuil de biais pour entrer", minval=5, maxval=90, group=grpGen)
+minConfidence = input.int(55, "Confiance minimale", minval=0, maxval=100, group=grpGen)
+
+grpW = "② Poids des familles"
+wTrend  = input.float(2.0, "Tendance",       minval=0, step=0.25, group=grpW)
+wMom    = input.float(1.5, "Momentum",       minval=0, step=0.25, group=grpW)
+wFlow   = input.float(1.0, "Volume / Flux",  minval=0, step=0.25, group=grpW)
+wLevel  = input.float(1.0, "Niveaux / Prix", minval=0, step=0.25, group=grpW)
+wStruct = input.float(1.5, "Structure",      minval=0, step=0.25, group=grpW)
+wInter  = input.float(1.5, "Inter-marchés",  minval=0, step=0.25, group=grpW)
+
+grpLen = "③ Longueurs"
+emaFastLen = input.int(8,   "EMA rapide",  minval=2, group=grpLen)
+emaMidLen  = input.int(21,  "EMA moyenne", minval=3, group=grpLen)
+emaSlowLen = input.int(50,  "EMA lente",   minval=5, group=grpLen)
+emaTrendLen= input.int(200, "EMA de fond", minval=20, group=grpLen)
+rsiLen     = input.int(14,  "RSI",   minval=2, group=grpLen)
+atrLen     = input.int(14,  "ATR",   minval=2, group=grpLen)
+atrRegime  = input.int(100, "Fenêtre régime volatilité", minval=20, group=grpLen)
+pivotLen   = input.int(5,   "Pivots (swing)", minval=2, group=grpLen)
+corrLen    = input.int(20,  "Fenêtre corrélation", minval=5, group=grpLen)
+
+grpInter = "④ Inter-marchés"
+useDXY    = input.bool(true,  "Dollar Index (DXY)",  group=grpInter)
+dxySym    = input.symbol("TVC:DXY",   "Symbole DXY",  group=grpInter)
+useYields = input.bool(true,  "Rendements US 10Y",   group=grpInter)
+yieldSym  = input.symbol("TVC:US10Y", "Symbole 10Y",  group=grpInter)
+useSilver = input.bool(true,  "Argent (XAG, corr. +)", group=grpInter)
+silverSym = input.symbol("OANDA:XAGUSD", "Symbole Argent", group=grpInter)
+useSPX    = input.bool(false, "S&P 500 (risk-on/off)", group=grpInter)
+spxSym    = input.symbol("SP:SPX", "Symbole SPX", group=grpInter)
+interLen  = input.int(10, "Fenêtre pente inter-marchés", minval=3, group=grpInter)
+
+grpSess = "⑤ Sessions & News"
+useSessions = input.bool(true, "Filtrer par sessions", group=grpSess)
+londonSess  = input.session("0700-1600", "Londres (UTC)", group=grpSess)
+nySess      = input.session("1200-2100", "New York (UTC)", group=grpSess)
+useNews   = input.bool(true, "Blackout news (UTC)", group=grpSess)
+newsHour  = input.int(12, "Heure news UTC",  minval=0, maxval=23, group=grpSess)
+newsMin   = input.int(30, "Minute news UTC", minval=0, maxval=59, group=grpSess)
+newsPad   = input.int(15, "Blackout ± minutes", minval=0, maxval=120, group=grpSess)
+
+grpLvl = "⑥ Niveaux"
+roundStep = input.float(10.0, "Pas nombres ronds ($)", minval=0.1, group=grpLvl)
+
+grpRisk = "⑦ Risque & sorties"
+slMult   = input.float(1.2, "Stop-loss (× ATR)", minval=0.1, step=0.1, group=grpRisk)
+tp1Mult  = input.float(1.0, "TP1 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
+tp2Mult  = input.float(2.0, "TP2 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
+tp1Qty   = input.int(50, "Part fermée au TP1 (%)", minval=0, maxval=100, group=grpRisk)
+useBE    = input.bool(true, "Stop au point d'entrée après TP1", group=grpRisk)
+useOppExit = input.bool(true, "Sortir si signal opposé", group=grpRisk)
+maxBars  = input.int(0, "Sortie forcée après N bougies (0 = off)", minval=0, group=grpRisk)
+
+grpBt = "⑧ Backtest — plage de dates"
+useDate = input.bool(false, "Limiter aux dates", group=grpBt)
+startD  = input.time(timestamp("2024-01-01 00:00"), "Début", group=grpBt)
+endD    = input.time(timestamp("2026-12-31 00:00"), "Fin", group=grpBt)
+inDate  = (not useDate) or (time >= startD and time <= endD)
+
+// ============================================================================
+// MOTEUR MULTI-FACTEURS (identique à l'indicateur)
+// ============================================================================
+emaFast  = ta.ema(close, emaFastLen)
+emaMid   = ta.ema(close, emaMidLen)
+emaSlow  = ta.ema(close, emaSlowLen)
+emaTrend = ta.ema(close, emaTrendLen)
+atr      = ta.atr(atrLen)
+atrAvg   = ta.sma(atr, atrRegime)
+volRatio = na(atrAvg) or atrAvg == 0 ? 1.0 : atr / atrAvg
+sessVwap = ta.vwap(hlc3)
+volAvg = ta.sma(volume, 20)
+volAvailable = not na(volAvg) and volAvg > 0
+
+// --- Tendance ---
+bullStack = emaFast > emaMid and emaMid > emaSlow and close > emaTrend
+bearStack = emaFast < emaMid and emaMid < emaSlow and close < emaTrend
+sRibbon = bullStack ? 1.0 : bearStack ? -1.0 : close > emaMid ? 0.4 : close < emaMid ? -0.4 : 0.0
+[h1c, h1e] = request.security(syminfo.tickerid, htf1, [close, ta.ema(close, emaSlowLen)], lookahead=barmerge.lookahead_off)
+[h2c, h2e] = request.security(syminfo.tickerid, htf2, [close, ta.ema(close, emaSlowLen)], lookahead=barmerge.lookahead_off)
+sHtf1 = na(h1c) ? 0.0 : h1c > h1e ? 1.0 : h1c < h1e ? -1.0 : 0.0
+sHtf2 = na(h2c) ? 0.0 : h2c > h2e ? 1.0 : h2c < h2e ? -1.0 : 0.0
+[stVal, stDir] = ta.supertrend(3.0, 10)
+sSuper = stDir < 0 ? 1.0 : -1.0
+sarv = ta.sar(0.02, 0.02, 0.2)
+sSar = close > sarv ? 1.0 : -1.0
+tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+spanA  = (tenkan + kijun) / 2
+spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+sIchi = close > math.max(spanA, spanB) and tenkan > kijun ? 1.0 : close < math.min(spanA, spanB) and tenkan < kijun ? -1.0 : 0.0
+[diPlus, diMinus, adx] = ta.dmi(14, 14)
+sAdx = adx > 20 ? (diPlus > diMinus ? 1.0 : -1.0) : (diPlus > diMinus ? 0.3 : -0.3)
+lr = ta.linreg(close, 20, 0)
+sLin = f_clamp((lr - lr[1]) / (atr * 0.15), -1.0, 1.0)
+sDonch = close >= ta.highest(high, 20)[1] ? 1.0 : close <= ta.lowest(low, 20)[1] ? -1.0 : 0.0
+trendScore = (sRibbon + sHtf1 + sHtf2 + sSuper + sSar + sIchi + sAdx + sLin + sDonch) / 9.0
+
+// --- Momentum ---
+rsi = ta.rsi(close, rsiLen)
+sRsi = f_clamp((rsi - 50) / 20, -1.0, 1.0)
+[macdLine, macdSig, macdHist] = ta.macd(close, 12, 26, 9)
+sMacd = macdHist > 0 and macdHist > macdHist[1] ? 1.0 : macdHist < 0 and macdHist < macdHist[1] ? -1.0 : macdHist > 0 ? 0.5 : macdHist < 0 ? -0.5 : 0.0
+kFast = ta.sma(ta.stoch(close, high, low, 14), 3)
+sStoch = f_clamp((kFast - 50) / 30, -1.0, 1.0)
+sCci = f_clamp(ta.cci(close, 20) / 150, -1.0, 1.0)
+hh14 = ta.highest(high, 14)
+ll14 = ta.lowest(low, 14)
+wpr = hh14 == ll14 ? -50.0 : (hh14 - close) / (hh14 - ll14) * -100
+sWpr = f_clamp((wpr + 50) / 50, -1.0, 1.0)
+sRoc = f_clamp(ta.roc(close, 9) / 0.3, -1.0, 1.0)
+ao = ta.sma(hl2, 5) - ta.sma(hl2, 34)
+sAo = ao > 0 and ao > ao[1] ? 1.0 : ao < 0 and ao < ao[1] ? -1.0 : ao > 0 ? 0.5 : ao < 0 ? -0.5 : 0.0
+plP = ta.pivotlow(low, pivotLen, pivotLen)
+phP = ta.pivothigh(high, pivotLen, pivotLen)
+var float prevPLp = na
+var float prevPLr = na
+var float prevPHp = na
+var float prevPHr = na
+bullDiv = false
+bearDiv = false
+if not na(plP)
+    rAt = rsi[pivotLen]
+    if not na(prevPLp)
+        bullDiv := plP < prevPLp and rAt > prevPLr
+    prevPLp := plP
+    prevPLr := rAt
+if not na(phP)
+    rAt = rsi[pivotLen]
+    if not na(prevPHp)
+        bearDiv := phP > prevPHp and rAt < prevPHr
+    prevPHp := phP
+    prevPHr := rAt
+var int divState = 0
+var int divAge = 0
+if bullDiv
+    divState := 1
+    divAge := 0
+if bearDiv
+    divState := -1
+    divAge := 0
+divAge += 1
+if divAge > 10
+    divState := 0
+momScore = (sRsi + sMacd + sStoch + sCci + sWpr + sRoc + sAo + divState) / 8.0
+
+// --- Volatilité (gating) ---
+[bbMid, bbUp, bbLo] = ta.bb(close, 20, 2.0)
+[kcMid, kcUp, kcLo] = ta.kc(close, 20, 1.5, true)
+squeezeOn = bbUp < kcUp and bbLo > kcLo
+volOk = volRatio > 0.6 and volRatio < 2.5
+
+// --- Volume / Flux ---
+obvSlope = ta.change(ta.ema(ta.obv, 10))
+sObv = obvSlope > 0 ? 1.0 : obvSlope < 0 ? -1.0 : 0.0
+sMfi = f_clamp((ta.mfi(hlc3, 14) - 50) / 25, -1.0, 1.0)
+mfMult = (high == low) ? 0.0 : ((close - low) - (high - close)) / (high - low)
+cmf = ta.sma(volume, 20) == 0 ? 0.0 : ta.sma(mfMult * volume, 20) / ta.sma(volume, 20)
+sCmf = f_clamp(cmf * 3, -1.0, 1.0)
+volPart = volAvailable ? f_clamp((volume / volAvg - 1), -1.0, 1.0) : 0.0
+flowScore = volAvailable ? (sObv + sMfi + sCmf) / 3.0 : 0.0
+
+// --- Niveaux ---
+sVwap = close > sessVwap ? 1.0 : close < sessVwap ? -1.0 : 0.0
+[pdh, pdl, pdc] = request.security(syminfo.tickerid, "D", [high[1], low[1], close[1]], lookahead=barmerge.lookahead_off)
+pivotP = (pdh + pdl + pdc) / 3
+sPivot = na(pivotP) ? 0.0 : close > pivotP ? 0.5 : -0.5
+sPdhl = na(pdh) ? 0.0 : close > pdh ? 1.0 : close < pdl ? -1.0 : 0.0
+nearRound = math.abs(close - math.round(close / roundStep) * roundStep) < atr * 0.15
+levelScore = (sVwap + sPivot + sPdhl) / 3.0
+
+// --- Structure ---
+var float lastPH = na
+var float lastPL = na
+if not na(phP)
+    lastPH := phP
+if not na(plP)
+    lastPL := plP
+sBos = (not na(lastPH) and close > lastPH) ? 1.0 : (not na(lastPL) and close < lastPL) ? -1.0 : 0.0
+var float sph1 = na
+var float sph2 = na
+var float spl1 = na
+var float spl2 = na
+if not na(phP)
+    sph2 := sph1
+    sph1 := phP
+if not na(plP)
+    spl2 := spl1
+    spl1 := plP
+seqUp   = not na(sph2) and not na(spl2) and sph1 > sph2 and spl1 > spl2
+seqDown = not na(sph2) and not na(spl2) and sph1 < sph2 and spl1 < spl2
+sSeq = seqUp ? 1.0 : seqDown ? -1.0 : 0.0
+body = math.abs(close - open)
+lowerWick = math.min(open, close) - low
+upperWick = high - math.max(open, close)
+bullEng = close > open and close[1] < open[1] and close >= open[1] and open <= close[1]
+bearEng = close < open and close[1] > open[1] and close <= open[1] and open >= close[1]
+hammer  = body > 0 and lowerWick > body * 2 and upperWick < body
+star    = body > 0 and upperWick > body * 2 and lowerWick < body
+sCandle = (bullEng or hammer) ? 1.0 : (bearEng or star) ? -1.0 : 0.0
+structScore = (sBos + sSeq + sCandle) / 3.0
+
+// --- Inter-marchés ---
+f_roc(sym, len) =>
+    px = request.security(sym, timeframe.period, close, lookahead=barmerge.lookahead_off)
+    r = na(px) ? na : (px - px[len]) / px[len]
+    [px, r]
+[dxyPx, dxyRoc] = f_roc(dxySym, interLen)
+[yldPx, yldRoc] = f_roc(yieldSym, interLen)
+[agPx,  agRoc]  = f_roc(silverSym, interLen)
+[spxPx, spxRoc] = f_roc(spxSym, interLen)
+sDxy    = useDXY    and not na(dxyRoc) ? (dxyRoc > 0 ? -1.0 : dxyRoc < 0 ? 1.0 : 0.0) : na
+sYield  = useYields and not na(yldRoc) ? (yldRoc > 0 ? -1.0 : yldRoc < 0 ? 1.0 : 0.0) : na
+sSilver = useSilver and not na(agRoc)  ? (agRoc  > 0 ?  1.0 : agRoc  < 0 ? -1.0 : 0.0) : na
+sSpx    = useSPX    and not na(spxRoc) ? (spxRoc > 0 ? -0.5 : spxRoc < 0 ? 0.5 : 0.0) : na
+interCnt = (useDXY ? 1 : 0) + (useYields ? 1 : 0) + (useSilver ? 1 : 0) + (useSPX ? 1 : 0)
+interRaw = (na(sDxy) ? 0.0 : sDxy) + (na(sYield) ? 0.0 : sYield) + (na(sSilver) ? 0.0 : sSilver) + (na(sSpx) ? 0.0 : sSpx)
+interScore = interCnt > 0 ? interRaw / interCnt : 0.0
+corrDxy = useDXY and not na(dxyPx) ? ta.correlation(close, dxyPx, corrLen) : na
+corrStrength = na(corrDxy) ? 0.5 : f_clamp(-corrDxy, 0.0, 1.0)
+
+// --- Sessions & news ---
+inLondon = not na(time(timeframe.period, londonSess, "UTC"))
+inNY     = not na(time(timeframe.period, nySess, "UTC"))
+inSession = (not useSessions) or inLondon or inNY
+overlap  = inLondon and inNY
+minsNow  = hour(time, "UTC") * 60 + minute(time, "UTC")
+inNews = useNews and math.abs(minsNow - (newsHour * 60 + newsMin)) <= newsPad
+
+// --- Composite ---
+catScores = array.from(trendScore, momScore, flowScore, levelScore, structScore, interScore)
+catWeights = array.from(wTrend, wMom, (volAvailable ? wFlow : 0.0), wLevel, wStruct, (interCnt > 0 ? wInter : 0.0))
+rawScore = 0.0
+wTot = 0.0
+for i = 0 to 5
+    rawScore += array.get(catScores, i) * array.get(catWeights, i)
+    wTot += array.get(catWeights, i)
+bias = wTot > 0 ? math.round(rawScore / wTot * 100) : 0
+dirSign = bias > 0 ? 1 : bias < 0 ? -1 : 0
+agree = 0
+activeCats = 0
+for i = 0 to 5
+    if array.get(catWeights, i) > 0
+        activeCats += 1
+        sc = array.get(catScores, i)
+        agree += (sc > 0 ? 1 : sc < 0 ? -1 : 0) == dirSign and sc != 0 ? 1 : 0
+agreeRatio = activeCats > 0 ? agree / activeCats : 0.0
+sessMult  = inSession ? (overlap ? 1.0 : 0.85) : 0.45
+volMult   = volOk ? 1.0 : (volRatio <= 0.6 ? 0.6 : 0.75)
+adxMult   = adx > 25 ? 1.1 : adx < 18 ? 0.75 : 1.0
+partMult  = volAvailable ? f_clamp(0.85 + volPart * 0.3, 0.7, 1.15) : 1.0
+squeezeMult = squeezeOn ? 0.7 : 1.0
+roundMult = nearRound ? 0.85 : 1.0
+interMult = interCnt > 0 ? f_clamp(0.85 + corrStrength * 0.3, 0.85, 1.15) : 1.0
+confidence = math.round(f_clamp(math.abs(bias) * (0.5 + 0.5 * agreeRatio) * sessMult * volMult * adxMult * partMult * squeezeMult * roundMult * interMult, 0, 100))
+
+// ============================================================================
+// SIGNAUX & EXÉCUTION
+// ============================================================================
+canTrade = inSession and not inNews and confidence >= minConfidence and volOk and inDate
+longSignal  = canTrade and bias >=  biasThreshold and bias[1] <  biasThreshold
+shortSignal = canTrade and bias <= -biasThreshold and bias[1] > -biasThreshold
+
+var float eStop = na
+var float eT1 = na
+var float eT2 = na
+var int   eBar = na
+var bool  tp1Done = false
+
+longEntry  = longSignal  and strategy.position_size <= 0
+shortEntry = shortSignal and strategy.position_size >= 0
+
+if longEntry
+    strategy.entry("Long", strategy.long)
+    eStop := close - atr * slMult
+    eT1   := close + atr * tp1Mult
+    eT2   := close + atr * tp2Mult
+    eBar  := bar_index
+    tp1Done := false
+if shortEntry
+    strategy.entry("Short", strategy.short)
+    eStop := close + atr * slMult
+    eT1   := close - atr * tp1Mult
+    eT2   := close - atr * tp2Mult
+    eBar  := bar_index
+    tp1Done := false
+
+// Passage du stop au point d'entrée après TP1
+curStop = eStop
+if useBE and tp1Done
+    curStop := strategy.position_avg_price
+
+// Sorties bracket (TP1 partiel + TP2 + stop)
+if strategy.position_size > 0
+    if tp1Qty > 0
+        strategy.exit("L-TP1", from_entry="Long", qty_percent=tp1Qty, limit=eT1, stop=curStop)
+    strategy.exit("L-TP2", from_entry="Long", limit=eT2, stop=curStop)
+    if high >= eT1
+        tp1Done := true
+if strategy.position_size < 0
+    if tp1Qty > 0
+        strategy.exit("S-TP1", from_entry="Short", qty_percent=tp1Qty, limit=eT1, stop=curStop)
+    strategy.exit("S-TP2", from_entry="Short", limit=eT2, stop=curStop)
+    if low <= eT1
+        tp1Done := true
+
+// Sortie sur signal opposé
+if useOppExit
+    if strategy.position_size > 0 and shortSignal
+        strategy.close("Long", comment="opp")
+    if strategy.position_size < 0 and longSignal
+        strategy.close("Short", comment="opp")
+
+// Sortie temporelle (scalping : ne pas laisser traîner)
+if maxBars > 0 and strategy.position_size != 0 and not na(eBar) and (bar_index - eBar) >= maxBars
+    strategy.close_all(comment="timeout")
+
+// ============================================================================
+// AFFICHAGE
+// ============================================================================
+plot(emaTrend, "EMA de fond", color=color.new(color.gray, 0), linewidth=2)
+plot(sessVwap, "VWAP", color=color.new(color.yellow, 40))
+
+var table dash = table.new(position.top_right, 2, 5, border_width=1)
+if barstate.islast
+    biasCol = bias > 0 ? color.new(color.green, 0) : bias < 0 ? color.new(color.red, 0) : color.gray
+    table.cell(dash, 0, 0, "STRAT — Biais", text_color=color.white, bgcolor=color.new(color.black,0))
+    table.cell(dash, 1, 0, str.tostring(bias), text_color=color.white, bgcolor=biasCol)
+    table.cell(dash, 0, 1, "Confiance", text_color=color.white)
+    table.cell(dash, 1, 1, str.tostring(confidence) + " %", text_color=color.white)
+    table.cell(dash, 0, 2, "Net profit", text_color=color.white)
+    table.cell(dash, 1, 2, str.tostring(strategy.netprofit, "0.0"), text_color=color.white)
+    table.cell(dash, 0, 3, "Trades", text_color=color.white)
+    table.cell(dash, 1, 3, str.tostring(strategy.closedtrades), text_color=color.white)
+    winRate = strategy.closedtrades > 0 ? strategy.wintrades / strategy.closedtrades * 100 : 0
+    table.cell(dash, 0, 4, "Win rate", text_color=color.white)
+    table.cell(dash, 1, 4, str.tostring(winRate, "0.0") + " %", text_color=color.white)

@@ -1,213 +1,349 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
-// © gold-scalper — Multi-factor XAU/USD scalping bias engine
+// © gold-scalper — Multi-factor XAU/USD scalping bias engine (édition étendue)
 //
-// Ce n'est PAS une boule de cristal. L'indicateur agrège plusieurs sources
-// d'information (tendance multi-TF, momentum, structure, volatilité, DXY,
-// rendements US10Y, sessions, fenêtres news) en un BIAIS probabiliste et un
-// SCORE DE CONFIANCE. À utiliser avec gestion du risque et à backtester.
-//
-// Aucun garantie de résultat. Le trading comporte un risque de perte.
+// Ce n'est PAS une boule de cristal. L'indicateur calcule TOUT ce que les maths
+// peuvent tirer du prix, du volume et des marchés liés, regroupé en 6 familles,
+// et en déduit un BIAIS (-100..100) + une CONFIANCE (0..100 %).
+// Il ne voit PAS le live pur (calendrier news en direct, carnet d'ordres).
+// À backtester (voir gold_scalper_strategy.pine). Le trading comporte un risque.
 
 //@version=6
-indicator("Gold Scalper — Multi-Factor Bias", shorttitle="XAU Scalper", overlay=true, max_labels_count=500, max_lines_count=500)
+indicator("Gold Scalper Pro — Multi-Factor Bias", shorttitle="XAU Scalper Pro", overlay=true, max_labels_count=500, max_lines_count=500)
 
 // ============================================================================
-// 0. ENTRÉES / RÉGLAGES
+// HELPERS
+// ============================================================================
+f_clamp(x, lo, hi) => math.max(lo, math.min(hi, x))
+f_dir(v) => v > 0.05 ? "▲" : v < -0.05 ? "▼" : "—"
+f_col(v) => v > 0.05 ? color.new(color.green, 20) : v < -0.05 ? color.new(color.red, 20) : color.new(color.gray, 45)
+
+// ============================================================================
+// 0. RÉGLAGES GÉNÉRAUX
 // ============================================================================
 grpGen   = "① Général"
-htfInput = input.timeframe("15", "Timeframe de confirmation (HTF)", group=grpGen, tooltip="Timeframe supérieur pour confirmer la tendance de fond. Ex: si tu scalpes en M1/M5, mets 15 ou 60.")
-biasThreshold = input.int(40, "Seuil de biais pour signaler", minval=10, maxval=90, group=grpGen, tooltip="Le biais composite (-100..100) doit dépasser ±ce seuil pour générer un signal.")
-minConfidence = input.int(55, "Confiance minimale pour signaler", minval=0, maxval=100, group=grpGen, tooltip="Sous ce niveau de confiance, aucun signal n'est émis (marché indécis).")
+htf1     = input.timeframe("15",  "HTF confirmation 1", group=grpGen)
+htf2     = input.timeframe("60",  "HTF confirmation 2", group=grpGen)
+biasThreshold = input.int(35, "Seuil de biais pour signaler", minval=5, maxval=90, group=grpGen)
+minConfidence = input.int(55, "Confiance minimale pour signaler", minval=0, maxval=100, group=grpGen)
+showTable = input.bool(true, "Afficher le tableau de bord", group=grpGen)
+showEmas  = input.bool(true, "Afficher EMAs + VWAP", group=grpGen)
 
-grpTrend = "② Tendance"
-emaFastLen = input.int(8,  "EMA rapide",   minval=2, group=grpTrend)
-emaMidLen  = input.int(21, "EMA moyenne",  minval=3, group=grpTrend)
-emaSlowLen = input.int(50, "EMA lente",    minval=5, group=grpTrend)
-emaTrendLen= input.int(200,"EMA de fond",  minval=20, group=grpTrend)
-showEmas   = input.bool(true, "Afficher les EMAs", group=grpTrend)
+grpW = "② Poids des familles"
+wTrend  = input.float(2.0, "Tendance",       minval=0, step=0.25, group=grpW)
+wMom    = input.float(1.5, "Momentum",       minval=0, step=0.25, group=grpW)
+wFlow   = input.float(1.0, "Volume / Flux",  minval=0, step=0.25, group=grpW)
+wLevel  = input.float(1.0, "Niveaux / Prix", minval=0, step=0.25, group=grpW)
+wStruct = input.float(1.5, "Structure",      minval=0, step=0.25, group=grpW)
+wInter  = input.float(1.5, "Inter-marchés",  minval=0, step=0.25, group=grpW)
 
-grpMom = "③ Momentum"
-rsiLen  = input.int(14, "RSI période", minval=2, group=grpMom)
-macdFast= input.int(12, "MACD rapide", minval=2, group=grpMom)
-macdSlow= input.int(26, "MACD lent",   minval=3, group=grpMom)
-macdSig = input.int(9,  "MACD signal", minval=2, group=grpMom)
+grpLen = "③ Longueurs"
+emaFastLen = input.int(8,   "EMA rapide",  minval=2, group=grpLen)
+emaMidLen  = input.int(21,  "EMA moyenne", minval=3, group=grpLen)
+emaSlowLen = input.int(50,  "EMA lente",   minval=5, group=grpLen)
+emaTrendLen= input.int(200, "EMA de fond", minval=20, group=grpLen)
+rsiLen     = input.int(14,  "RSI",   minval=2, group=grpLen)
+atrLen     = input.int(14,  "ATR",   minval=2, group=grpLen)
+atrRegime  = input.int(100, "Fenêtre régime volatilité", minval=20, group=grpLen)
+pivotLen   = input.int(5,   "Pivots (swing)", minval=2, group=grpLen)
+corrLen    = input.int(20,  "Fenêtre corrélation inter-marchés", minval=5, group=grpLen)
 
-grpVol = "④ Volatilité (ATR)"
-atrLen      = input.int(14, "ATR période", minval=2, group=grpVol)
-atrRegimeLen= input.int(100,"Fenêtre régime de volatilité", minval=20, group=grpVol, tooltip="Compare l'ATR courant à sa moyenne sur cette fenêtre pour juger si le marché est trop mou (spread) ou exploitable.")
+grpInter = "④ Inter-marchés"
+useDXY    = input.bool(true,  "Dollar Index (DXY)",  group=grpInter)
+dxySym    = input.symbol("TVC:DXY",   "Symbole DXY",  group=grpInter)
+useYields = input.bool(true,  "Rendements US 10Y",   group=grpInter)
+yieldSym  = input.symbol("TVC:US10Y", "Symbole 10Y",  group=grpInter)
+useSilver = input.bool(true,  "Argent (XAG, corr. +)", group=grpInter)
+silverSym = input.symbol("OANDA:XAGUSD", "Symbole Argent", group=grpInter)
+useSPX    = input.bool(false, "S&P 500 (risk-on/off)", group=grpInter)
+spxSym    = input.symbol("SP:SPX", "Symbole SPX", group=grpInter)
+interLen  = input.int(10, "Fenêtre pente inter-marchés", minval=3, group=grpInter)
 
-grpStruct = "⑤ Structure de marché"
-pivotLen = input.int(5, "Longueur des pivots (swing)", minval=2, group=grpStruct, tooltip="Nombre de bougies de chaque côté pour valider un swing high/low. Petit = réactif, grand = fiable.")
+grpSess = "⑤ Sessions & News"
+useSessions = input.bool(true, "Filtrer par sessions", group=grpSess)
+londonSess  = input.session("0700-1600", "Londres (UTC)", group=grpSess)
+nySess      = input.session("1200-2100", "New York (UTC)", group=grpSess)
+useNews   = input.bool(true, "Blackout autour d'une heure news (UTC)", group=grpSess)
+newsHour  = input.int(12, "Heure news UTC",  minval=0, maxval=23, group=grpSess)
+newsMin   = input.int(30, "Minute news UTC", minval=0, maxval=59, group=grpSess)
+newsPad   = input.int(15, "Blackout ± minutes", minval=0, maxval=120, group=grpSess)
 
-grpInter = "⑥ Corrélations inter-marchés"
-useDXY   = input.bool(true,  "Utiliser le Dollar Index (DXY)", group=grpInter, tooltip="L'or est inversement corrélé au dollar. DXY qui baisse = pression haussière sur l'or.")
-dxySym   = input.symbol("TVC:DXY", "Symbole DXY", group=grpInter)
-useYields= input.bool(true,  "Utiliser les rendements US 10Y", group=grpInter, tooltip="Rendements réels en hausse = généralement baissier pour l'or (actif sans coupon).")
-yieldSym = input.symbol("TVC:US10Y", "Symbole rendement 10Y", group=grpInter)
-interLen = input.int(10, "Fenêtre de pente inter-marchés", minval=3, group=grpInter)
+grpLvl = "⑥ Niveaux"
+roundStep = input.float(10.0, "Pas des nombres ronds ($)", minval=0.1, group=grpLvl, tooltip="Proximité d'un multiple de ce pas = zone de réaction : la confiance est réduite.")
 
-grpSess = "⑦ Sessions"
-useSessions = input.bool(true, "Filtrer par sessions", group=grpSess, tooltip="Le scalping de l'or est surtout liquide sur Londres et New York. Hors session, la confiance est réduite.")
-londonSess  = input.session("0700-1600", "Session Londres (UTC)", group=grpSess)
-nySess      = input.session("1200-2100", "Session New York (UTC)", group=grpSess)
-sessTz      = input.string("UTC", "Fuseau des sessions", options=["UTC"], group=grpSess)
-
-grpNews = "⑧ Fenêtre news (blackout)"
-useNews   = input.bool(true, "Bloquer autour d'une heure news", group=grpNews, tooltip="Pine n'a PAS de calendrier live. Renseigne ici l'heure UTC des stats à fort impact que tu suis (NFP, CPI, FOMC = souvent 12:30 ou 18:00 UTC).")
-newsHour  = input.int(12, "Heure news (UTC)", minval=0, maxval=23, group=grpNews)
-newsMin   = input.int(30, "Minute news (UTC)", minval=0, maxval=59, group=grpNews)
-newsPad   = input.int(15, "Minutes de blackout avant/après", minval=0, maxval=120, group=grpNews)
-
-grpRisk = "⑨ Risque (SL/TP en ATR)"
+grpRisk = "⑦ Risque (SL/TP en ATR)"
 slMult  = input.float(1.2, "Stop-loss (× ATR)", minval=0.1, step=0.1, group=grpRisk)
-tp1Mult = input.float(1.0, "Take-profit 1 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
-tp2Mult = input.float(2.0, "Take-profit 2 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
+tp1Mult = input.float(1.0, "TP1 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
+tp2Mult = input.float(2.0, "TP2 (× ATR)", minval=0.1, step=0.1, group=grpRisk)
 showRisk= input.bool(true, "Afficher SL/TP sur signal", group=grpRisk)
 
-grpWeights = "⑩ Pondérations des facteurs"
-wHtf    = input.float(2.0, "Poids tendance HTF",        minval=0, step=0.5, group=grpWeights)
-wRibbon = input.float(2.0, "Poids alignement EMA",      minval=0, step=0.5, group=grpWeights)
-wStruct = input.float(1.5, "Poids structure de marché", minval=0, step=0.5, group=grpWeights)
-wRsi    = input.float(1.0, "Poids RSI",                 minval=0, step=0.5, group=grpWeights)
-wMacd   = input.float(1.0, "Poids MACD",                minval=0, step=0.5, group=grpWeights)
-wVwap   = input.float(1.0, "Poids VWAP",                minval=0, step=0.5, group=grpWeights)
-wDxy    = input.float(1.5, "Poids DXY",                 minval=0, step=0.5, group=grpWeights)
-wYield  = input.float(1.0, "Poids rendements 10Y",      minval=0, step=0.5, group=grpWeights)
-
-showTable = input.bool(true, "Afficher le tableau de bord", group=grpGen)
-
 // ============================================================================
-// 1. INDICATEURS DE BASE
+// 1. BASES
 // ============================================================================
 emaFast  = ta.ema(close, emaFastLen)
 emaMid   = ta.ema(close, emaMidLen)
 emaSlow  = ta.ema(close, emaSlowLen)
 emaTrend = ta.ema(close, emaTrendLen)
-
-rsi = ta.rsi(close, rsiLen)
-[macdLine, signalLine, histLine] = ta.macd(close, macdFast, macdSlow, macdSig)
-
 atr      = ta.atr(atrLen)
-atrAvg   = ta.sma(atr, atrRegimeLen)
-volRatio = atr / atrAvg                 // >1 = plus volatil que la normale
-sessionVwap = ta.vwap(hlc3)
+atrAvg   = ta.sma(atr, atrRegime)
+volRatio = na(atrAvg) or atrAvg == 0 ? 1.0 : atr / atrAvg
+sessVwap = ta.vwap(hlc3)
+
+volAvg = ta.sma(volume, 20)
+volAvailable = not na(volAvg) and volAvg > 0
 
 // ============================================================================
-// 2. FACTEUR : TENDANCE HTF (confirmation timeframe supérieur)
+// 2. FAMILLE TENDANCE
 // ============================================================================
-htfClose = request.security(syminfo.tickerid, htfInput, close, lookahead=barmerge.lookahead_off)
-htfEma   = request.security(syminfo.tickerid, htfInput, ta.ema(close, emaSlowLen), lookahead=barmerge.lookahead_off)
-sHtf = htfClose > htfEma ? 1.0 : htfClose < htfEma ? -1.0 : 0.0
-
-// ============================================================================
-// 3. FACTEUR : ALIGNEMENT EMA (ribbon) + position vs EMA de fond
-// ============================================================================
+// EMA ribbon
 bullStack = emaFast > emaMid and emaMid > emaSlow and close > emaTrend
 bearStack = emaFast < emaMid and emaMid < emaSlow and close < emaTrend
-sRibbon = bullStack ? 1.0 : bearStack ? -1.0 : (close > emaMid ? 0.5 : close < emaMid ? -0.5 : 0.0)
+sRibbon = bullStack ? 1.0 : bearStack ? -1.0 : close > emaMid ? 0.4 : close < emaMid ? -0.4 : 0.0
+// HTF (tuple pour économiser les appels security)
+[h1c, h1e] = request.security(syminfo.tickerid, htf1, [close, ta.ema(close, emaSlowLen)], lookahead=barmerge.lookahead_off)
+[h2c, h2e] = request.security(syminfo.tickerid, htf2, [close, ta.ema(close, emaSlowLen)], lookahead=barmerge.lookahead_off)
+sHtf1 = na(h1c) ? 0.0 : h1c > h1e ? 1.0 : h1c < h1e ? -1.0 : 0.0
+sHtf2 = na(h2c) ? 0.0 : h2c > h2e ? 1.0 : h2c < h2e ? -1.0 : 0.0
+// Supertrend
+[stVal, stDir] = ta.supertrend(3.0, 10)
+sSuper = stDir < 0 ? 1.0 : -1.0        // dir -1 = tendance haussière
+// Parabolic SAR
+sarv = ta.sar(0.02, 0.02, 0.2)
+sSar = close > sarv ? 1.0 : -1.0
+// Ichimoku
+tenkan = (ta.highest(high, 9)  + ta.lowest(low, 9))  / 2
+kijun  = (ta.highest(high, 26) + ta.lowest(low, 26)) / 2
+spanA  = (tenkan + kijun) / 2
+spanB  = (ta.highest(high, 52) + ta.lowest(low, 52)) / 2
+cloudTop = math.max(spanA, spanB)
+cloudBot = math.min(spanA, spanB)
+sIchi = close > cloudTop and tenkan > kijun ? 1.0 : close < cloudBot and tenkan < kijun ? -1.0 : 0.0
+// ADX / DMI
+[diPlus, diMinus, adx] = ta.dmi(14, 14)
+sAdx = adx > 20 ? (diPlus > diMinus ? 1.0 : -1.0) : (diPlus > diMinus ? 0.3 : -0.3)
+// Régression linéaire (pente)
+lr = ta.linreg(close, 20, 0)
+lrSlope = lr - lr[1]
+sLin = f_clamp(lrSlope / (atr * 0.15), -1.0, 1.0)
+// Donchian breakout
+dcU = ta.highest(high, 20)
+dcL = ta.lowest(low, 20)
+sDonch = close >= dcU[1] ? 1.0 : close <= dcL[1] ? -1.0 : 0.0
+
+trendSum = sRibbon + sHtf1 + sHtf2 + sSuper + sSar + sIchi + sAdx + sLin + sDonch
+trendScore = trendSum / 9.0
 
 // ============================================================================
-// 4. FACTEUR : STRUCTURE DE MARCHÉ (BOS via swings)
+// 3. FAMILLE MOMENTUM
 // ============================================================================
-ph = ta.pivothigh(high, pivotLen, pivotLen)
-pl = ta.pivotlow(low,  pivotLen, pivotLen)
+rsi = ta.rsi(close, rsiLen)
+sRsi = f_clamp((rsi - 50) / 20, -1.0, 1.0)
+[macdLine, macdSig, macdHist] = ta.macd(close, 12, 26, 9)
+sMacd = macdHist > 0 and macdHist > macdHist[1] ? 1.0 : macdHist < 0 and macdHist < macdHist[1] ? -1.0 : macdHist > 0 ? 0.5 : macdHist < 0 ? -0.5 : 0.0
+kFast = ta.sma(ta.stoch(close, high, low, 14), 3)
+sStoch = f_clamp((kFast - 50) / 30, -1.0, 1.0)
+cci = ta.cci(close, 20)
+sCci = f_clamp(cci / 150, -1.0, 1.0)
+hh14 = ta.highest(high, 14)
+ll14 = ta.lowest(low, 14)
+wpr = hh14 == ll14 ? -50.0 : (hh14 - close) / (hh14 - ll14) * -100
+sWpr = f_clamp((wpr + 50) / 50, -1.0, 1.0)
+roc = ta.roc(close, 9)
+sRoc = f_clamp(roc / 0.3, -1.0, 1.0)
+ao = ta.sma(hl2, 5) - ta.sma(hl2, 34)
+sAo = ao > 0 and ao > ao[1] ? 1.0 : ao < 0 and ao < ao[1] ? -1.0 : ao > 0 ? 0.5 : ao < 0 ? -0.5 : 0.0
+// Divergences RSI (régulières), maintenues 10 bougies
+var float prevPLp = na
+var float prevPLr = na
+var float prevPHp = na
+var float prevPHr = na
+plP = ta.pivotlow(low, pivotLen, pivotLen)
+phP = ta.pivothigh(high, pivotLen, pivotLen)
+bullDiv = false
+bearDiv = false
+if not na(plP)
+    rAt = rsi[pivotLen]
+    if not na(prevPLp)
+        bullDiv := plP < prevPLp and rAt > prevPLr
+    prevPLp := plP
+    prevPLr := rAt
+if not na(phP)
+    rAt = rsi[pivotLen]
+    if not na(prevPHp)
+        bearDiv := phP > prevPHp and rAt < prevPHr
+    prevPHp := phP
+    prevPHr := rAt
+var int divState = 0
+var int divAge = 0
+if bullDiv
+    divState := 1
+    divAge := 0
+if bearDiv
+    divState := -1
+    divAge := 0
+divAge += 1
+if divAge > 10
+    divState := 0
+sDiv = divState
+
+momSum = sRsi + sMacd + sStoch + sCci + sWpr + sRoc + sAo + sDiv
+momScore = momSum / 8.0
+
+// ============================================================================
+// 4. FAMILLE VOLATILITÉ (régime + squeeze) — gating, %B mild directionnel
+// ============================================================================
+[bbMid, bbUp, bbLo] = ta.bb(close, 20, 2.0)
+[kcMid, kcUp, kcLo] = ta.kc(close, 20, 1.5, true)
+squeezeOn = bbUp < kcUp and bbLo > kcLo      // Bollinger dans Keltner = compression
+volOk = volRatio > 0.6 and volRatio < 2.5
+
+// ============================================================================
+// 5. FAMILLE VOLUME / FLUX
+// ============================================================================
+obvEma = ta.ema(ta.obv, 10)
+obvSlope = ta.change(obvEma)
+sObv = obvSlope > 0 ? 1.0 : obvSlope < 0 ? -1.0 : 0.0
+mfi = ta.mfi(hlc3, 14)
+sMfi = f_clamp((mfi - 50) / 25, -1.0, 1.0)
+mfMult = (high == low) ? 0.0 : ((close - low) - (high - close)) / (high - low)
+mfVol = mfMult * volume
+cmf = ta.sma(volume, 20) == 0 ? 0.0 : ta.sma(mfVol, 20) / ta.sma(volume, 20)
+sCmf = f_clamp(cmf * 3, -1.0, 1.0)
+volPart = volAvailable ? f_clamp((volume / volAvg - 1), -1.0, 1.0) : 0.0
+
+flowSum = volAvailable ? (sObv + sMfi + sCmf) : 0.0
+flowScore = volAvailable ? flowSum / 3.0 : 0.0
+
+// ============================================================================
+// 6. FAMILLE NIVEAUX / PRIX
+// ============================================================================
+sVwap = close > sessVwap ? 1.0 : close < sessVwap ? -1.0 : 0.0
+[pdh, pdl, pdc] = request.security(syminfo.tickerid, "D", [high[1], low[1], close[1]], lookahead=barmerge.lookahead_off)
+pivotP = (pdh + pdl + pdc) / 3
+sPivot = na(pivotP) ? 0.0 : close > pivotP ? 0.5 : -0.5
+sPdhl = na(pdh) ? 0.0 : close > pdh ? 1.0 : close < pdl ? -1.0 : 0.0
+nearestRound = math.round(close / roundStep) * roundStep
+roundDist = math.abs(close - nearestRound)
+nearRound = roundDist < atr * 0.15
+
+levelSum = sVwap + sPivot + sPdhl
+levelScore = levelSum / 3.0
+
+// ============================================================================
+// 7. FAMILLE STRUCTURE
+// ============================================================================
 var float lastPH = na
 var float lastPL = na
-if not na(ph)
-    lastPH := ph
-if not na(pl)
-    lastPL := pl
-// Cassure de structure : clôture au-dessus du dernier swing high (haussier) / sous le dernier swing low (baissier)
+if not na(phP)
+    lastPH := phP
+if not na(plP)
+    lastPL := plP
 bosUp   = not na(lastPH) and close > lastPH
 bosDown = not na(lastPL) and close < lastPL
-sStruct = bosUp ? 1.0 : bosDown ? -1.0 : 0.0
+sBos = bosUp ? 1.0 : bosDown ? -1.0 : 0.0
+// Séquence HH/HL vs LH/LL
+var float ph1 = na
+var float ph2 = na
+var float pl1 = na
+var float pl2 = na
+if not na(phP)
+    ph2 := ph1
+    ph1 := phP
+if not na(plP)
+    pl2 := pl1
+    pl1 := plP
+seqUp   = not na(ph2) and not na(pl2) and ph1 > ph2 and pl1 > pl2
+seqDown = not na(ph2) and not na(pl2) and ph1 < ph2 and pl1 < pl2
+sSeq = seqUp ? 1.0 : seqDown ? -1.0 : 0.0
+// Chandeliers
+body = math.abs(close - open)
+lowerWick = math.min(open, close) - low
+upperWick = high - math.max(open, close)
+bullEng = close > open and close[1] < open[1] and close >= open[1] and open <= close[1]
+bearEng = close < open and close[1] > open[1] and close <= open[1] and open >= close[1]
+hammer  = body > 0 and lowerWick > body * 2 and upperWick < body
+star    = body > 0 and upperWick > body * 2 and lowerWick < body
+sCandle = (bullEng or hammer) ? 1.0 : (bearEng or star) ? -1.0 : 0.0
+
+structSum = sBos + sSeq + sCandle
+structScore = structSum / 3.0
 
 // ============================================================================
-// 5. FACTEURS : MOMENTUM (RSI + MACD)
+// 8. FAMILLE INTER-MARCHÉS
 // ============================================================================
-sRsi = rsi > 55 ? 1.0 : rsi < 45 ? -1.0 : (rsi - 50.0) / 5.0        // pente douce entre 45-55
-sMacd = histLine > 0 and histLine > histLine[1] ? 1.0 : histLine < 0 and histLine < histLine[1] ? -1.0 : (histLine > 0 ? 0.5 : histLine < 0 ? -0.5 : 0.0)
-
-// ============================================================================
-// 6. FACTEUR : VWAP (biais intraday)
-// ============================================================================
-sVwap = close > sessionVwap ? 1.0 : close < sessionVwap ? -1.0 : 0.0
-
-// ============================================================================
-// 7. FACTEURS INTER-MARCHÉS : DXY & rendements (corrélation inverse)
-// ============================================================================
-f_slope(sym, len) =>
+f_roc(sym, len) =>
     px = request.security(sym, timeframe.period, close, lookahead=barmerge.lookahead_off)
-    na(px) ? na : (px - px[len]) / px[len]      // rate of change
+    r = na(px) ? na : (px - px[len]) / px[len]
+    [px, r]
 
-dxyRoc = useDXY ? f_slope(dxySym, interLen) : na
-// DXY en hausse => baissier pour l'or (signe inversé)
-sDxy = na(dxyRoc) ? 0.0 : dxyRoc > 0 ? -1.0 : dxyRoc < 0 ? 1.0 : 0.0
+[dxyPx, dxyRoc] = f_roc(dxySym, interLen)
+[yldPx, yldRoc] = f_roc(yieldSym, interLen)
+[agPx,  agRoc]  = f_roc(silverSym, interLen)
+[spxPx, spxRoc] = f_roc(spxSym, interLen)
 
-yieldRoc = useYields ? f_slope(yieldSym, interLen) : na
-// Rendements en hausse => baissier pour l'or (signe inversé)
-sYield = na(yieldRoc) ? 0.0 : yieldRoc > 0 ? -1.0 : yieldRoc < 0 ? 1.0 : 0.0
+sDxy    = useDXY    and not na(dxyRoc) ? (dxyRoc > 0 ? -1.0 : dxyRoc < 0 ? 1.0 : 0.0) : na   // inverse
+sYield  = useYields and not na(yldRoc) ? (yldRoc > 0 ? -1.0 : yldRoc < 0 ? 1.0 : 0.0) : na   // inverse
+sSilver = useSilver and not na(agRoc)  ? (agRoc  > 0 ?  1.0 : agRoc  < 0 ? -1.0 : 0.0) : na  // positive
+sSpx    = useSPX    and not na(spxRoc) ? (spxRoc > 0 ? -0.5 : spxRoc < 0 ? 0.5 : 0.0) : na   // risk-off léger pro-or
+
+interCnt = (useDXY ? 1 : 0) + (useYields ? 1 : 0) + (useSilver ? 1 : 0) + (useSPX ? 1 : 0)
+interRaw = (na(sDxy) ? 0.0 : sDxy) + (na(sYield) ? 0.0 : sYield) + (na(sSilver) ? 0.0 : sSilver) + (na(sSpx) ? 0.0 : sSpx)
+interScore = interCnt > 0 ? interRaw / interCnt : 0.0
+// Corrélation live or/DXY (doit être négative) → fiabilité inter-marchés
+corrDxy = useDXY and not na(dxyPx) ? ta.correlation(close, dxyPx, corrLen) : na
+corrStrength = na(corrDxy) ? 0.5 : f_clamp(-corrDxy, 0.0, 1.0)   // 1 = parfaitement inverse
 
 // ============================================================================
-// 8. SESSIONS & FENÊTRE NEWS
+// 9. SESSIONS & NEWS
 // ============================================================================
-inLondon = not na(time(timeframe.period, londonSess, sessTz))
-inNY     = not na(time(timeframe.period, nySess, sessTz))
+inLondon = not na(time(timeframe.period, londonSess, "UTC"))
+inNY     = not na(time(timeframe.period, nySess, "UTC"))
 inSession = (not useSessions) or inLondon or inNY
-overlapLDN_NY = inLondon and inNY      // meilleure liquidité de la journée
-
-// Blackout news : minutes UTC courantes vs cible
+overlap  = inLondon and inNY
 minsNow    = hour(time, "UTC") * 60 + minute(time, "UTC")
 minsTarget = newsHour * 60 + newsMin
-inNewsBlackout = useNews and math.abs(minsNow - minsTarget) <= newsPad
+inNews = useNews and math.abs(minsNow - minsTarget) <= newsPad
 
 // ============================================================================
-// 9. SCORE COMPOSITE → BIAIS & CONFIANCE
+// 10. COMPOSITE : BIAIS & CONFIANCE
 // ============================================================================
-// Contributions signées pondérées
-cHtf    = sHtf    * wHtf
-cRibbon = sRibbon * wRibbon
-cStruct = sStruct * wStruct
-cRsi    = sRsi    * wRsi
-cMacd   = sMacd   * wMacd
-cVwap   = sVwap   * wVwap
-cDxy    = sDxy    * (useDXY ? wDxy : 0.0)
-cYield  = sYield  * (useYields ? wYield : 0.0)
-
-rawScore = cHtf + cRibbon + cStruct + cRsi + cMacd + cVwap + cDxy + cYield
-maxScore = wHtf + wRibbon + wStruct + wRsi + wMacd + wVwap + (useDXY ? wDxy : 0.0) + (useYields ? wYield : 0.0)
-bias = maxScore > 0 ? math.round(rawScore / maxScore * 100) : 0     // -100..100
-
-// Accord entre facteurs (combien pointent dans le sens du biais)
+catScores = array.from(trendScore, momScore, flowScore, levelScore, structScore, interScore)
+catWeights = array.from(wTrend, wMom, (volAvailable ? wFlow : 0.0), wLevel, wStruct, (interCnt > 0 ? wInter : 0.0))
+rawScore = 0.0
+wTot = 0.0
+for i = 0 to 5
+    rawScore += array.get(catScores, i) * array.get(catWeights, i)
+    wTot += array.get(catWeights, i)
+bias = wTot > 0 ? math.round(rawScore / wTot * 100) : 0
 dirSign = bias > 0 ? 1 : bias < 0 ? -1 : 0
-agreeCount = 0
-agreeCount += math.sign(cHtf)    == dirSign and cHtf    != 0 ? 1 : 0
-agreeCount += math.sign(cRibbon) == dirSign and cRibbon != 0 ? 1 : 0
-agreeCount += math.sign(cStruct) == dirSign and cStruct != 0 ? 1 : 0
-agreeCount += math.sign(cRsi)    == dirSign and cRsi    != 0 ? 1 : 0
-agreeCount += math.sign(cMacd)   == dirSign and cMacd   != 0 ? 1 : 0
-agreeCount += math.sign(cVwap)   == dirSign and cVwap   != 0 ? 1 : 0
-agreeCount += (useDXY    and math.sign(cDxy)   == dirSign and cDxy   != 0) ? 1 : 0
-agreeCount += (useYields and math.sign(cYield) == dirSign and cYield != 0) ? 1 : 0
-activeFactors = 6 + (useDXY ? 1 : 0) + (useYields ? 1 : 0)
-agreeRatio = activeFactors > 0 ? agreeCount / activeFactors : 0.0
 
-// Gating : volatilité exploitable (ni morte, ni folle) + session active
-volOk   = volRatio > 0.7 and volRatio < 2.5
-sessMult = inSession ? (overlapLDN_NY ? 1.0 : 0.85) : 0.45
-volMult  = volOk ? 1.0 : (volRatio <= 0.7 ? 0.6 : 0.75)
+// Accord entre familles
+agree = 0
+activeCats = 0
+for i = 0 to 5
+    if array.get(catWeights, i) > 0
+        activeCats += 1
+        sc = array.get(catScores, i)
+        agree += (sc > 0 ? 1 : sc < 0 ? -1 : 0) == dirSign and sc != 0 ? 1 : 0
+agreeRatio = activeCats > 0 ? agree / activeCats : 0.0
 
-// Confiance = magnitude du biais × accord × gating (0..100)
-confidence = math.round(math.min(100, math.abs(bias) * (0.5 + 0.5 * agreeRatio) * sessMult * volMult))
+// Multiplicateurs de confiance
+sessMult  = inSession ? (overlap ? 1.0 : 0.85) : 0.45
+volMult   = volOk ? 1.0 : (volRatio <= 0.6 ? 0.6 : 0.75)
+adxMult   = adx > 25 ? 1.1 : adx < 18 ? 0.75 : 1.0
+partMult  = volAvailable ? f_clamp(0.85 + volPart * 0.3, 0.7, 1.15) : 1.0
+squeezeMult = squeezeOn ? 0.7 : 1.0
+roundMult = nearRound ? 0.85 : 1.0
+interMult = interCnt > 0 ? f_clamp(0.85 + corrStrength * 0.3, 0.85, 1.15) : 1.0
+
+confidence = math.round(f_clamp(math.abs(bias) * (0.5 + 0.5 * agreeRatio) * sessMult * volMult * adxMult * partMult * squeezeMult * roundMult * interMult, 0, 100))
 
 // ============================================================================
-// 10. GÉNÉRATION DES SIGNAUX
+// 11. SIGNAUX
 // ============================================================================
-canTrade = inSession and not inNewsBlackout and confidence >= minConfidence and volOk
+canTrade = inSession and not inNews and confidence >= minConfidence and volOk
 longSignal  = canTrade and bias >=  biasThreshold and bias[1] <  biasThreshold
 shortSignal = canTrade and bias <= -biasThreshold and bias[1] > -biasThreshold
 
-// SL/TP en ATR
 longSL  = close - atr * slMult
 longTP1 = close + atr * tp1Mult
 longTP2 = close + atr * tp2Mult
@@ -216,76 +352,67 @@ shortTP1 = close - atr * tp1Mult
 shortTP2 = close - atr * tp2Mult
 
 // ============================================================================
-// 11. AFFICHAGE
+// 12. AFFICHAGE
 // ============================================================================
-plot(showEmas ? emaFast  : na, "EMA rapide",  color=color.new(color.aqua, 0),   linewidth=1)
-plot(showEmas ? emaMid   : na, "EMA moyenne", color=color.new(color.orange, 0), linewidth=1)
-plot(showEmas ? emaSlow  : na, "EMA lente",   color=color.new(color.fuchsia, 0),linewidth=1)
-plot(showEmas ? emaTrend : na, "EMA de fond", color=color.new(color.gray, 0),   linewidth=2)
-plot(sessionVwap, "VWAP", color=color.new(color.yellow, 30), linewidth=1)
+plot(showEmas ? emaFast  : na, "EMA rapide",  color=color.new(color.aqua, 0))
+plot(showEmas ? emaMid   : na, "EMA moyenne", color=color.new(color.orange, 0))
+plot(showEmas ? emaSlow  : na, "EMA lente",   color=color.new(color.fuchsia, 0))
+plot(showEmas ? emaTrend : na, "EMA de fond", color=color.new(color.gray, 0), linewidth=2)
+plot(showEmas ? sessVwap : na, "VWAP", color=color.new(color.yellow, 30))
 
-plotshape(longSignal,  title="Achat",  style=shape.triangleup,   location=location.belowbar, color=color.new(color.lime, 0),  size=size.small, text="BUY")
-plotshape(shortSignal, title="Vente",  style=shape.triangledown, location=location.abovebar, color=color.new(color.red, 0),   size=size.small, text="SELL")
+plotshape(longSignal,  title="Achat", style=shape.triangleup,   location=location.belowbar, color=color.new(color.lime, 0), size=size.small, text="BUY")
+plotshape(shortSignal, title="Vente", style=shape.triangledown, location=location.abovebar, color=color.new(color.red, 0),  size=size.small, text="SELL")
 
-// Lignes de risque
 if showRisk and longSignal
     line.new(bar_index, longSL,  bar_index + 6, longSL,  color=color.red,   width=1)
     line.new(bar_index, longTP1, bar_index + 6, longTP1, color=color.green, width=1)
     line.new(bar_index, longTP2, bar_index + 6, longTP2, color=color.green, style=line.style_dashed, width=1)
-    label.new(bar_index + 6, longSL,  "SL " + str.tostring(longSL, format.mintick),  style=label.style_label_left, color=color.new(color.red,80),   textcolor=color.red,   size=size.tiny)
-    label.new(bar_index + 6, longTP1, "TP1 "+ str.tostring(longTP1, format.mintick), style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
-    label.new(bar_index + 6, longTP2, "TP2 "+ str.tostring(longTP2, format.mintick), style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
+    label.new(bar_index + 6, longSL,  "SL",  style=label.style_label_left, color=color.new(color.red,80),   textcolor=color.red,   size=size.tiny)
+    label.new(bar_index + 6, longTP2, "TP2", style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
 if showRisk and shortSignal
     line.new(bar_index, shortSL,  bar_index + 6, shortSL,  color=color.red,   width=1)
     line.new(bar_index, shortTP1, bar_index + 6, shortTP1, color=color.green, width=1)
     line.new(bar_index, shortTP2, bar_index + 6, shortTP2, color=color.green, style=line.style_dashed, width=1)
-    label.new(bar_index + 6, shortSL,  "SL " + str.tostring(shortSL, format.mintick),  style=label.style_label_left, color=color.new(color.red,80),   textcolor=color.red,   size=size.tiny)
-    label.new(bar_index + 6, shortTP1, "TP1 "+ str.tostring(shortTP1, format.mintick), style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
-    label.new(bar_index + 6, shortTP2, "TP2 "+ str.tostring(shortTP2, format.mintick), style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
-
-// ---- Tableau de bord ----
-f_cellDir(v) => v > 0 ? "▲" : v < 0 ? "▼" : "—"
-f_cellCol(v) => v > 0 ? color.new(color.green, 20) : v < 0 ? color.new(color.red, 20) : color.new(color.gray, 40)
+    label.new(bar_index + 6, shortSL,  "SL",  style=label.style_label_left, color=color.new(color.red,80),   textcolor=color.red,   size=size.tiny)
+    label.new(bar_index + 6, shortTP2, "TP2", style=label.style_label_left, color=color.new(color.green,80), textcolor=color.green, size=size.tiny)
 
 var table dash = table.new(position.top_right, 2, 12, border_width=1)
 if showTable and barstate.islast
     biasCol = bias > 0 ? color.new(color.green, 0) : bias < 0 ? color.new(color.red, 0) : color.gray
     reco = confidence < minConfidence ? "ATTENDRE" : bias >= biasThreshold ? "BIAIS ACHAT" : bias <= -biasThreshold ? "BIAIS VENTE" : "NEUTRE"
-    table.cell(dash, 0, 0, "GOLD SCALPER", text_color=color.white, bgcolor=color.new(color.black, 0), text_size=size.normal)
-    table.cell(dash, 1, 0, reco, text_color=color.white, bgcolor=biasCol, text_size=size.normal)
+    table.cell(dash, 0, 0, "GOLD SCALPER PRO", text_color=color.white, bgcolor=color.new(color.black, 0))
+    table.cell(dash, 1, 0, reco, text_color=color.white, bgcolor=biasCol)
     table.cell(dash, 0, 1, "Biais",      text_color=color.white)
-    table.cell(dash, 1, 1, str.tostring(bias) + " /100", text_color=color.white, bgcolor=f_cellCol(bias))
+    table.cell(dash, 1, 1, str.tostring(bias) + " /100", text_color=color.white, bgcolor=f_col(bias / 100.0))
     table.cell(dash, 0, 2, "Confiance",  text_color=color.white)
     table.cell(dash, 1, 2, str.tostring(confidence) + " %", text_color=color.white, bgcolor=confidence >= minConfidence ? color.new(color.green,20) : color.new(color.gray,40))
-    table.cell(dash, 0, 3, "Tendance HTF", text_color=color.white)
-    table.cell(dash, 1, 3, f_cellDir(sHtf), text_color=color.white, bgcolor=f_cellCol(sHtf))
-    table.cell(dash, 0, 4, "EMA align.",  text_color=color.white)
-    table.cell(dash, 1, 4, f_cellDir(sRibbon), text_color=color.white, bgcolor=f_cellCol(sRibbon))
-    table.cell(dash, 0, 5, "Structure",   text_color=color.white)
-    table.cell(dash, 1, 5, f_cellDir(sStruct), text_color=color.white, bgcolor=f_cellCol(sStruct))
-    table.cell(dash, 0, 6, "RSI/MACD",    text_color=color.white)
-    table.cell(dash, 1, 6, f_cellDir(sRsi) + " " + f_cellDir(sMacd), text_color=color.white, bgcolor=f_cellCol(sRsi + sMacd))
-    table.cell(dash, 0, 7, "VWAP",        text_color=color.white)
-    table.cell(dash, 1, 7, f_cellDir(sVwap), text_color=color.white, bgcolor=f_cellCol(sVwap))
-    table.cell(dash, 0, 8, "DXY (inv.)",  text_color=color.white)
-    table.cell(dash, 1, 8, useDXY ? f_cellDir(sDxy) : "off", text_color=color.white, bgcolor=f_cellCol(sDxy))
-    table.cell(dash, 0, 9, "10Y (inv.)",  text_color=color.white)
-    table.cell(dash, 1, 9, useYields ? f_cellDir(sYield) : "off", text_color=color.white, bgcolor=f_cellCol(sYield))
-    table.cell(dash, 0, 10, "Session",    text_color=color.white)
-    table.cell(dash, 1, 10, inSession ? (overlapLDN_NY ? "LDN×NY" : inLondon ? "Londres" : inNY ? "New York" : "active") : "hors sess.", text_color=color.white, bgcolor=inSession ? color.new(color.green,30) : color.new(color.gray,40))
-    table.cell(dash, 0, 11, "Volatilité", text_color=color.white)
-    table.cell(dash, 1, 11, str.tostring(volRatio, "0.00") + "× " + (inNewsBlackout ? "⛔NEWS" : volOk ? "ok" : "hors zone"), text_color=color.white, bgcolor=inNewsBlackout ? color.new(color.red,10) : volOk ? color.new(color.green,30) : color.new(color.orange,30))
+    table.cell(dash, 0, 3, "Tendance",   text_color=color.white)
+    table.cell(dash, 1, 3, f_dir(trendScore),  text_color=color.white, bgcolor=f_col(trendScore))
+    table.cell(dash, 0, 4, "Momentum",   text_color=color.white)
+    table.cell(dash, 1, 4, f_dir(momScore),    text_color=color.white, bgcolor=f_col(momScore))
+    table.cell(dash, 0, 5, "Volume/Flux",text_color=color.white)
+    table.cell(dash, 1, 5, volAvailable ? f_dir(flowScore) : "n/a", text_color=color.white, bgcolor=f_col(flowScore))
+    table.cell(dash, 0, 6, "Niveaux",    text_color=color.white)
+    table.cell(dash, 1, 6, f_dir(levelScore),  text_color=color.white, bgcolor=f_col(levelScore))
+    table.cell(dash, 0, 7, "Structure",  text_color=color.white)
+    table.cell(dash, 1, 7, f_dir(structScore), text_color=color.white, bgcolor=f_col(structScore))
+    table.cell(dash, 0, 8, "Inter-marchés", text_color=color.white)
+    table.cell(dash, 1, 8, interCnt > 0 ? f_dir(interScore) : "off", text_color=color.white, bgcolor=f_col(interScore))
+    table.cell(dash, 0, 9, "Session",    text_color=color.white)
+    table.cell(dash, 1, 9, inSession ? (overlap ? "LDN×NY" : inLondon ? "Londres" : inNY ? "New York" : "active") : "hors sess.", text_color=color.white, bgcolor=inSession ? color.new(color.green,30) : color.new(color.gray,40))
+    table.cell(dash, 0, 10, "Volatilité",text_color=color.white)
+    table.cell(dash, 1, 10, str.tostring(volRatio, "0.00") + "× " + (squeezeOn ? "squeeze" : volOk ? "ok" : "hors zone"), text_color=color.white, bgcolor=volOk and not squeezeOn ? color.new(color.green,30) : color.new(color.orange,30))
+    table.cell(dash, 0, 11, "Contexte",  text_color=color.white)
+    table.cell(dash, 1, 11, (inNews ? "⛔NEWS " : "") + (nearRound ? "rond " : "") + "ADX " + str.tostring(adx, "0"), text_color=color.white, bgcolor=inNews ? color.new(color.red,10) : color.new(color.gray,40))
 
-// Fond coloré léger selon le biais
 bgcolor(canTrade and bias >= biasThreshold ? color.new(color.green, 92) : canTrade and bias <= -biasThreshold ? color.new(color.red, 92) : na)
 
 // ============================================================================
-// 12. ALERTES
+// 13. ALERTES
 // ============================================================================
-alertcondition(longSignal,  title="🟢 Signal ACHAT (Gold Scalper)",  message="XAU ACHAT sur {{ticker}} {{interval}} — prix {{close}}")
-alertcondition(shortSignal, title="🔴 Signal VENTE (Gold Scalper)",  message="XAU VENTE sur {{ticker}} {{interval}} — prix {{close}}")
-alertcondition(longSignal or shortSignal, title="⚪ Tout signal (Gold Scalper)", message="Nouveau signal Gold Scalper sur {{ticker}} — {{interval}}")
+alertcondition(longSignal,  title="🟢 ACHAT (Gold Scalper Pro)", message="XAU ACHAT sur {{ticker}} {{interval}} — prix {{close}}")
+alertcondition(shortSignal, title="🔴 VENTE (Gold Scalper Pro)", message="XAU VENTE sur {{ticker}} {{interval}} — prix {{close}}")
+alertcondition(longSignal or shortSignal, title="⚪ Tout signal (Gold Scalper Pro)", message="Signal Gold Scalper Pro sur {{ticker}} — {{interval}}")
 
-// Plot invisible du biais pour le référencer dans les messages d'alerte
 plot(bias, "Biais", display=display.data_window)
 plot(confidence, "Confiance", display=display.data_window)
