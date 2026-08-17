@@ -6,6 +6,7 @@ Deux scripts TradingView pour le **scalping de l'or** :
 |---|---|
 | [`gold_scalper.pine`](./gold_scalper.pine) | **Indicateur** : biais -100…+100, confiance 0…100 %, signaux, tableau de bord, alertes. |
 | [`gold_scalper_strategy.pine`](./gold_scalper_strategy.pine) | **Stratégie** : même moteur, exécutée en trades pour le **backtest** (win-rate, profit factor, drawdown). |
+| [`optimize/`](./optimize/) | **Optimiseur Python** : reproduit le moteur, backteste sur vraies données et cherche les **poids des familles** qui tiennent hors échantillon (walk-forward + ablation). |
 
 Le moteur calcule **tout ce que les maths peuvent tirer du prix, du volume et
 des marchés liés**, regroupé en **6 familles**, et le condense en un biais
